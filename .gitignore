@@ -38,3 +38,5 @@ media/
 
 # Django migrations cache
 **/__pycache__/
+
+*.sqlite*
