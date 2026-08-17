@@ -1,0 +1,32 @@
+<section class="recommendation-performance-card" id="recommendationPerformanceSection">
+<div class="performance-head">
+<div>
+<div class="section-eyebrow">RECOMMENDATION PERFORMANCE</div>
+<h2 class="performance-title">عملکرد موتور پیشنهاددهی</h2>
+<p class="performance-subtitle">این بخش نشان می‌دهد پیشنهادهای ارائه‌شده برای این مشتری تا چه اندازه به خرید و درآمد منجر شده‌اند.</p>
+</div>
+<button class="performance-refresh" id="refreshRecommendationPerformance" type="button">↻ بروزرسانی</button>
+</div>
+<div class="performance-summary" id="performanceSummary">
+<div class="performance-stat"><div class="performance-stat-label">پیشنهاد ارائه‌شده</div><div class="performance-stat-value" id="performancePresented">—</div></div>
+<div class="performance-stat success"><div class="performance-stat-label">خرید</div><div class="performance-stat-value" id="performancePurchased">—</div></div>
+<div class="performance-stat warning"><div class="performance-stat-label">علاقه‌مند</div><div class="performance-stat-value" id="performanceInterested">—</div></div>
+<div class="performance-stat info"><div class="performance-stat-label">درآمد</div><div class="performance-stat-value" id="performanceRevenue">—</div></div>
+<div class="performance-stat"><div class="performance-stat-label">نرخ تبدیل</div><div class="performance-stat-value" id="performanceConversion">—</div></div>
+<div class="performance-stat"><div class="performance-stat-label">نرخ علاقه‌مندی</div><div class="performance-stat-value" id="performanceInterestRate">—</div></div>
+</div>
+<div class="performance-loading" id="performanceLoading">در حال دریافت عملکرد پیشنهادها...</div>
+<div class="performance-error" id="performanceError"></div>
+<div class="performance-empty" id="performanceEmpty">هنوز داده‌ای برای عملکرد پیشنهادهای این مشتری ثبت نشده است.</div>
+<div class="performance-table-wrap" id="performanceTableWrap" style="display:none">
+<table class="performance-table">
+<thead>
+<tr>
+<th>نوع پیشنهاد</th><th>ارائه‌شده</th><th>خرید</th><th>علاقه‌مند</th><th>رد شده</th><th>پیگیری</th><th>درآمد</th><th>میانگین فروش</th><th>نرخ تبدیل</th><th>نرخ علاقه‌مندی</th>
+</tr>
+</thead>
+<tbody id="performanceTableBody"></tbody>
+</table>
+</div>
+<div class="performance-note">🧠 <strong>Learning Loop:</strong> این شاخص‌ها مستقیماً از نتایج واقعی جلسات فروش به دست می‌آیند و در مراحل بعد می‌توانند برای ارزیابی و بهبود Recommendation Engine استفاده شوند.</div>
+</section>

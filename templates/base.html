@@ -1,0 +1,250 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}
+            Sales AI Copilot
+        {% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/app.css' %}"
+    >
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                ✦
+            </div>
+
+            <div>
+                <div class="brand-name">
+                    Sales AI
+                </div>
+
+                <div class="brand-subtitle">
+                    COPILOT
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <div class="sidebar-label">
+                WORKSPACE
+            </div>
+
+            <nav class="sidebar-nav">
+
+                <a
+                    href="#"
+                    class="nav-item active"
+                >
+                    <span class="nav-icon">⌂</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <a
+                    href="#"
+                    class="nav-item"
+                >
+                    <span class="nav-icon">◉</span>
+                    <span>Customers</span>
+                </a>
+
+                <a
+                    href="#"
+                    class="nav-item"
+                >
+                    <span class="nav-icon">◷</span>
+                    <span>Visits</span>
+                </a>
+
+                <a
+                    href="#"
+                    class="nav-item"
+                >
+                    <span class="nav-icon">✦</span>
+                    <span>AI Insights</span>
+                </a>
+
+                <a
+                    href="#"
+                    class="nav-item"
+                >
+                    <span class="nav-icon">◇</span>
+                    <span>Recommendations</span>
+                </a>
+
+                <a
+                    href="#"
+                    class="nav-item"
+                >
+                    <span class="nav-icon">%</span>
+                    <span>Promotions</span>
+                </a>
+
+            </nav>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <div class="sidebar-label">
+                SYSTEM
+            </div>
+
+            <nav class="sidebar-nav">
+
+                <a
+                    href="#"
+                    class="nav-item"
+                >
+                    <span class="nav-icon">⚙</span>
+                    <span>Settings</span>
+                </a>
+
+            </nav>
+
+        </div>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="ai-status">
+
+                <span class="status-dot"></span>
+
+                <div>
+                    <div class="status-title">
+                        AI Engine Online
+                    </div>
+
+                    <div class="status-subtitle">
+                        Recommendation Engine v1.0
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================
+         MAIN
+    ========================== -->
+
+    <main class="main-content">
+
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <div class="breadcrumb">
+                    Sales AI Copilot
+                    <span>/</span>
+                    {% block breadcrumb %}
+                        Dashboard
+                    {% endblock %}
+                </div>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <button
+                    class="topbar-button"
+                    type="button"
+                >
+                    ⌕
+                </button>
+
+                <button
+                    class="topbar-button notification-button"
+                    type="button"
+                >
+                    ♢
+                    <span class="notification-dot"></span>
+                </button>
+
+
+                <div class="user-profile">
+
+                    <div class="avatar">
+                        MB
+                    </div>
+
+                    <div class="user-info">
+
+                        <div class="user-name">
+                            Sales Manager
+                        </div>
+
+                        <div class="user-role">
+                            Sales Representative
+                        </div>
+
+                    </div>
+
+                    <span class="user-arrow">
+                        ▾
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- PAGE CONTENT -->
+
+        <section class="page-content">
+
+            {% block content %}
+            {% endblock %}
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

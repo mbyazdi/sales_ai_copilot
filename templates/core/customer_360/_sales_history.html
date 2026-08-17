@@ -1,0 +1,182 @@
+<section class="sales-history-section" id="customerSalesHistory">
+
+    <div class="sales-history-header">
+
+        <div>
+            <div class="section-eyebrow">
+                SALES CONTEXT
+            </div>
+
+            <h2 class="sales-history-title">
+                تاریخچه خرید مشتری
+            </h2>
+
+            <p class="sales-history-subtitle">
+                بررسی سفارش‌ها و محصولات خریداری‌شده توسط مشتری
+            </p>
+        </div>
+
+        <div class="sales-history-summary-badge">
+            {{ sales_history.summary.total_orders }}
+            سفارش
+        </div>
+
+    </div>
+
+
+    {% if sales_history and sales_history.sales %}
+
+        <div class="sales-history-list">
+
+            {% for sale in sales_history.sales %}
+
+                <article class="sale-history-card">
+
+                    <!-- ===============================
+                         SALE HEADER
+                    ================================= -->
+
+                    <div class="sale-history-card-head">
+
+                        <div class="sale-history-date">
+
+                            <div class="sale-history-date-icon">
+                                🧾
+                            </div>
+
+                            <div>
+
+                                <div class="sale-history-invoice">
+                                    {{ sale.invoice_number }}
+                                </div>
+
+                                <div class="sale-history-date-value">
+                                    {{ sale.sale_date|date:"Y/m/d" }}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="sale-history-amount">
+
+                            <span class="sale-history-amount-label">
+                                مبلغ سفارش
+                            </span>
+
+                            <strong>
+                                {{ sale.total_amount|floatformat:0 }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ===============================
+                         PRODUCTS
+                    ================================= -->
+
+                    <div class="sale-history-products">
+
+                        {% for item in sale.items %}
+
+                            <div class="sale-history-product">
+
+                                <div class="sale-history-product-main">
+
+                                    <div class="sale-history-product-name">
+                                        {{ item.product_name }}
+                                    </div>
+
+                                    <div class="sale-history-product-meta">
+
+                                        <span>
+                                            {{ item.product_code }}
+                                        </span>
+
+                                        {% if item.category %}
+                                            <span>•</span>
+                                            <span>
+                                                {{ item.category }}
+                                            </span>
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="sale-history-product-quantity">
+
+                                    <span>
+                                        تعداد
+                                    </span>
+
+                                    <strong>
+                                        {{ item.quantity }}
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="sale-history-product-total">
+
+                                    <span>
+                                        مبلغ
+                                    </span>
+
+                                    <strong>
+                                        {{ item.total_amount|floatformat:0 }}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- ===============================
+                         DESCRIPTION
+                    ================================= -->
+
+                    {% if sale.description %}
+
+                        <div class="sale-history-description">
+                            {{ sale.description }}
+                        </div>
+
+                    {% endif %}
+
+                </article>
+
+            {% endfor %}
+
+        </div>
+
+
+    {% else %}
+
+        <div class="sales-history-empty">
+
+            <div class="sales-history-empty-icon">
+                🛒
+            </div>
+
+            <h3>
+                هنوز سابقه خریدی ثبت نشده است
+            </h3>
+
+            <p>
+                برای این مشتری هنوز سفارش ثبت‌شده‌ای در سیستم وجود ندارد.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</section>

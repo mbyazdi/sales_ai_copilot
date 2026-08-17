@@ -1,0 +1,30 @@
+<section class="kpi-grid">
+<div class="kpi-card">
+<div class="kpi-icon">💰</div>
+<div class="kpi-label">مجموع فروش</div>
+<div class="kpi-value">
+                {{ customer_360.total_sales_amount|floatformat:0 }}
+            </div>
+</div>
+<div class="kpi-card">
+<div class="kpi-icon">🧾</div>
+<div class="kpi-label">تعداد سفارش</div>
+<div class="kpi-value">
+                {{ customer_360.total_orders }}
+            </div>
+</div>
+<div class="kpi-card">
+<div class="kpi-icon">📦</div>
+<div class="kpi-label">تعداد کالا</div>
+<div class="kpi-value">
+                {{ customer_360.total_items }}
+            </div>
+</div>
+<div class="kpi-card">
+<div class="kpi-icon">📊</div>
+<div class="kpi-label">میانگین ارزش سفارش</div>
+<div class="kpi-value">
+                {{ customer_360.average_order_value|floatformat:0 }}
+            </div>
+</div>
+</section>

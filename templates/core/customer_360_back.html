@@ -1,0 +1,3453 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales AI Copilot</title>
+
+    <style>
+        :root {
+            --bg: #f4f6fb;
+            --surface: #ffffff;
+            --surface-soft: #f8f9fd;
+            --text: #172033;
+            --muted: #727b91;
+            --border: #e6e9f2;
+
+            --primary: #5146e5;
+            --primary-dark: #3931a8;
+            --primary-soft: #eeecff;
+
+            --ai: #6d4aff;
+            --ai-soft: #f1edff;
+
+            --success: #0f9f76;
+            --success-soft: #e9faf4;
+
+            --warning: #c27a00;
+            --warning-soft: #fff6df;
+
+            --danger: #c2415a;
+            --danger-soft: #fff0f3;
+
+            --shadow-sm: 0 5px 18px rgba(32, 42, 82, .055);
+            --shadow-md: 0 14px 36px rgba(32, 42, 82, .085);
+            --shadow-lg: 0 22px 55px rgba(45, 38, 150, .16);
+
+            --radius-sm: 12px;
+            --radius-md: 18px;
+            --radius-lg: 24px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            background:
+                radial-gradient(circle at 88% 0%, rgba(108, 92, 231, .10), transparent 25%),
+                linear-gradient(180deg, #f7f8fd 0%, var(--bg) 100%);
+            color: var(--text);
+            font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        .page {
+            width: min(1500px, calc(100% - 40px));
+            margin: 0 auto;
+            padding: 28px 0 60px;
+        }
+
+        /* =========================================================
+           SEARCH
+        ========================================================= */
+
+        .search-bar {
+            display: flex;
+            gap: 12px;
+            align-items: stretch;
+            background: rgba(255,255,255,.92);
+            border: 1px solid rgba(226,229,240,.95);
+            border-radius: 20px;
+            padding: 9px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 0;
+            border: 1px solid var(--border);
+            background: #fff;
+            border-radius: 14px;
+            padding: 13px 17px;
+            color: var(--text);
+            outline: none;
+            transition: .2s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(81,70,229,.08);
+        }
+
+        .search-button {
+            border: 0;
+            min-width: 180px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #5146e5, #6558ef);
+            color: #fff;
+            font-weight: 800;
+            cursor: pointer;
+            padding: 0 24px;
+            box-shadow: 0 8px 18px rgba(81,70,229,.20);
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .search-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 24px rgba(81,70,229,.25);
+        }
+
+        /* =========================================================
+           CUSTOMER HERO
+        ========================================================= */
+
+        .customer-hero {
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 30px;
+            min-height: 180px;
+            padding: 28px 32px;
+            border-radius: 26px;
+            color: #fff;
+            background:
+                radial-gradient(circle at 0% 100%, rgba(255,255,255,.13), transparent 20%),
+                linear-gradient(135deg, #30288f 0%, #5146e5 58%, #5d50eb 100%);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 22px;
+        }
+
+        .customer-hero::after {
+            content: "";
+            position: absolute;
+            width: 240px;
+            height: 240px;
+            left: -90px;
+            bottom: -160px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.07);
+        }
+
+        .customer-identity {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            min-width: 0;
+        }
+
+        .customer-avatar {
+            flex: 0 0 auto;
+            width: 76px;
+            height: 76px;
+            display: grid;
+            place-items: center;
+            border-radius: 22px;
+            background: rgba(255,255,255,.16);
+            border: 1px solid rgba(255,255,255,.20);
+            font-size: 32px;
+            font-weight: 800;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.18);
+        }
+
+        .customer-info {
+            min-width: 0;
+        }
+
+        .eyebrow {
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+            opacity: .72;
+            margin-bottom: 4px;
+        }
+
+        .customer-name {
+            font-size: clamp(22px, 2.2vw, 30px);
+            font-weight: 850;
+            line-height: 1.25;
+            margin-bottom: 4px;
+        }
+
+        .customer-code {
+            color: rgba(255,255,255,.72);
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .customer-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: rgba(255,255,255,.13);
+            border: 1px solid rgba(255,255,255,.10);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .tag.grade {
+            background: #ffbf1a;
+            border-color: #ffbf1a;
+            color: #4c3900;
+            font-weight: 800;
+        }
+
+        .last-purchase {
+            position: relative;
+            z-index: 1;
+            min-width: 165px;
+            text-align: center;
+            padding: 18px 22px;
+            border-radius: 20px;
+            background: rgba(255,255,255,.12);
+            border: 1px solid rgba(255,255,255,.12);
+            backdrop-filter: blur(8px);
+        }
+
+        .last-purchase-label {
+            font-size: 11px;
+            opacity: .72;
+            margin-bottom: 2px;
+        }
+
+        .last-purchase-value {
+            font-size: 36px;
+            line-height: 1;
+            font-weight: 900;
+            margin: 5px 0;
+        }
+
+        .last-purchase-unit {
+            font-size: 11px;
+            opacity: .72;
+        }
+
+        /* =========================================================
+           AI RECOMMENDATION HERO
+        ========================================================= */
+
+        .recommendations-hero {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 22px;
+        }
+
+        .section-head {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 22px;
+        }
+
+        .section-head-main {
+            min-width: 0;
+        }
+
+        .section-eyebrow {
+            color: var(--ai);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            margin-bottom: 5px;
+        }
+
+        .section-title {
+            margin: 0;
+            font-size: clamp(22px, 2vw, 29px);
+            line-height: 1.25;
+            font-weight: 900;
+        }
+
+        .section-description {
+            color: var(--muted);
+            margin: 6px 0 0;
+            font-size: 13px;
+        }
+
+        .count-badge {
+            flex: 0 0 auto;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--primary-soft);
+            color: var(--primary-dark);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .primary-recommendation {
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 25px;
+            padding: 26px;
+            border-radius: 22px;
+            background:
+                radial-gradient(circle at 100% 0%, rgba(255,255,255,.16), transparent 30%),
+                linear-gradient(135deg, #4136c4, #6253ed);
+            color: #fff;
+            box-shadow: 0 18px 38px rgba(81,70,229,.20);
+        }
+
+        .primary-recommendation::after {
+            content: "";
+            position: absolute;
+            width: 210px;
+            height: 210px;
+            left: -110px;
+            bottom: -140px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.06);
+        }
+
+        .primary-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .primary-label {
+            font-size: 11px;
+            font-weight: 800;
+            opacity: .72;
+            margin-bottom: 8px;
+        }
+
+        .primary-product-name {
+            font-size: clamp(22px, 2.2vw, 31px);
+            font-weight: 900;
+            line-height: 1.3;
+            margin-bottom: 5px;
+        }
+
+        .primary-product-code {
+            font-size: 12px;
+            opacity: .72;
+            margin-bottom: 15px;
+        }
+
+        .primary-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .primary-pill {
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(255,255,255,.13);
+            border: 1px solid rgba(255,255,255,.10);
+            font-size: 11px;
+        }
+
+        .primary-reason {
+            max-width: 780px;
+            padding: 15px 17px;
+            border-radius: 15px;
+            background: rgba(255,255,255,.09);
+            border: 1px solid rgba(255,255,255,.10);
+            line-height: 1.95;
+            font-size: 13px;
+        }
+
+        .primary-score {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 180px;
+            padding: 22px;
+            border-radius: 20px;
+            background: rgba(255,255,255,.10);
+            border: 1px solid rgba(255,255,255,.12);
+        }
+
+        .score-caption {
+            font-size: 12px;
+            opacity: .72;
+        }
+
+        .score-number {
+            font-size: 62px;
+            font-weight: 950;
+            line-height: 1;
+            margin: 8px 0;
+        }
+
+        .score-label {
+            font-size: 11px;
+            opacity: .72;
+        }
+
+        .alternative-label {
+            margin: 24px 0 12px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .alternative-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0,1fr));
+            gap: 14px;
+        }
+
+        .alternative-card {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 13px;
+            padding: 16px;
+            background: var(--surface-soft);
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            transition: .2s ease;
+        }
+
+        .alternative-card:hover {
+            transform: translateY(-2px);
+            border-color: #cfd2f8;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .alternative-rank {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            background: var(--primary-soft);
+            color: var(--primary);
+            font-weight: 900;
+        }
+
+        .alternative-name {
+            font-weight: 800;
+            font-size: 14px;
+        }
+
+        .alternative-code {
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+        .alternative-score {
+            color: var(--primary);
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        /* =========================================================
+           KPI
+        ========================================================= */
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0,1fr));
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        .kpi-card {
+            position: relative;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 19px;
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+            opacity: .85;
+        }
+
+        .kpi-icon {
+            width: 40px;
+            height: 40px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: var(--primary-soft);
+            font-size: 19px;
+            margin-bottom: 13px;
+        }
+
+        .kpi-label {
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+
+        .kpi-value {
+            font-size: 27px;
+            line-height: 1.2;
+            font-weight: 900;
+            color: #111827;
+        }
+
+        /* =========================================================
+           WORKSPACE GRID
+        ========================================================= */
+
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
+            gap: 20px;
+            margin-bottom: 20px;
+            align-items: start;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            box-shadow: var(--shadow-sm);
+            padding: 24px;
+        }
+
+        .card.ai-card {
+            background:
+                linear-gradient(145deg, #f7f5ff 0%, #ffffff 55%);
+            border-color: #ddd9ff;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card-heading {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .heading-icon {
+            width: 46px;
+            height: 46px;
+            flex: 0 0 auto;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #5146e5, #735df4);
+            color: #fff;
+            box-shadow: 0 9px 20px rgba(81,70,229,.18);
+            font-size: 21px;
+        }
+
+        .card-title {
+            margin: 0;
+            font-size: 20px;
+            line-height: 1.3;
+            font-weight: 900;
+        }
+
+        .card-subtitle {
+            margin-top: 3px;
+            color: var(--ai);
+            font-size: 10px;
+            letter-spacing: 1.1px;
+            font-weight: 900;
+        }
+
+        .ai-content {
+            background: #fff;
+            border: 1px solid #eeeef6;
+            border-radius: 17px;
+            padding: 20px;
+            font-size: 13px;
+            line-height: 2.1;
+        }
+
+        .ai-content p {
+            margin: 8px 0;
+        }
+
+        .ai-action {
+            margin-top: 14px;
+            padding: 17px 19px;
+            border-radius: 16px;
+            color: #fff;
+            background: linear-gradient(135deg, #5146e5, #624fe9);
+            font-weight: 800;
+            line-height: 1.9;
+        }
+
+        /* =========================================================
+           MEETING COPILOT
+        ========================================================= */
+
+        .meeting-card {
+            position: relative;
+            overflow: hidden;
+            background:
+                linear-gradient(145deg, #ffffff, #f7f5ff);
+            border-color: #dcd8ff;
+        }
+
+        .meeting-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(180deg, #5146e5, #8b5cf6);
+        }
+
+        .meeting-block {
+            border: 1px solid #ececf5;
+            background: #fff;
+            border-radius: 16px;
+            padding: 16px 18px;
+            margin-bottom: 12px;
+        }
+
+        .meeting-block.opportunity {
+            background: var(--warning-soft);
+            border-color: #f8dfaa;
+        }
+
+        .meeting-label {
+            font-size: 12px;
+            font-weight: 900;
+            color: #4b5063;
+            margin-bottom: 6px;
+        }
+
+        .meeting-text {
+            color: #34384b;
+            font-size: 13px;
+            line-height: 2;
+        }
+
+        .meeting-product {
+            margin: 15px 0;
+            padding: 21px;
+            border-radius: 18px;
+            color: #fff;
+            background: linear-gradient(135deg, #5146e5, #6a50ee);
+            box-shadow: 0 14px 28px rgba(81,70,229,.18);
+        }
+
+        .meeting-product-label {
+            opacity: .72;
+            font-size: 11px;
+            margin-bottom: 6px;
+        }
+
+        .meeting-product-name {
+            font-size: 22px;
+            font-weight: 900;
+            line-height: 1.35;
+        }
+
+        .meeting-product-code {
+            opacity: .72;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .meeting-score {
+            margin-top: 13px;
+            font-size: 11px;
+            opacity: .8;
+        }
+
+        .meeting-score strong {
+            font-size: 22px;
+            margin-right: 4px;
+        }
+
+        .talking-point {
+            padding: 18px;
+            border-radius: 17px;
+            background: var(--success-soft);
+            border: 1px solid #c9efdf;
+        }
+
+        .talking-label {
+            color: #087f5b;
+            font-size: 12px;
+            font-weight: 900;
+            margin-bottom: 7px;
+        }
+
+        .talking-text {
+            color: #145c48;
+            font-size: 13px;
+            line-height: 2;
+            font-weight: 700;
+        }
+
+        /* =========================================================
+           LOWER GRID
+        ========================================================= */
+
+        .lower-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0,1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .rfm-score {
+            text-align: center;
+            font-size: 58px;
+            line-height: 1;
+            color: var(--primary);
+            font-weight: 950;
+            margin: 10px 0;
+        }
+
+        .segment-wrap {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .segment {
+            display: inline-flex;
+            padding: 7px 16px;
+            border-radius: 999px;
+            background: var(--success-soft);
+            color: var(--success);
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .score-row {
+            display: grid;
+            grid-template-columns: 90px 25px 1fr;
+            align-items: center;
+            gap: 10px;
+            margin: 16px 0;
+            font-size: 12px;
+        }
+
+        .score-row strong {
+            text-align: center;
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 99px;
+            overflow: hidden;
+            background: #e9eaf0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #6058ef, #8b55df);
+        }
+
+        .sales-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0,1fr));
+            gap: 14px;
+        }
+
+        .sales-box {
+            background: var(--surface-soft);
+            border: 1px solid #edf0f6;
+            border-radius: 16px;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .sales-label {
+            color: var(--muted);
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .sales-value {
+            font-size: 21px;
+            font-weight: 900;
+        }
+
+        /* =========================================================
+           SUMMARY
+        ========================================================= */
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .details {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0,1fr));
+            gap: 12px;
+        }
+
+        .detail {
+            background: var(--surface-soft);
+            border: 1px solid #edf0f6;
+            border-radius: 15px;
+            padding: 15px;
+        }
+
+        .detail-label {
+            color: var(--muted);
+            font-size: 10px;
+            margin-bottom: 3px;
+        }
+
+        .detail-value {
+            font-size: 13px;
+            font-weight: 800;
+            word-break: break-word;
+        }
+
+        .recommendation-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .recommendation-row {
+            display: grid;
+            grid-template-columns: 38px 1fr auto auto;
+            gap: 12px;
+            align-items: center;
+            padding: 12px 13px;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            background: #fff;
+        }
+
+        .recommendation-row-rank {
+            width: 36px;
+            height: 36px;
+            display: grid;
+            place-items: center;
+            border-radius: 11px;
+            background: var(--primary-soft);
+            color: var(--primary);
+            font-weight: 900;
+        }
+
+        .recommendation-row-name {
+            font-size: 13px;
+            font-weight: 850;
+        }
+
+        .recommendation-row-code {
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .recommendation-row-type {
+            padding: 5px 9px;
+            border-radius: 9px;
+            background: #f2f3f7;
+            color: #555b6e;
+            font-size: 10px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .recommendation-row-score {
+            color: var(--primary);
+            font-size: 19px;
+            font-weight: 950;
+        }
+
+        /* =========================================================
+           EMPTY / NOT FOUND
+        ========================================================= */
+
+        .not-found {
+            padding: 18px;
+            border-radius: 16px;
+            text-align: center;
+            background: var(--danger-soft);
+            border: 1px solid #ffd6df;
+            color: var(--danger);
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+
+        /* =========================================================
+           AI EXPLAINABILITY + SALES OUTCOME LOOP
+        ========================================================= */
+        .explainability-section { margin-top: 24px; }
+        .explainability-grid { display:grid; grid-template-columns: 1.15fr .85fr; gap:20px; }
+        .why-ai-card, .outcome-card {
+            background:rgba(255,255,255,.96); border:1px solid var(--border); border-radius:24px;
+            box-shadow:var(--shadow-md); padding:26px; position:relative; overflow:hidden;
+        }
+        .why-ai-card::before { content:""; position:absolute; inset:0 auto 0 0; width:5px; background:linear-gradient(180deg,#5146e5,#7b61ff); }
+        .outcome-card::before { content:""; position:absolute; inset:0 auto 0 0; width:5px; background:linear-gradient(180deg,#0f9f76,#4cc9a1); }
+        .ai-card-head { display:flex; justify-content:space-between; align-items:flex-start; gap:18px; margin-bottom:22px; }
+        .ai-card-title { margin:0; font-size:25px; font-weight:900; }
+        .ai-card-subtitle { color:var(--muted); font-size:13px; margin-top:4px; }
+        .confidence-badge { background:var(--success-soft); color:var(--success); border:1px solid #c9f0e3; padding:8px 12px; border-radius:999px; font-weight:800; white-space:nowrap; }
+        .confidence-value { font-size:18px; margin-right:4px; }
+        .reason-list { display:grid; gap:10px; }
+        .reason-item { display:grid; grid-template-columns:32px 1fr auto; align-items:center; gap:10px; background:var(--surface-soft); border:1px solid #edf0f6; border-radius:14px; padding:12px 14px; }
+        .reason-icon { width:28px; height:28px; border-radius:9px; display:grid; place-items:center; background:var(--success-soft); color:var(--success); font-weight:900; }
+        .reason-text strong { display:block; font-size:14px; }
+        .reason-text span { color:var(--muted); font-size:12px; }
+        .reason-weight { font-size:12px; color:var(--primary); font-weight:900; background:var(--primary-soft); padding:5px 8px; border-radius:8px; }
+        .alternative-insight { margin-top:16px; padding:14px 16px; border-radius:14px; background:#faf9ff; border:1px dashed #d8d2ff; }
+        .alternative-insight-title { font-weight:900; margin-bottom:7px; }
+        .alternative-insight-text { color:var(--muted); font-size:13px; }
+        .outcome-intro { color:var(--muted); font-size:13px; margin-bottom:18px; }
+        .outcome-product { background:linear-gradient(135deg,#f7fffc,#effaf6); border:1px solid #d8f1e8; border-radius:16px; padding:15px; margin-bottom:18px; }
+        .outcome-product-label { color:var(--success); font-size:11px; font-weight:900; letter-spacing:.5px; }
+        .outcome-product-name { font-size:20px; font-weight:900; margin-top:3px; }
+        .outcome-product-code { color:var(--muted); font-size:12px; }
+        .outcome-buttons { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+        .outcome-btn { border:1px solid var(--border); background:white; border-radius:14px; padding:13px 10px; cursor:pointer; font-weight:800; color:var(--text); transition:.2s ease; }
+        .outcome-btn:hover { transform:translateY(-2px); box-shadow:var(--shadow-sm); border-color:#cfc9ff; }
+        .outcome-btn.active { background:var(--primary); color:white; border-color:var(--primary); box-shadow:0 8px 20px rgba(81,70,229,.22); }
+        .outcome-status { margin-top:14px; padding:12px 14px; background:var(--surface-soft); border-radius:12px; color:var(--muted); font-size:13px; min-height:44px; }
+        .learning-loop { margin-top:16px; display:flex; align-items:center; gap:10px; color:var(--success); font-size:12px; font-weight:800; }
+        .learning-dot { width:8px; height:8px; border-radius:50%; background:var(--success); box-shadow:0 0 0 5px rgba(15,159,118,.10); }
+        @media (max-width: 1050px) { .explainability-grid { grid-template-columns:1fr; } }
+        @media (max-width: 600px) { .outcome-buttons { grid-template-columns:1fr; } .ai-card-head { flex-direction:column; } }
+
+        /* =========================================================
+           RESPONSIVE
+        ========================================================= */
+
+        @media (max-width: 1100px) {
+            .primary-recommendation {
+                grid-template-columns: 1fr;
+            }
+
+            .primary-score {
+                min-height: 130px;
+            }
+
+            .workspace-grid,
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 850px) {
+            .page {
+                width: min(100% - 24px, 1500px);
+                padding-top: 14px;
+            }
+
+            .customer-hero {
+                grid-template-columns: 1fr;
+            }
+
+            .last-purchase {
+                width: 100%;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(2, minmax(0,1fr));
+            }
+
+            .alternative-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .details {
+                grid-template-columns: repeat(2, minmax(0,1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            .search-bar {
+                flex-direction: column;
+            }
+
+            .search-button {
+                min-height: 46px;
+            }
+
+            .customer-hero,
+            .recommendations-hero,
+            .card {
+                padding: 18px;
+            }
+
+            .customer-identity {
+                align-items: flex-start;
+            }
+
+            .customer-avatar {
+                width: 58px;
+                height: 58px;
+                border-radius: 17px;
+            }
+
+            .customer-name {
+                font-size: 21px;
+            }
+
+            .kpi-grid,
+            .sales-grid,
+            .details {
+                grid-template-columns: 1fr;
+            }
+
+            .section-head {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .primary-recommendation {
+                padding: 19px;
+            }
+
+            .recommendation-row {
+                grid-template-columns: 36px 1fr auto;
+            }
+
+            .recommendation-row-type {
+                display: none;
+            }
+
+            .score-row {
+                grid-template-columns: 75px 22px 1fr;
+            }
+        }
+
+        /* =========================================================
+           PREMIUM ENTERPRISE UI — v2
+        ========================================================= */
+        :root {
+            --bg: #f3f5fa;
+            --surface: #ffffff;
+            --surface-soft: #f8f9fc;
+            --text: #111827;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --primary: #5b4df5;
+            --primary-dark: #4037c8;
+            --primary-soft: #efedff;
+            --ai: #5b4df5;
+            --ai-soft: #f1efff;
+            --success: #079669;
+            --success-soft: #eafaf5;
+            --warning: #b77900;
+            --warning-soft: #fff8e8;
+            --shadow-sm: 0 5px 18px rgba(15, 23, 42, .045);
+            --shadow-md: 0 16px 40px rgba(15, 23, 42, .075);
+            --shadow-lg: 0 24px 60px rgba(36, 31, 112, .18);
+        }
+
+        body {
+            background:
+                radial-gradient(circle at 88% -5%, rgba(91,77,245,.10), transparent 25%),
+                radial-gradient(circle at 5% 35%, rgba(99,102,241,.045), transparent 22%),
+                #f3f5fa;
+        }
+
+        .page {
+            width: min(1480px, calc(100% - 48px));
+            padding-top: 24px;
+        }
+
+        .search-bar {
+            gap: 10px;
+            padding: 8px;
+            border-radius: 18px;
+            background: rgba(255,255,255,.96);
+            box-shadow: 0 8px 28px rgba(15,23,42,.055);
+        }
+
+        .search-input {
+            border-color: #e7e9f0;
+            border-radius: 12px;
+            padding: 14px 18px;
+            font-size: 14px;
+        }
+
+        .search-button {
+            min-width: 205px;
+            border-radius: 12px;
+            background: linear-gradient(135deg,#5146e5,#6658f1);
+            box-shadow: 0 8px 18px rgba(81,70,229,.18);
+            transition: transform .18s ease, box-shadow .18s ease;
+        }
+        .search-button:hover { transform: translateY(-1px); box-shadow: 0 11px 24px rgba(81,70,229,.23); }
+
+        .customer-hero {
+            min-height: 172px;
+            padding: 26px 30px;
+            border-radius: 24px;
+            background:
+                radial-gradient(circle at 0% 100%, rgba(255,255,255,.12), transparent 24%),
+                linear-gradient(120deg,#28245f 0%,#4036bb 52%,#5b4df5 100%);
+            box-shadow: 0 22px 55px rgba(58,48,178,.20);
+        }
+
+        .customer-hero::after {
+            width: 300px;
+            height: 300px;
+            left: -120px;
+            bottom: -215px;
+            background: rgba(255,255,255,.055);
+        }
+
+        .customer-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            background: rgba(255,255,255,.10);
+            border-color: rgba(255,255,255,.18);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 12px 25px rgba(0,0,0,.08);
+        }
+
+        .customer-name { letter-spacing: -.25px; }
+        .customer-tags { gap: 7px; }
+        .tag { background: rgba(255,255,255,.105); border-color: rgba(255,255,255,.12); }
+        .tag.grade { background: #ffc52a; border-color: #ffc52a; color:#3f3100; }
+
+        .last-purchase {
+            min-width: 172px;
+            padding: 16px 20px;
+            border-radius: 18px;
+            background: rgba(255,255,255,.095);
+            border-color: rgba(255,255,255,.15);
+        }
+
+        .recommendations-hero {
+            padding: 30px;
+            border-radius: 24px;
+            border-color: #e4e6ef;
+            box-shadow: var(--shadow-md);
+        }
+
+        .section-head { margin-bottom: 24px; }
+        .section-eyebrow { letter-spacing: 1.8px; }
+        .section-title { letter-spacing: -.3px; }
+        .count-badge { background:#f0efff; color:#5146e5; border:1px solid #e5e2ff; }
+
+        /* The main AI recommendation becomes a premium dark product command card. */
+        .primary-recommendation {
+            grid-template-columns: minmax(0,1fr) 260px;
+            gap: 22px;
+            padding: 24px;
+            border-radius: 21px;
+            background:
+                radial-gradient(circle at 95% 5%, rgba(139,125,255,.28), transparent 28%),
+                linear-gradient(135deg,#171a35 0%,#24235a 52%,#4a3fd1 100%);
+            box-shadow: 0 20px 42px rgba(28,25,93,.22);
+        }
+
+        .primary-product-name { letter-spacing:-.45px; }
+        .primary-pill { background:rgba(255,255,255,.09); border-color:rgba(255,255,255,.12); }
+        .primary-reason {
+            background: rgba(255,255,255,.065);
+            border-color: rgba(255,255,255,.10);
+            max-width: none;
+        }
+
+        .primary-score {
+            min-height: 205px;
+            border-radius: 18px;
+            background: rgba(255,255,255,.075);
+            border-color: rgba(255,255,255,.13);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+        }
+
+        .score-number {
+            width: 118px;
+            height: 118px;
+            display:grid;
+            place-items:center;
+            border-radius:50%;
+            margin: 10px 0;
+            font-size: 48px;
+            background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.18), rgba(255,255,255,.04));
+            border: 1px solid rgba(255,255,255,.18);
+            box-shadow: 0 0 0 8px rgba(255,255,255,.035), 0 14px 32px rgba(0,0,0,.16);
+        }
+
+        .alternative-label {
+            position: relative;
+            padding-right: 13px;
+            margin-top: 26px;
+        }
+        .alternative-label::before {
+            content:"";
+            position:absolute;
+            right:0;
+            top:50%;
+            width:4px;
+            height:16px;
+            border-radius:4px;
+            background:#5b4df5;
+            transform:translateY(-50%);
+        }
+
+        .alternative-card {
+            background:#fbfbfd;
+            border-color:#e7e9f1;
+            border-radius:15px;
+            padding:14px 16px;
+        }
+        .alternative-card:hover { border-color:#cfcaff; box-shadow:0 10px 25px rgba(81,70,229,.08); }
+
+        .kpi-card {
+            border-radius:17px;
+            padding:18px 20px;
+            box-shadow:0 8px 25px rgba(15,23,42,.045);
+            transition:transform .18s ease, box-shadow .18s ease;
+        }
+        .kpi-card:hover { transform:translateY(-2px); box-shadow:0 14px 32px rgba(15,23,42,.075); }
+
+        .card {
+            border-radius:20px;
+            padding:23px;
+            box-shadow:0 8px 28px rgba(15,23,42,.045);
+        }
+        .card.ai-card {
+            background:linear-gradient(145deg,#f8f7ff,#fff 62%);
+            border-color:#e0ddff;
+        }
+
+        .heading-icon {
+            width:44px;
+            height:44px;
+            border-radius:13px;
+            background:linear-gradient(135deg,#4d43df,#6a5bf1);
+            box-shadow:0 8px 18px rgba(81,70,229,.17);
+        }
+
+        .ai-content { border-color:#e8e8f1; background:#fff; }
+        .ai-action { box-shadow:0 10px 22px rgba(81,70,229,.14); }
+        .meeting-product { box-shadow:0 12px 25px rgba(81,70,229,.15); }
+
+        .lower-grid, .summary-grid { gap:18px; }
+        .sales-box, .detail { background:#fafbfe; }
+
+        .recommendation-row {
+            border-color:#e5e7ef;
+            border-radius:14px;
+            transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        }
+        .recommendation-row:hover {
+            transform:translateY(-1px);
+            border-color:#d5d1ff;
+            box-shadow:0 8px 20px rgba(15,23,42,.055);
+        }
+
+        @media (max-width: 760px) {
+            .page { width:min(100% - 24px, 1480px); padding-top:12px; }
+            .search-button { min-width:120px; }
+            .customer-hero { grid-template-columns:1fr; gap:16px; }
+            .last-purchase { width:100%; }
+            .primary-recommendation { grid-template-columns:1fr; }
+            .primary-score { min-height:150px; }
+            .score-number { width:92px; height:92px; font-size:38px; }
+        }
+
+    
+/* AI Command Center */
+.command-center{margin-bottom:22px}.command-grid{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:20px;align-items:stretch}.command-card{position:relative;overflow:hidden;border-radius:24px;border:1px solid #dedcff;box-shadow:var(--shadow-md)}
+.next-action-card{color:#fff;padding:27px;background:radial-gradient(circle at 12% 92%,rgba(255,255,255,.10),transparent 28%),radial-gradient(circle at 95% 0%,rgba(139,92,246,.35),transparent 32%),linear-gradient(135deg,#17134e 0%,#3026a5 52%,#5946e8 100%)}
+.next-action-card:after{content:"";position:absolute;width:260px;height:260px;left:-135px;bottom:-175px;border:1px solid rgba(255,255,255,.09);border-radius:50%;box-shadow:0 0 0 35px rgba(255,255,255,.025),0 0 0 70px rgba(255,255,255,.018)}
+.command-eyebrow{font-size:10px;letter-spacing:1.5px;font-weight:950;opacity:.62;margin-bottom:6px}.command-title{margin:0;font-size:24px;font-weight:950;line-height:1.35}.command-subtitle{margin-top:6px;font-size:12px;opacity:.68}.action-main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 180px;gap:22px;align-items:center;margin-top:22px}.action-product{min-width:0}.action-product-label{display:inline-flex;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.11);font-size:10px;margin-bottom:12px}.action-product-name{font-size:clamp(24px,2.5vw,34px);font-weight:950;line-height:1.25}.action-product-code{margin-top:5px;font-size:11px;opacity:.58}
+.action-score{display:grid;place-items:center;min-height:160px;border-radius:22px;background:rgba(255,255,255,.085);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(8px)}.score-ring{width:108px;height:108px;display:grid;place-items:center;border-radius:50%;background:conic-gradient(#fff 0deg,#fff calc(var(--score)*3.6deg),rgba(255,255,255,.16) calc(var(--score)*3.6deg),rgba(255,255,255,.16) 360deg);position:relative}.score-ring:before{content:"";position:absolute;inset:9px;border-radius:50%;background:#3429ad}.score-ring-content{position:relative;z-index:1;text-align:center}.score-ring-number{display:block;font-size:30px;line-height:1;font-weight:950}.score-ring-label{display:block;margin-top:5px;font-size:9px;opacity:.7}.evidence-row{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}.evidence-chip{padding:8px 11px;border-radius:12px;background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.10);font-size:11px;color:rgba(255,255,255,.88)}.why-action{position:relative;z-index:1;margin-top:17px;padding:16px 18px;border-radius:16px;background:rgba(255,255,255,.085);border:1px solid rgba(255,255,255,.10);font-size:12px;line-height:2}.why-action strong{display:block;margin-bottom:3px;font-size:11px;opacity:.68}
+.copilot-card{padding:24px;background:linear-gradient(145deg,#fff,#f7f6ff)}.copilot-head{display:flex;align-items:center;gap:12px;margin-bottom:19px}.copilot-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:15px;color:#fff;background:linear-gradient(135deg,#5146e5,#765cf5);box-shadow:0 10px 24px rgba(81,70,229,.18);font-size:20px}.copilot-title{margin:0;font-size:20px;font-weight:950}.copilot-subtitle{color:var(--ai);font-size:9px;letter-spacing:1.1px;font-weight:950}.copilot-step{display:grid;grid-template-columns:34px 1fr;gap:12px;position:relative;padding-bottom:16px}.copilot-step:not(:last-child):after{content:"";position:absolute;right:16px;top:34px;bottom:0;width:1px;background:#e5e2ff}.step-number{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:var(--primary-soft);color:var(--primary);font-weight:950;font-size:12px;position:relative;z-index:1}.step-label{color:var(--muted);font-size:10px;font-weight:850;margin-bottom:3px}.step-text{font-size:12px;line-height:1.95;color:#303548}.talk-track{margin-top:4px;padding:17px 18px;border-radius:17px;background:#ecfbf5;border:1px solid #cdeedf}.talk-track-label{color:#087c5d;font-size:10px;font-weight:950;margin-bottom:6px}.talk-track-text{color:#184b3d;font-size:12px;line-height:2;font-weight:700}@media(max-width:1050px){.command-grid{grid-template-columns:1fr}}@media(max-width:700px){.action-main{grid-template-columns:1fr}.action-score{min-height:135px}}
+
+    
+        /* STAGE 6 + 7 — SALES OUTCOME UI / MODAL */
+        .outcome-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+        .outcome-btn{border:1px solid var(--border);background:#fff;color:var(--text);border-radius:13px;padding:12px 10px;font-family:inherit;font-size:12px;font-weight:850;cursor:pointer;transition:all .18s ease}
+        .outcome-btn:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(15,23,42,.07)}
+        .outcome-btn.selected{box-shadow:0 0 0 3px rgba(81,70,229,.12);transform:translateY(-1px)}
+        .outcome-btn.purchased:hover,.outcome-btn.purchased.selected{background:#ecfdf5;border-color:#10b981;color:#047857}
+        .outcome-btn.interested:hover,.outcome-btn.interested.selected{background:#eff6ff;border-color:#3b82f6;color:#1d4ed8}
+        .outcome-btn.followup:hover,.outcome-btn.followup.selected{background:#fffbeb;border-color:#f59e0b;color:#b45309}
+        .outcome-btn.rejected:hover,.outcome-btn.rejected.selected{background:#fef2f2;border-color:#ef4444;color:#b91c1c}
+        .outcome-btn.not-presented:hover,.outcome-btn.not-presented.selected{background:#f3f4f6;border-color:#9ca3af;color:#374151}
+        .outcome-modal{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(15,23,42,.55);backdrop-filter:blur(5px)}
+        .outcome-modal.is-open{display:flex}
+        .outcome-modal-card{width:min(560px,100%);background:#fff;border-radius:24px;padding:28px;box-shadow:0 25px 70px rgba(15,23,42,.25);direction:rtl}
+        .outcome-modal-header{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:22px}
+        .outcome-modal-title{font-size:20px;font-weight:900;color:#172033}
+        .outcome-modal-product{margin-top:5px;color:#5b4df5;font-size:13px;font-weight:800}
+        .outcome-modal-outcome{display:inline-flex;margin-top:9px;padding:5px 10px;border-radius:999px;background:#f0efff;color:#5146e5;font-size:11px;font-weight:850}
+        .outcome-modal-close{width:38px;height:38px;border:0;border-radius:12px;background:#f3f4f6;color:#4b5563;cursor:pointer;font-size:20px}
+        .outcome-form-group{margin-bottom:17px}
+        .outcome-form-label{display:block;margin-bottom:7px;color:#374151;font-size:13px;font-weight:800}
+        .outcome-form-input,.outcome-form-textarea{width:100%;border:1px solid #e5e7eb;border-radius:12px;padding:12px 14px;background:#f9fafb;color:#172033;font-family:inherit;font-size:14px;outline:none}
+        .outcome-form-input:focus,.outcome-form-textarea:focus{border-color:#6366f1;background:#fff;box-shadow:0 0 0 3px rgba(99,102,241,.10)}
+        .outcome-form-textarea{min-height:105px;resize:vertical}
+        .outcome-modal-actions{display:flex;justify-content:flex-start;gap:10px;margin-top:22px}
+        .outcome-cancel-btn,.outcome-submit-btn{border:0;border-radius:12px;padding:12px 20px;font-family:inherit;font-size:13px;font-weight:900;cursor:pointer}
+        .outcome-cancel-btn{background:#f3f4f6;color:#4b5563}
+        .outcome-submit-btn{background:linear-gradient(135deg,#5146e5,#7c3aed);color:#fff;box-shadow:0 8px 18px rgba(81,70,229,.18)}
+        .outcome-submit-btn:disabled{opacity:.6;cursor:not-allowed}
+        .outcome-error,.outcome-success{display:none;margin-top:15px;padding:11px 13px;border-radius:10px;font-size:13px}
+        .outcome-error{background:#fef2f2;color:#b91c1c}.outcome-success{background:#ecfdf5;color:#047857}
+        @media(max-width:600px){.outcome-buttons{grid-template-columns:1fr}.outcome-modal-card{padding:20px;border-radius:18px}.outcome-modal-actions{flex-direction:column}.outcome-cancel-btn,.outcome-submit-btn{width:100%}}
+
+    
+
+        /* =========================================================
+           STAGE 8 — SALES INTELLIGENCE / OUTCOME HISTORY
+        ========================================================= */
+        .sales-intelligence-section{margin-top:26px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1.95fr);gap:18px}
+        .sales-feedback-card,.sales-history-card{background:#fff;border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow-sm);padding:24px}
+        .feedback-head,.history-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
+        .feedback-title,.history-title{margin:4px 0 0;font-size:19px;font-weight:900;color:var(--text);letter-spacing:-.02em}
+        .feedback-subtitle,.history-subtitle{margin:7px 0 0;color:var(--muted);font-size:12px;line-height:1.8}
+        .feedback-refresh{border:1px solid var(--border);background:#f8f7ff;color:var(--primary);border-radius:11px;padding:9px 12px;font-family:inherit;font-size:11px;font-weight:850;cursor:pointer;white-space:nowrap}
+        .feedback-refresh:hover{background:#f0efff}
+        .feedback-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+        .feedback-metric{border:1px solid #eeeef5;background:linear-gradient(180deg,#fff,#fafafe);border-radius:15px;padding:15px}
+        .feedback-metric-label{font-size:10px;font-weight:800;color:var(--muted);margin-bottom:7px}
+        .feedback-metric-value{font-size:22px;font-weight:950;color:var(--text);letter-spacing:-.03em}
+        .feedback-metric-note{font-size:10px;color:var(--muted);margin-top:4px}
+        .feedback-metric.success .feedback-metric-value{color:#059669}
+        .feedback-metric.warning .feedback-metric-value{color:#d97706}
+        .feedback-metric.info .feedback-metric-value{color:#2563eb}
+        .feedback-conversion{margin-top:14px;padding:15px 16px;border-radius:16px;background:linear-gradient(135deg,#f7f5ff,#f8fbff);border:1px solid #ebe8ff}
+        .feedback-conversion-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+        .feedback-conversion-label{font-size:11px;font-weight:850;color:#5b5a72}
+        .feedback-conversion-value{font-size:20px;font-weight:950;color:var(--primary)}
+        .feedback-progress{height:7px;background:#e9e8f3;border-radius:999px;overflow:hidden;margin-top:10px}
+        .feedback-progress-bar{height:100%;width:0;background:linear-gradient(90deg,#6d5dfc,#8b7fff);border-radius:999px;transition:width .45s ease}
+        .feedback-learning{margin-top:15px;padding:13px 14px;border-radius:14px;background:#f0fdf7;border:1px solid #d8f5e8;color:#047857;font-size:11px;line-height:1.8;font-weight:750}
+        .feedback-empty{display:none;padding:18px;border-radius:15px;background:#fafafa;border:1px dashed #ddd;color:var(--muted);font-size:12px;text-align:center}
+        .history-list{display:flex;flex-direction:column;gap:10px;max-height:430px;overflow:auto;padding-left:2px}
+        .history-row{display:grid;grid-template-columns:42px minmax(0,1.4fr) 120px 90px 105px 88px;align-items:center;gap:12px;padding:13px 12px;border:1px solid #eeeef4;border-radius:16px;background:#fff;transition:.18s ease}
+        .history-row:hover{border-color:#ddd9ff;box-shadow:0 7px 18px rgba(81,70,229,.06);transform:translateY(-1px)}
+        .history-rank{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:#f1efff;color:var(--primary);font-size:11px;font-weight:950}
+        .history-product{min-width:0}
+        .history-product-name{font-size:12px;font-weight:900;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .history-product-code{font-size:10px;color:var(--muted);margin-top:4px}
+        .history-type{font-size:10px;font-weight:850;color:#5b5a72}
+        .history-date{font-size:10px;color:var(--muted)}
+        .history-amount{font-size:11px;font-weight:900;color:var(--text);text-align:left;direction:ltr}
+        .history-result{display:inline-flex;align-items:center;justify-content:center;padding:6px 9px;border-radius:999px;font-size:10px;font-weight:900;white-space:nowrap}
+        .history-result.purchased{background:#ecfdf5;color:#047857}
+        .history-result.interested{background:#eff6ff;color:#1d4ed8}
+        .history-result.follow-up{background:#fffbeb;color:#b45309}
+        .history-result.rejected{background:#fef2f2;color:#b91c1c}
+        .history-result.not-presented{background:#f3f4f6;color:#4b5563}
+        .history-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;padding-top:13px;border-top:1px solid #f0f0f4;color:var(--muted);font-size:10px}
+        .history-loading{text-align:center;padding:35px 15px;color:var(--muted);font-size:12px}
+        .history-error{text-align:center;padding:18px;border-radius:14px;background:#fff7f7;border:1px solid #fee2e2;color:#b91c1c;font-size:11px;display:none}
+        @media(max-width:1050px){.sales-intelligence-section{grid-template-columns:1fr}.history-row{grid-template-columns:38px minmax(0,1fr) 100px 85px}.history-type{display:none}.history-date{display:none}}
+        @media(max-width:680px){.feedback-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.history-row{grid-template-columns:38px minmax(0,1fr) 90px}.history-amount{display:none}.history-result{font-size:9px;padding:5px 7px}.sales-feedback-card,.sales-history-card{padding:18px}.feedback-head,.history-head{align-items:center}}
+
+        /* =========================================================
+           STAGE 8B — RECOMMENDATION PERFORMANCE
+        ========================================================= */
+        .recommendation-performance-card{margin-top:18px;background:#fff;border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow-sm);padding:24px}
+        .performance-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
+        .performance-title{margin:4px 0 0;font-size:19px;font-weight:900;color:var(--text)}
+        .performance-subtitle{margin:7px 0 0;color:var(--muted);font-size:12px;line-height:1.8}
+        .performance-refresh{border:1px solid var(--border);background:#f8f7ff;color:var(--primary);border-radius:11px;padding:9px 12px;font-family:inherit;font-size:11px;font-weight:850;cursor:pointer;white-space:nowrap}
+        .performance-summary{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:18px}
+        .performance-stat{border:1px solid #eeeef5;background:linear-gradient(180deg,#fff,#fafafe);border-radius:15px;padding:14px;min-width:0}
+        .performance-stat-label{font-size:10px;font-weight:800;color:var(--muted);margin-bottom:6px}
+        .performance-stat-value{font-size:21px;font-weight:950;color:var(--text);letter-spacing:-.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .performance-stat.success .performance-stat-value{color:#059669}.performance-stat.warning .performance-stat-value{color:#d97706}.performance-stat.info .performance-stat-value{color:#2563eb}
+        .performance-table-wrap{overflow:auto;border:1px solid #eeeef5;border-radius:16px}
+        .performance-table{width:100%;border-collapse:collapse;min-width:780px;background:#fff}
+        .performance-table th{padding:12px 13px;background:#fafbfe;color:#6b7280;font-size:10px;font-weight:900;text-align:right;border-bottom:1px solid #eeeef5;white-space:nowrap}
+        .performance-table td{padding:13px;border-bottom:1px solid #f1f1f5;font-size:11px;color:#303548;white-space:nowrap}
+        .performance-table tr:last-child td{border-bottom:0}.performance-table tbody tr:hover{background:#fbfaff}
+        .performance-type{font-weight:900;color:var(--text)}
+        .performance-rate{font-weight:950;color:var(--primary)}
+        .performance-revenue{font-weight:900;direction:ltr;text-align:right}
+        .performance-loading,.performance-error,.performance-empty{padding:20px;text-align:center;color:var(--muted);font-size:12px}
+        .performance-error{display:none;border-radius:14px;background:#fff7f7;border:1px solid #fee2e2;color:#b91c1c}
+        .performance-empty{display:none;border:1px dashed #ddd;border-radius:14px}
+        .performance-note{margin-top:13px;padding:12px 14px;border-radius:14px;background:#f7f6ff;border:1px solid #e9e6ff;color:#5146e5;font-size:10px;line-height:1.9;font-weight:750}
+        @media(max-width:1050px){.performance-summary{grid-template-columns:repeat(3,minmax(0,1fr))}}
+        @media(max-width:680px){.recommendation-performance-card{padding:18px}.performance-head{align-items:center}.performance-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.performance-refresh{padding:8px 10px}}
+/* =========================================================
+   STAGE 8B — RECOMMENDATION PERFORMANCE
+   ========================================================= */
+
+.recommendation-performance-card {
+    margin-top: 24px;
+    padding: 28px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow:
+        0 12px 35px rgba(15, 23, 42, 0.08);
+}
+
+.performance-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.performance-title {
+    margin: 5px 0 6px;
+    font-size: 24px;
+    font-weight: 800;
+    color: #172033;
+}
+
+.performance-subtitle {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.performance-refresh {
+    border: 0;
+    border-radius: 12px;
+    padding: 10px 16px;
+    cursor: pointer;
+    background: #f1f5f9;
+    color: #334155;
+    font-family: inherit;
+    font-weight: 700;
+    transition: all .2s ease;
+}
+
+.performance-refresh:hover {
+    transform: translateY(-1px);
+    background: #e2e8f0;
+}
+
+.performance-summary {
+    display: grid;
+    grid-template-columns:
+        repeat(6, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.performance-stat {
+    padding: 18px;
+    border-radius: 16px;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+}
+
+.performance-stat.success {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+.performance-stat.warning {
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+
+.performance-stat.info {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.performance-stat-label {
+    color: #64748b;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.performance-stat-value {
+    color: #172033;
+    font-size: 24px;
+    font-weight: 850;
+}
+
+.performance-loading {
+    padding: 18px;
+    text-align: center;
+    color: #64748b;
+}
+
+.performance-error {
+    display: none;
+    padding: 14px 18px;
+    border-radius: 12px;
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    margin-bottom: 16px;
+}
+
+.performance-empty {
+    display: none;
+    padding: 30px;
+    text-align: center;
+    color: #64748b;
+}
+
+.performance-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+}
+
+.performance-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 950px;
+    font-size: 13px;
+}
+
+.performance-table th {
+    padding: 14px 12px;
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 800;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.performance-table td {
+    padding: 15px 12px;
+    border-top: 1px solid #eef2f7;
+    text-align: center;
+    color: #334155;
+}
+
+.performance-table tbody tr {
+    transition: background .2s ease;
+}
+
+.performance-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.performance-type {
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.performance-positive {
+    color: #15803d !important;
+    font-weight: 800;
+}
+
+.performance-interest {
+    color: #b45309 !important;
+    font-weight: 800;
+}
+
+.performance-revenue {
+    color: #1d4ed8 !important;
+    font-weight: 800;
+}
+
+.performance-note {
+    margin-top: 20px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.9;
+}
+
+
+/* ---------------------------------------------------------
+   Responsive
+   --------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+
+    .performance-summary {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .performance-head {
+        flex-direction: column;
+    }
+
+    .performance-summary {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .performance-stat-value {
+        font-size: 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+<div class="page">
+
+    <!-- =========================================================
+         SEARCH
+    ========================================================= -->
+
+    <form method="get" class="search-bar">
+        <input
+            class="search-input"
+            type="text"
+            name="customer_code"
+            value="{{ customer_code }}"
+            placeholder="کد مشتری را وارد کنید؛ مثلاً C0003"
+        >
+        <button class="search-button" type="submit">
+            🔍 جستجوی مشتری
+        </button>
+    </form>
+
+    {% if not_found %}
+        <div class="not-found">
+            مشتری موردنظر پیدا نشد.
+        </div>
+    {% endif %}
+
+    {% if customer %}
+
+    <!-- =========================================================
+         CUSTOMER HERO
+    ========================================================= -->
+
+    <section class="customer-hero">
+
+        <div class="customer-identity">
+            <div class="customer-avatar">
+                {{ customer.name|first }}
+            </div>
+
+            <div class="customer-info">
+                <div class="eyebrow">CUSTOMER 360</div>
+
+                <div class="customer-name">
+                    {{ customer.name }}
+                </div>
+
+                <div class="customer-code">
+                    {{ customer.customer_code }}
+                </div>
+
+                <div class="customer-tags">
+
+                    {% if customer.grade %}
+                        <span class="tag grade">
+                            {{ customer.grade.name }}
+                        </span>
+                    {% endif %}
+
+                    <span class="tag">
+                        {{ customer.customer_type }}
+                    </span>
+
+                    <span class="tag">
+                        {{ customer.city }}
+                    </span>
+
+                </div>
+            </div>
+        </div>
+
+        {% if customer_360 %}
+            <div class="last-purchase">
+                <div class="last-purchase-label">
+                    روز از آخرین خرید
+                </div>
+
+                <div class="last-purchase-value">
+                    {{ customer_360.days_since_last_purchase }}
+                </div>
+
+                <div class="last-purchase-unit">
+                    روز
+                </div>
+            </div>
+        {% endif %}
+
+    </section>
+
+
+    {% if customer_360 %}
+
+    <!-- =========================================================
+         AI RECOMMENDATIONS
+    ========================================================= -->
+
+    {% if recommendations %}
+
+    <section class="recommendations-hero">
+
+        <div class="section-head">
+
+            <div class="section-head-main">
+                <div class="section-eyebrow">
+                    AI SALES COPILOT
+                </div>
+
+                <h1 class="section-title">
+                    پیشنهادهای هوشمند فروش
+                </h1>
+
+                <p class="section-description">
+                    پیشنهادهای تولیدشده بر اساس رفتار خرید مشتری
+                </p>
+            </div>
+
+            <div class="count-badge">
+                {{ recommendations|length }} پیشنهاد
+            </div>
+
+        </div>
+
+
+        {% with primary=recommendations.0 %}
+
+        <div class="primary-recommendation">
+
+            <div class="primary-content">
+
+                <div class="primary-label">
+                    🎯 پیشنهاد اصلی برای این مشتری
+                </div>
+
+                <div class="primary-product-name">
+                    {{ primary.product.name }}
+                </div>
+
+                <div class="primary-product-code">
+                    {{ primary.product.product_code }}
+                </div>
+
+                <div class="primary-meta">
+
+                    <span class="primary-pill">
+                        {% if primary.recommendation_type == "REPEAT_PURCHASE" %}
+                            🔄 خرید مجدد
+                        {% elif primary.recommendation_type == "CROSS_SELL" %}
+                            🛒 فروش مکمل
+                        {% elif primary.recommendation_type == "CATEGORY" %}
+                            📂 پیشنهاد دسته
+                        {% elif primary.recommendation_type == "SIMILAR_PRODUCT" %}
+                            🔁 محصول مشابه
+                        {% elif primary.recommendation_type == "UP_SELL" %}
+                            ⭐ فروش ارتقایی
+                        {% else %}
+                            💡 پیشنهاد هوشمند
+                        {% endif %}
+                    </span>
+
+                    <span class="primary-pill">
+                        {{ primary.product.category }}
+                    </span>
+
+                </div>
+
+                {% if primary.reason %}
+                    <div class="primary-reason">
+                        <strong>چرا این محصول؟</strong>
+                        <br>
+                        {{ primary.reason }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+            <div class="primary-score">
+                <div class="score-caption">
+                    امتیاز پیشنهاد
+                </div>
+
+                <div class="score-number">
+                    {{ primary.score|floatformat:0 }}
+                </div>
+
+                <div class="score-label">
+                    بالاترین اولویت
+                </div>
+            </div>
+
+        </div>
+
+        {% endwith %}
+
+
+        {% if recommendations|length > 1 %}
+
+        <div class="alternative-label">
+            گزینه‌های جایگزین
+        </div>
+
+        <div class="alternative-grid">
+
+            {% for recommendation in recommendations %}
+
+                {% if not forloop.first %}
+
+                <div class="alternative-card">
+
+                    <div class="alternative-rank">
+                        {{ recommendation.rank }}
+                    </div>
+
+                    <div>
+                        <div class="alternative-name">
+                            {{ recommendation.product.name }}
+                        </div>
+
+                        <div class="alternative-code">
+                            {{ recommendation.product.product_code }}
+                        </div>
+                    </div>
+
+                    <div class="alternative-score">
+                        {{ recommendation.score|floatformat:0 }}
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+            {% endfor %}
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+    {% endif %}
+
+
+    <!-- =========================================================
+         KPI
+    ========================================================= -->
+
+    <section class="kpi-grid">
+
+        <div class="kpi-card">
+            <div class="kpi-icon">💰</div>
+            <div class="kpi-label">مجموع فروش</div>
+            <div class="kpi-value">
+                {{ customer_360.total_sales_amount|floatformat:0 }}
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon">🧾</div>
+            <div class="kpi-label">تعداد سفارش</div>
+            <div class="kpi-value">
+                {{ customer_360.total_orders }}
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon">📦</div>
+            <div class="kpi-label">تعداد کالا</div>
+            <div class="kpi-value">
+                {{ customer_360.total_items }}
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon">📊</div>
+            <div class="kpi-label">میانگین ارزش سفارش</div>
+            <div class="kpi-value">
+                {{ customer_360.average_order_value|floatformat:0 }}
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         AI COMMAND CENTER
+    ========================================================= -->
+
+    {% if recommendations %}
+    <section class="command-center">
+        <div class="command-grid">
+            {% with primary=recommendations.0 %}
+            <div class="command-card next-action-card">
+                <div class="command-eyebrow">AI DECISION ENGINE</div>
+                <h2 class="command-title">بهترین اقدام بعدی برای این مشتری</h2>
+                <div class="command-subtitle">یک پیشنهاد مشخص، همراه با دلیل و شواهد رفتاری</div>
+                <div class="action-main">
+                    <div class="action-product">
+                        <div class="action-product-label">🎯 اقدام پیشنهادی</div>
+                        <div class="action-product-name">{{ primary.product.name }}</div>
+                        <div class="action-product-code">کد محصول: {{ primary.product.product_code }}</div>
+                    </div>
+                    <div class="action-score">
+                        <div class="score-ring" style="--score: {{ primary.score|floatformat:0 }}">
+                            <div class="score-ring-content">
+                                <span class="score-ring-number">{{ primary.score|floatformat:0 }}</span>
+                                <span class="score-ring-label">AI SCORE</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="evidence-row">
+                    <div class="evidence-chip">🕒 {{ customer_360.days_since_last_purchase }} روز از آخرین خرید</div>
+                    <div class="evidence-chip">📦 دسته اصلی: {{ customer_360.top_category }}</div>
+                    <div class="evidence-chip">⭐ محصول پرتکرار: {{ customer_360.top_product_code }}</div>
+                </div>
+                {% if primary.reason %}
+                <div class="why-action"><strong>چرا این اقدام؟</strong>{{ primary.reason }}</div>
+                {% endif %}
+            </div>
+            {% endwith %}
+
+            {% if sales_session %}
+            <div class="command-card copilot-card">
+                <div class="copilot-head">
+                    <div class="copilot-icon">🤖</div>
+                    <div><h2 class="copilot-title">Sales Copilot</h2><div class="copilot-subtitle">MEETING PLAYBOOK</div></div>
+                </div>
+                <div class="copilot-step"><div class="step-number">1</div><div><div class="step-label">وضعیت مشتری</div><div class="step-text">{{ sales_session.customer_status }}</div></div></div>
+                <div class="copilot-step"><div class="step-number">2</div><div><div class="step-label">فرصت فروش</div><div class="step-text">{{ sales_session.sales_opportunity }}</div></div></div>
+                {% if sales_session.primary_product %}
+                <div class="copilot-step"><div class="step-number">3</div><div><div class="step-label">محصولی که در جلسه مطرح شود</div><div class="step-text"><strong>{{ sales_session.primary_product }}</strong> · {{ sales_session.primary_product_code }}</div></div></div>
+                {% endif %}
+                {% if sales_session.talking_point %}
+                <div class="talk-track"><div class="talk-track-label">🗣️ جمله پیشنهادی برای فروشنده</div><div class="talk-track-text">«{{ sales_session.talking_point }}»</div></div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
+
+
+
+
+    <!-- =========================================================
+         WHY AI + SALES OUTCOME LOOP
+    ========================================================= -->
+    {% if recommendations %}
+    <section class="explainability-section">
+        {% with primary=recommendations.0 %}
+        <div class="explainability-grid">
+
+            <div class="why-ai-card">
+                <div class="ai-card-head">
+                    <div>
+                        <div class="section-eyebrow">AI EXPLAINABILITY</div>
+                        <h2 class="ai-card-title">🧠 چرا AI این پیشنهاد را انتخاب کرده؟</h2>
+                        <div class="ai-card-subtitle">دلایل قابل فهم برای فروشنده؛ بدون پنهان کردن منطق تصمیم</div>
+                    </div>
+                    <div class="confidence-badge">Confidence <span class="confidence-value">{{ primary.score|floatformat:0 }}%</span></div>
+                </div>
+
+                <div class="reason-list">
+                    <div class="reason-item">
+                        <div class="reason-icon">✓</div>
+                        <div class="reason-text"><strong>الگوی خرید مشتری</strong><span>رفتار خرید قبلی با این نوع پیشنهاد همخوانی دارد.</span></div>
+                        <div class="reason-weight">High</div>
+                    </div>
+                    <div class="reason-item">
+                        <div class="reason-icon">✓</div>
+                        <div class="reason-text"><strong>زمان‌بندی خرید</strong><span>{{ customer_360.days_since_last_purchase }} روز از آخرین خرید گذشته است.</span></div>
+                        <div class="reason-weight">High</div>
+                    </div>
+                    <div class="reason-item">
+                        <div class="reason-icon">✓</div>
+                        <div class="reason-text"><strong>هم‌خوانی با دسته خرید</strong><span>دسته اصلی خرید مشتری: {{ customer_360.top_category }}</span></div>
+                        <div class="reason-weight">Medium</div>
+                    </div>
+                    <div class="reason-item">
+                        <div class="reason-icon">✓</div>
+                        <div class="reason-text"><strong>ارزش مشتری</strong><span>مشتری از نظر ارزش خرید در گروه {{ customer.grade.name|default:"قابل توجه" }} قرار دارد.</span></div>
+                        <div class="reason-weight">Medium</div>
+                    </div>
+                </div>
+
+                {% if recommendations|length > 1 %}
+                {% with second=recommendations.1 %}
+                <div class="alternative-insight">
+                    <div class="alternative-insight-title">🔁 اگر پیشنهاد اصلی مناسب نبود؟</div>
+                    <div class="alternative-insight-text">گزینه جایگزین AI: <strong>{{ second.product.name }}</strong> با امتیاز <strong>{{ second.score|floatformat:0 }}</strong>. فروشنده می‌تواند بدون خروج از جلسه به گزینه دوم سوییچ کند.</div>
+                </div>
+                {% endwith %}
+                {% endif %}
+            </div>
+
+            <div class="outcome-card">
+                <div class="ai-card-head">
+                    <div>
+                        <div class="section-eyebrow">SALES LEARNING LOOP</div>
+                        <h2 class="ai-card-title">🎯 نتیجه جلسه فروش</h2>
+                        <div class="ai-card-subtitle">نتیجه واقعی جلسه را ثبت کنید تا Recommendation Engine بهتر شود.</div>
+                    </div>
+                </div>
+
+                <div class="outcome-product">
+                    <div class="outcome-product-label">پیشنهاد مورد ارزیابی</div>
+                    <div class="outcome-product-name">{{ primary.product.name }}</div>
+                    <div class="outcome-product-code">{{ primary.product.product_code }}</div>
+                </div>
+
+                <div class="outcome-buttons" id="outcomeButtons">
+                    <button
+                        class="outcome-btn purchased"
+                        type="button"
+                        data-outcome="PURCHASED"
+                        data-recommendation-id="{{ primary.id }}"
+                        data-product-name="{{ primary.product.name|escape }}"
+                        data-product-code="{{ primary.product.product_code|escape }}"
+                    >✓ خرید شد</button>
+
+                    <button
+                        class="outcome-btn interested"
+                        type="button"
+                        data-outcome="INTERESTED"
+                        data-recommendation-id="{{ primary.id }}"
+                        data-product-name="{{ primary.product.name|escape }}"
+                        data-product-code="{{ primary.product.product_code|escape }}"
+                    >♥ علاقه‌مند شد</button>
+
+                    <button
+                        class="outcome-btn followup"
+                        type="button"
+                        data-outcome="FOLLOW_UP"
+                        data-recommendation-id="{{ primary.id }}"
+                        data-product-name="{{ primary.product.name|escape }}"
+                        data-product-code="{{ primary.product.product_code|escape }}"
+                    >↻ نیاز به پیگیری</button>
+
+                    <button
+                        class="outcome-btn rejected"
+                        type="button"
+                        data-outcome="REJECTED"
+                        data-recommendation-id="{{ primary.id }}"
+                        data-product-name="{{ primary.product.name|escape }}"
+                        data-product-code="{{ primary.product.product_code|escape }}"
+                    >✕ رد شد</button>
+
+                    <button
+                        class="outcome-btn not-presented"
+                        type="button"
+                        data-outcome="NOT_PRESENTED"
+                        data-recommendation-id="{{ primary.id }}"
+                        data-product-name="{{ primary.product.name|escape }}"
+                        data-product-code="{{ primary.product.product_code|escape }}"
+                    >— مطرح نشد</button>
+                </div>
+
+                <div class="outcome-status" id="outcomeStatus">
+                    هنوز نتیجه‌ای ثبت نشده است.
+                </div>
+                <div class="learning-loop"><span class="learning-dot"></span> این نتیجه در نسخه واقعی سیستم به بازخورد موتور پیشنهاددهی تبدیل خواهد شد.</div>
+            </div>
+        </div>
+        {% endwith %}
+    </section>
+    {% endif %}
+
+
+
+
+    <!-- =========================================================
+         STAGE 8 — SALES INTELLIGENCE / OUTCOME HISTORY
+    ========================================================= -->
+    <section class="sales-intelligence-section" id="salesIntelligenceSection">
+
+        <div class="sales-feedback-card">
+            <div class="feedback-head">
+                <div>
+                    <div class="section-eyebrow">RECOMMENDATION FEEDBACK</div>
+                    <h2 class="feedback-title">عملکرد پیشنهادهای فروش</h2>
+                    <p class="feedback-subtitle">نتایج واقعی جلسات نشان می‌دهد پیشنهادهای AI در عمل چقدر موفق بوده‌اند.</p>
+                </div>
+                <button type="button" class="feedback-refresh" id="refreshSalesHistory">↻ بروزرسانی</button>
+            </div>
+
+            <div class="feedback-metrics" id="feedbackMetrics">
+                <div class="feedback-metric">
+                    <div class="feedback-metric-label">تعامل فروش</div>
+                    <div class="feedback-metric-value" id="feedbackTotal">—</div>
+                    <div class="feedback-metric-note">نتیجه‌های ثبت‌شده</div>
+                </div>
+                <div class="feedback-metric success">
+                    <div class="feedback-metric-label">خرید موفق</div>
+                    <div class="feedback-metric-value" id="feedbackPurchased">—</div>
+                    <div class="feedback-metric-note">نتیجه PURCHASED</div>
+                </div>
+                <div class="feedback-metric warning">
+                    <div class="feedback-metric-label">علاقه‌مند</div>
+                    <div class="feedback-metric-value" id="feedbackInterested">—</div>
+                    <div class="feedback-metric-note">فرصت پیگیری فروش</div>
+                </div>
+                <div class="feedback-metric info">
+                    <div class="feedback-metric-label">فروش حاصل</div>
+                    <div class="feedback-metric-value" id="feedbackRevenue">—</div>
+                    <div class="feedback-metric-note">مجموع مبلغ ثبت‌شده</div>
+                </div>
+            </div>
+
+            <div class="feedback-conversion">
+                <div class="feedback-conversion-top">
+                    <span class="feedback-conversion-label">نرخ تبدیل پیشنهاد به خرید</span>
+                    <strong class="feedback-conversion-value" id="feedbackConversion">0%</strong>
+                </div>
+                <div class="feedback-progress"><div class="feedback-progress-bar" id="feedbackProgressBar"></div></div>
+            </div>
+
+            <div class="feedback-learning">
+                <strong>🧠 Learning Loop:</strong>
+                هر نتیجه ثبت‌شده به عنوان بازخورد واقعی عملکرد Recommendation Engine نگهداری می‌شود و در مراحل بعد برای بهبود امتیازدهی پیشنهادها استفاده خواهد شد.
+            </div>
+        </div>
+
+        <div class="sales-history-card">
+            <div class="history-head">
+                <div>
+                    <div class="section-eyebrow">SALES OUTCOME HISTORY</div>
+                    <h2 class="history-title">تاریخچه تعاملات فروش</h2>
+                    <p class="history-subtitle">آخرین نتیجه‌های ثبت‌شده برای پیشنهادهای ارائه‌شده به این مشتری</p>
+                </div>
+            </div>
+
+            <div id="salesHistoryLoading" class="history-loading">در حال دریافت تاریخچه فروش...</div>
+            <div id="salesHistoryError" class="history-error"></div>
+            <div id="salesHistoryEmpty" class="feedback-empty">هنوز نتیجه‌ای برای این مشتری ثبت نشده است.</div>
+            <div id="salesHistoryList" class="history-list"></div>
+            <div class="history-footer">
+                <span id="salesHistoryCount">۰ تعامل ثبت شده</span>
+                <span>آخرین بروزرسانی: <strong id="salesHistoryUpdated">—</strong></span>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         STAGE 8B — RECOMMENDATION PERFORMANCE
+    ========================================================= -->
+    <section class="recommendation-performance-card" id="recommendationPerformanceSection">
+        <div class="performance-head">
+            <div>
+                <div class="section-eyebrow">RECOMMENDATION PERFORMANCE</div>
+                <h2 class="performance-title">عملکرد موتور پیشنهاددهی</h2>
+                <p class="performance-subtitle">این بخش نشان می‌دهد پیشنهادهای ارائه‌شده برای این مشتری تا چه اندازه به خرید و درآمد منجر شده‌اند.</p>
+            </div>
+            <button type="button" class="performance-refresh" id="refreshRecommendationPerformance">↻ بروزرسانی</button>
+        </div>
+
+        <div class="performance-summary" id="performanceSummary">
+            <div class="performance-stat"><div class="performance-stat-label">پیشنهاد ارائه‌شده</div><div class="performance-stat-value" id="performancePresented">—</div></div>
+            <div class="performance-stat success"><div class="performance-stat-label">خرید</div><div class="performance-stat-value" id="performancePurchased">—</div></div>
+            <div class="performance-stat warning"><div class="performance-stat-label">علاقه‌مند</div><div class="performance-stat-value" id="performanceInterested">—</div></div>
+            <div class="performance-stat info"><div class="performance-stat-label">درآمد</div><div class="performance-stat-value" id="performanceRevenue">—</div></div>
+            <div class="performance-stat"><div class="performance-stat-label">نرخ تبدیل</div><div class="performance-stat-value" id="performanceConversion">—</div></div>
+            <div class="performance-stat"><div class="performance-stat-label">نرخ علاقه‌مندی</div><div class="performance-stat-value" id="performanceInterestRate">—</div></div>
+        </div>
+
+        <div id="performanceLoading" class="performance-loading">در حال دریافت عملکرد پیشنهادها...</div>
+        <div id="performanceError" class="performance-error"></div>
+        <div id="performanceEmpty" class="performance-empty">هنوز داده‌ای برای عملکرد پیشنهادهای این مشتری ثبت نشده است.</div>
+
+        <div class="performance-table-wrap" id="performanceTableWrap" style="display:none">
+            <table class="performance-table">
+                <thead>
+                    <tr>
+                        <th>نوع پیشنهاد</th><th>ارائه‌شده</th><th>خرید</th><th>علاقه‌مند</th><th>رد شده</th><th>پیگیری</th><th>درآمد</th><th>میانگین فروش</th><th>نرخ تبدیل</th><th>نرخ علاقه‌مندی</th>
+                    </tr>
+                </thead>
+                <tbody id="performanceTableBody"></tbody>
+            </table>
+        </div>
+
+        <div class="performance-note">🧠 <strong>Learning Loop:</strong> این شاخص‌ها مستقیماً از نتایج واقعی جلسات فروش به دست می‌آیند و در مراحل بعد می‌توانند برای ارزیابی و بهبود Recommendation Engine استفاده شوند.</div>
+    </section>
+
+    <!-- =========================================================
+         RFM + SALES PERFORMANCE
+    ========================================================= -->
+
+    <section class="lower-grid">
+
+        <!-- RFM -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div class="card-heading">
+
+                    <div class="heading-icon">
+                        ⭐
+                    </div>
+
+                    <div>
+                        <h2 class="card-title">
+                            امتیاز و ارزش مشتری
+                        </h2>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="rfm-score">
+                {{ customer_360.rfm_score }}
+            </div>
+
+            <div class="segment-wrap">
+                <span class="segment">
+                    {{ customer_360.segment }}
+                </span>
+            </div>
+
+
+            <div class="score-row">
+
+                <span>تازگی خرید</span>
+
+                <strong>
+                    {{ customer_360.recency_score }}
+                </strong>
+
+                <div class="progress">
+                    <div
+                        class="progress-bar"
+                        style="width:{% widthratio customer_360.recency_score 5 100 %}%"
+                    ></div>
+                </div>
+
+            </div>
+
+
+            <div class="score-row">
+
+                <span>تعداد خرید</span>
+
+                <strong>
+                    {{ customer_360.frequency_score }}
+                </strong>
+
+                <div class="progress">
+                    <div
+                        class="progress-bar"
+                        style="width:{% widthratio customer_360.frequency_score 5 100 %}%"
+                    ></div>
+                </div>
+
+            </div>
+
+
+            <div class="score-row">
+
+                <span>ارزش خرید</span>
+
+                <strong>
+                    {{ customer_360.monetary_score }}
+                </strong>
+
+                <div class="progress">
+                    <div
+                        class="progress-bar"
+                        style="width:{% widthratio customer_360.monetary_score 5 100 %}%"
+                    ></div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SALES -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div class="card-heading">
+
+                    <div class="heading-icon">
+                        📈
+                    </div>
+
+                    <div>
+                        <h2 class="card-title">
+                            عملکرد فروش
+                        </h2>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="sales-grid">
+
+                <div class="sales-box">
+
+                    <div class="sales-label">
+                        فروش ۳۰ روز اخیر
+                    </div>
+
+                    <div class="sales-value">
+                        {{ customer_360.sales_30d|floatformat:0 }}
+                    </div>
+
+                </div>
+
+
+                <div class="sales-box">
+
+                    <div class="sales-label">
+                        فروش ۹۰ روز اخیر
+                    </div>
+
+                    <div class="sales-value">
+                        {{ customer_360.sales_90d|floatformat:0 }}
+                    </div>
+
+                </div>
+
+
+                <div class="sales-box">
+
+                    <div class="sales-label">
+                        اولین خرید
+                    </div>
+
+                    <div class="sales-value">
+                        {{ customer_360.first_purchase_date }}
+                    </div>
+
+                </div>
+
+
+                <div class="sales-box">
+
+                    <div class="sales-label">
+                        آخرین خرید
+                    </div>
+
+                    <div class="sales-value">
+                        {{ customer_360.last_purchase_date }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         SUMMARY
+    ========================================================= -->
+
+    <section class="summary-grid">
+
+        <!-- CUSTOMER SUMMARY -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div class="card-heading">
+
+                    <div class="heading-icon">
+                        📌
+                    </div>
+
+                    <div>
+                        <h2 class="card-title">
+                            خلاصه مشتری
+                        </h2>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="details">
+
+                <div class="detail">
+                    <div class="detail-label">نام مشتری</div>
+                    <div class="detail-value">{{ customer.name }}</div>
+                </div>
+
+                <div class="detail">
+                    <div class="detail-label">کد مشتری</div>
+                    <div class="detail-value">{{ customer.customer_code }}</div>
+                </div>
+
+                <div class="detail">
+                    <div class="detail-label">نوع مشتری</div>
+                    <div class="detail-value">{{ customer.customer_type }}</div>
+                </div>
+
+                <div class="detail">
+                    <div class="detail-label">شهر</div>
+                    <div class="detail-value">{{ customer.city }}</div>
+                </div>
+
+                <div class="detail">
+                    <div class="detail-label">تلفن</div>
+                    <div class="detail-value">{{ customer.phone }}</div>
+                </div>
+
+                <div class="detail">
+                    <div class="detail-label">دسته اصلی خرید</div>
+                    <div class="detail-value">{{ customer_360.top_category }}</div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- RECOMMENDATION SUMMARY -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div class="card-heading">
+
+                    <div class="heading-icon">
+                        🎯
+                    </div>
+
+                    <div>
+                        <h2 class="card-title">
+                            خلاصه پیشنهادهای فروش
+                        </h2>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {% if recommendations %}
+
+            <div class="recommendation-list">
+
+                {% for recommendation in recommendations %}
+
+                <div class="recommendation-row">
+
+                    <div class="recommendation-row-rank">
+                        {{ recommendation.rank }}
+                    </div>
+
+                    <div>
+                        <div class="recommendation-row-name">
+                            {{ recommendation.product.name }}
+                        </div>
+
+                        <div class="recommendation-row-code">
+                            {{ recommendation.product.product_code }}
+                        </div>
+                    </div>
+
+                    <div class="recommendation-row-type">
+
+                        {% if recommendation.recommendation_type == "REPEAT_PURCHASE" %}
+                            خرید مجدد
+                        {% elif recommendation.recommendation_type == "CATEGORY" %}
+                            پیشنهاد دسته
+                        {% elif recommendation.recommendation_type == "CROSS_SELL" %}
+                            فروش مکمل
+                        {% elif recommendation.recommendation_type == "SIMILAR_PRODUCT" %}
+                            محصول مشابه
+                        {% elif recommendation.recommendation_type == "UP_SELL" %}
+                            فروش ارتقایی
+                        {% else %}
+                            پیشنهاد
+                        {% endif %}
+
+                    </div>
+
+                    <div class="recommendation-row-score">
+                        {{ recommendation.score|floatformat:0 }}
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            {% else %}
+
+                <p class="section-description">
+                    پیشنهاد فعالی برای این مشتری وجود ندارد.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+    {% endif %}
+    {% endif %}
+
+
+    <!-- STAGE 7 — SALES OUTCOME MODAL -->
+    <div id="outcomeModal" class="outcome-modal" aria-hidden="true">
+        <div class="outcome-modal-card" role="dialog" aria-modal="true" aria-labelledby="outcomeModalTitle">
+            <div class="outcome-modal-header">
+                <div>
+                    <div id="outcomeModalTitle" class="outcome-modal-title">ثبت نتیجه جلسه فروش</div>
+                    <div id="outcomeModalProduct" class="outcome-modal-product"></div>
+                    <div id="outcomeModalOutcome" class="outcome-modal-outcome"></div>
+                </div>
+                <button type="button" id="outcomeModalClose" class="outcome-modal-close" aria-label="بستن">×</button>
+            </div>
+            <form id="outcomeForm">
+                <div class="outcome-form-group">
+                    <label class="outcome-form-label" for="outcomeQuantity">تعداد</label>
+                    <input id="outcomeQuantity" class="outcome-form-input" type="number" min="0" step="1" value="0">
+                </div>
+                <div class="outcome-form-group">
+                    <label class="outcome-form-label" for="outcomeSalesAmount">مبلغ فروش</label>
+                    <input id="outcomeSalesAmount" class="outcome-form-input" type="number" min="0" step="0.01" value="0">
+                </div>
+                <div class="outcome-form-group">
+                    <label class="outcome-form-label" for="outcomeNotes">یادداشت فروشنده</label>
+                    <textarea id="outcomeNotes" class="outcome-form-textarea" placeholder="توضیح کوتاه درباره نتیجه جلسه..."></textarea>
+                </div>
+                <div id="outcomeError" class="outcome-error"></div>
+                <div id="outcomeSuccess" class="outcome-success"></div>
+                <div class="outcome-modal-actions">
+                    <button type="button" id="outcomeCancel" class="outcome-cancel-btn">انصراف</button>
+                    <button type="submit" id="outcomeSubmit" class="outcome-submit-btn">ثبت نتیجه جلسه</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    /* =========================================================
+       STAGE 7 — SALES OUTCOME MODAL
+    ========================================================= */
+    const modal=document.getElementById("outcomeModal"), form=document.getElementById("outcomeForm");
+    const customerCode="{{ customer.customer_code|escapejs }}";
+    const visitId={% if latest_visit %}{{ latest_visit.id }}{% else %}null{% endif %};
+    const labels={PURCHASED:"خرید شد",INTERESTED:"علاقه‌مند شد",FOLLOW_UP:"نیاز به پیگیری",REJECTED:"رد شد",NOT_PRESENTED:"مطرح نشد"};
+
+    if(modal&&form){
+        const modalProduct=document.getElementById("outcomeModalProduct"), modalOutcome=document.getElementById("outcomeModalOutcome");
+        const closeButton=document.getElementById("outcomeModalClose"), cancelButton=document.getElementById("outcomeCancel"), submitButton=document.getElementById("outcomeSubmit");
+        const quantityInput=document.getElementById("outcomeQuantity"), salesAmountInput=document.getElementById("outcomeSalesAmount"), notesInput=document.getElementById("outcomeNotes");
+        const errorBox=document.getElementById("outcomeError"), successBox=document.getElementById("outcomeSuccess"), statusBox=document.getElementById("outcomeStatus");
+        let selectedRecommendationId=null, selectedOutcome=null, selectedButton=null;
+
+        function clearMessages(){errorBox.style.display="none";errorBox.textContent="";successBox.style.display="none";successBox.textContent=""}
+        function openModal(button){
+            selectedRecommendationId=button.dataset.recommendationId||null; selectedOutcome=button.dataset.outcome||null; selectedButton=button;
+            const name=button.dataset.productName||"", code=button.dataset.productCode||"";
+            modalProduct.textContent=name+(code?" — "+code:""); modalOutcome.textContent=labels[selectedOutcome]||selectedOutcome||"";
+            quantityInput.value="0"; salesAmountInput.value="0"; notesInput.value=""; clearMessages();
+            document.querySelectorAll(".outcome-btn.selected").forEach(b=>b.classList.remove("selected")); button.classList.add("selected");
+            modal.classList.add("is-open"); modal.setAttribute("aria-hidden","false"); setTimeout(()=>notesInput.focus(),50);
+        }
+        function closeModal(){
+            modal.classList.remove("is-open"); modal.setAttribute("aria-hidden","true");
+            if(selectedButton)selectedButton.classList.remove("selected");
+            selectedRecommendationId=null; selectedOutcome=null; selectedButton=null; clearMessages();
+            submitButton.disabled=false; submitButton.textContent="ثبت نتیجه جلسه";
+        }
+        document.querySelectorAll(".outcome-btn").forEach(b=>b.addEventListener("click",()=>openModal(b)));
+        closeButton.addEventListener("click",closeModal); cancelButton.addEventListener("click",closeModal);
+        modal.addEventListener("click",e=>{if(e.target===modal)closeModal()});
+        document.addEventListener("keydown",e=>{if(e.key==="Escape"&&modal.classList.contains("is-open"))closeModal()});
+
+        form.addEventListener("submit",async e=>{
+            e.preventDefault(); clearMessages();
+            if(!visitId){errorBox.textContent="برای این مشتری جلسه فعالی ثبت نشده است.";errorBox.style.display="block";return}
+            if(!selectedRecommendationId||!selectedOutcome){errorBox.textContent="محصول و نتیجه جلسه باید انتخاب شوند.";errorBox.style.display="block";return}
+            const quantity=Number(quantityInput.value||0), salesAmount=Number(salesAmountInput.value||0);
+            if(quantity<0||salesAmount<0){errorBox.textContent="تعداد و مبلغ فروش نمی‌توانند منفی باشند.";errorBox.style.display="block";return}
+            const payload={visit_id:Number(visitId),recommendation_id:Number(selectedRecommendationId),outcome:selectedOutcome,quantity:quantity,sales_amount:salesAmount,notes:notesInput.value.trim()};
+            submitButton.disabled=true; submitButton.textContent="در حال ثبت...";
+            try{
+                const response=await fetch("/api/visits/v1/outcomes/",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json","X-CSRFToken":getCsrfToken()},credentials:"same-origin",body:JSON.stringify(payload)});
+                const data=await response.json();
+                if(!response.ok)throw new Error(data.detail||data.error||"ثبت نتیجه جلسه ناموفق بود.");
+                successBox.textContent="✓ نتیجه جلسه با موفقیت ثبت شد."; successBox.style.display="block"; submitButton.textContent="ثبت شد";
+                updateStatus(data);
+                await loadSalesHistory();
+                setTimeout(closeModal,900);
+            }catch(error){errorBox.textContent=error.message||"خطایی در ثبت نتیجه رخ داد.";errorBox.style.display="block";submitButton.disabled=false;submitButton.textContent="ثبت نتیجه جلسه"}
+        });
+
+        function updateStatus(data){
+            if(!statusBox)return;
+            const outcome=data.sales_outcome&&data.sales_outcome.outcome?data.sales_outcome.outcome:selectedOutcome;
+            const quantity=data.sales_outcome&&data.sales_outcome.quantity!==undefined?data.sales_outcome.quantity:Number(quantityInput.value||0);
+            const amount=data.sales_outcome&&data.sales_outcome.sales_amount!==undefined?data.sales_outcome.sales_amount:Number(salesAmountInput.value||0);
+            statusBox.innerHTML="<strong>آخرین نتیجه:</strong> "+(labels[outcome]||outcome)+"<br><small>تعداد: "+formatNumber(quantity)+" · مبلغ فروش: "+formatMoney(amount)+"</small>";
+            document.querySelectorAll(".outcome-btn").forEach(b=>b.classList.remove("selected")); if(selectedButton)selectedButton.classList.add("selected");
+        }
+    }
+
+    /* =========================================================
+       STAGE 8 — SALES HISTORY + RECOMMENDATION FEEDBACK
+    ========================================================= */
+    const historyList=document.getElementById("salesHistoryList");
+    const loadingBox=document.getElementById("salesHistoryLoading");
+    const errorBox=document.getElementById("salesHistoryError");
+    const emptyBox=document.getElementById("salesHistoryEmpty");
+    const refreshButton=document.getElementById("refreshSalesHistory");
+    const totalBox=document.getElementById("feedbackTotal");
+    const purchasedBox=document.getElementById("feedbackPurchased");
+    const interestedBox=document.getElementById("feedbackInterested");
+    const revenueBox=document.getElementById("feedbackRevenue");
+    const conversionBox=document.getElementById("feedbackConversion");
+    const progressBar=document.getElementById("feedbackProgressBar");
+    const countBox=document.getElementById("salesHistoryCount");
+    const updatedBox=document.getElementById("salesHistoryUpdated");
+    const outcomeLabels={PURCHASED:"خرید شد",INTERESTED:"علاقه‌مند شد",FOLLOW_UP:"نیاز به پیگیری",REJECTED:"رد شد",NOT_PRESENTED:"مطرح نشد"};
+    const recommendationLabels={REPEAT_PURCHASE:"خرید مجدد",CROSS_SELL:"فروش مکمل",CATEGORY:"پیشنهاد دسته",SIMILAR_PRODUCT:"محصول مشابه",UP_SELL:"فروش ارتقایی"};
+
+    function formatNumber(value){return new Intl.NumberFormat("fa-IR").format(Number(value||0))}
+    function formatMoney(value){return new Intl.NumberFormat("fa-IR",{maximumFractionDigits:2}).format(Number(value||0))}
+    function formatDate(value){
+        if(!value)return "—";
+        const parts=String(value).split("-");
+        if(parts.length===3)return `${parts[2]} / ${parts[1]} / ${parts[0]}`;
+        return value;
+    }
+    function resultClass(outcome){return String(outcome||"").toLowerCase().replaceAll("_","-")}
+    function escapeHtml(value){
+        return String(value??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[c]));
+    }
+
+    function renderHistory(items){
+        if(!historyList)return;
+        historyList.innerHTML="";
+        if(!items.length){emptyBox.style.display="block";return}
+        emptyBox.style.display="none";
+        items.forEach((item,index)=>{
+            const outcome=item.outcome||"";
+            const type=(item.recommendation&&item.recommendation.type)||"";
+            const quantity=Number(item.quantity||0);
+            const amount=Number(item.sales_amount||0);
+            const row=document.createElement("div");
+            row.className="history-row";
+            row.innerHTML=`
+                <div class="history-rank">${formatNumber(index+1)}</div>
+                <div class="history-product">
+                    <div class="history-product-name" title="${escapeHtml(item.product?.name||"")}">${escapeHtml(item.product?.name||"—")}</div>
+                    <div class="history-product-code">${escapeHtml(item.product?.code||"")} · ${escapeHtml(item.product?.category||"")}</div>
+                </div>
+                <div class="history-type">${escapeHtml(recommendationLabels[type]||type||"پیشنهاد")}</div>
+                <div class="history-date">${formatDate(item.visit_date)}</div>
+                <div class="history-amount">${amount>0?formatMoney(amount):"—"}${quantity>0?` · ×${formatNumber(quantity)}`:""}</div>
+                <div><span class="history-result ${resultClass(outcome)}">${escapeHtml(outcomeLabels[outcome]||outcome||"—")}</span></div>
+            `;
+            historyList.appendChild(row);
+        });
+    }
+
+    function updateFeedback(items){
+        const total=items.length;
+        const purchased=items.filter(x=>x.outcome==="PURCHASED").length;
+        const interested=items.filter(x=>x.outcome==="INTERESTED").length;
+        const revenue=items.reduce((sum,x)=>sum+Number(x.sales_amount||0),0);
+        const conversion=total?((purchased/total)*100):0;
+        totalBox.textContent=formatNumber(total);
+        purchasedBox.textContent=formatNumber(purchased);
+        interestedBox.textContent=formatNumber(interested);
+        revenueBox.textContent=formatMoney(revenue);
+        conversionBox.textContent=`${conversion.toLocaleString("fa-IR",{maximumFractionDigits:1})}%`;
+        progressBar.style.width=`${Math.min(100,conversion)}%`;
+        countBox.textContent=`${formatNumber(total)} تعامل ثبت شده`;
+        updatedBox.textContent=new Intl.DateTimeFormat("fa-IR",{hour:"2-digit",minute:"2-digit"}).format(new Date());
+    }
+
+    async function loadSalesHistory(){
+        if(!historyList||!customerCode)return;
+        loadingBox.style.display="block"; errorBox.style.display="none"; emptyBox.style.display="none";
+        try{
+            const response=await fetch(`/api/visits/v1/customers/${encodeURIComponent(customerCode)}/sales-outcomes/`,{method:"GET",headers:{"Accept":"application/json"},credentials:"same-origin"});
+            const data=await response.json();
+            if(!response.ok)throw new Error(data.detail||"دریافت تاریخچه فروش ناموفق بود.");
+            const items=Array.isArray(data.sales_outcomes)?data.sales_outcomes:[];
+            renderHistory(items); updateFeedback(items);
+        }catch(error){
+            historyList.innerHTML=""; loadingBox.style.display="none"; errorBox.textContent=error.message||"خطا در دریافت تاریخچه فروش"; errorBox.style.display="block";
+        }finally{loadingBox.style.display="none"}
+    }
+
+    if(refreshButton)refreshButton.addEventListener("click",loadSalesHistory);
+    loadSalesHistory();
+
+
+    /* =========================================================
+       STAGE 8B — RECOMMENDATION PERFORMANCE
+    ========================================================= */
+    const performanceTableWrap=document.getElementById("performanceTableWrap");
+    const performanceTableBody=document.getElementById("performanceTableBody");
+    const performanceLoading=document.getElementById("performanceLoading");
+    const performanceError=document.getElementById("performanceError");
+    const performanceEmpty=document.getElementById("performanceEmpty");
+    const performancePresented=document.getElementById("performancePresented");
+    const performancePurchased=document.getElementById("performancePurchased");
+    const performanceInterested=document.getElementById("performanceInterested");
+    const performanceRevenue=document.getElementById("performanceRevenue");
+    const performanceConversion=document.getElementById("performanceConversion");
+    const performanceInterestRate=document.getElementById("performanceInterestRate");
+    const performanceRefresh=document.getElementById("refreshRecommendationPerformance");
+    const performanceTypeLabels={REPEAT_PURCHASE:"خرید مجدد",CROSS_SELL:"فروش مکمل",CATEGORY:"پیشنهاد دسته",SIMILAR_PRODUCT:"محصول مشابه",UP_SELL:"فروش ارتقایی"};
+
+    function formatPercent(value){return `${Number(value||0).toLocaleString("fa-IR",{maximumFractionDigits:1})}%`}
+
+    function updatePerformanceSummary(summary){
+        if(!summary)return;
+        performancePresented.textContent=formatNumber(summary.presented);
+        performancePurchased.textContent=formatNumber(summary.purchased);
+        performanceInterested.textContent=formatNumber(summary.interested);
+        performanceRevenue.textContent=formatMoney(summary.revenue);
+        performanceConversion.textContent=formatPercent(summary.conversion_rate);
+        performanceInterestRate.textContent=formatPercent(summary.interest_rate);
+    }
+
+    function renderPerformance(performance){
+        performanceTableBody.innerHTML="";
+        if(!Array.isArray(performance)||!performance.length){performanceTableWrap.style.display="none";performanceEmpty.style.display="block";return;}
+        performanceEmpty.style.display="none";performanceTableWrap.style.display="block";
+        performance.forEach(item=>{
+            const row=document.createElement("tr");
+            row.innerHTML=`<td class="performance-type">${escapeHtml(performanceTypeLabels[item.recommendation_type]||item.recommendation_type||"پیشنهاد")}</td>
+                <td>${formatNumber(item.presented)}</td><td>${formatNumber(item.purchased)}</td><td>${formatNumber(item.interested)}</td>
+                <td>${formatNumber(item.rejected)}</td><td>${formatNumber(item.follow_up)}</td>
+                <td class="performance-revenue">${formatMoney(item.revenue)}</td><td class="performance-revenue">${formatMoney(item.average_revenue)}</td>
+                <td class="performance-rate">${formatPercent(item.conversion_rate)}</td><td class="performance-rate">${formatPercent(item.interest_rate)}</td>`;
+            performanceTableBody.appendChild(row);
+        });
+    }
+
+    async function loadRecommendationPerformance(){
+        if(!customerCode)return;
+        performanceLoading.style.display="block";performanceError.style.display="none";performanceEmpty.style.display="none";
+        try{
+            const response=await fetch(`/api/recommendations/v1/customers/${encodeURIComponent(customerCode)}/performance/`,{method:"GET",headers:{"Accept":"application/json"},credentials:"same-origin"});
+            const data=await response.json();
+            if(!response.ok)throw new Error(data.detail||data.error||"دریافت عملکرد پیشنهادها ناموفق بود.");
+            updatePerformanceSummary(data.summary||{});
+            renderPerformance(data.performance||[]);
+        }catch(error){
+            performanceTableWrap.style.display="none";performanceError.textContent=error.message||"خطا در دریافت عملکرد پیشنهادها";performanceError.style.display="block";
+        }finally{performanceLoading.style.display="none";}
+    }
+
+    if(performanceRefresh)performanceRefresh.addEventListener("click",loadRecommendationPerformance);
+    loadRecommendationPerformance();
+
+    function getCsrfToken(){
+        const name="csrftoken=", cookies=document.cookie.split(";");
+        for(let cookie of cookies){cookie=cookie.trim();if(cookie.indexOf(name)===0)return decodeURIComponent(cookie.substring(name.length))}
+        return "";
+    }
+})();
+
+/* =========================================================
+   STAGE 8B — RECOMMENDATION PERFORMANCE API
+   ========================================================= */
+
+(function () {
+
+    const performanceSection =
+        document.getElementById("recommendationPerformanceSection");
+
+    if (!performanceSection) {
+        return;
+    }
+
+    const refreshButton =
+        document.getElementById(
+            "refreshRecommendationPerformance"
+        );
+
+    const loading =
+        document.getElementById(
+            "performanceLoading"
+        );
+
+    const errorBox =
+        document.getElementById(
+            "performanceError"
+        );
+
+    const emptyBox =
+        document.getElementById(
+            "performanceEmpty"
+        );
+
+    const tableWrap =
+        document.getElementById(
+            "performanceTableWrap"
+        );
+
+    const tableBody =
+        document.getElementById(
+            "performanceTableBody"
+        );
+
+    const presented =
+        document.getElementById(
+            "performancePresented"
+        );
+
+    const purchased =
+        document.getElementById(
+            "performancePurchased"
+        );
+
+    const interested =
+        document.getElementById(
+            "performanceInterested"
+        );
+
+    const revenue =
+        document.getElementById(
+            "performanceRevenue"
+        );
+
+    const conversion =
+        document.getElementById(
+            "performanceConversion"
+        );
+
+    const interestRate =
+        document.getElementById(
+            "performanceInterestRate"
+        );
+
+
+    /* ---------------------------------------------------------
+       Helpers
+       --------------------------------------------------------- */
+
+    function getCustomerCode() {
+
+        /*
+         * اولویت:
+         * 1. customer_code از URL
+         * 2. input جستجوی مشتری
+         * 3. data-customer-code روی body
+         */
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        let code =
+            params.get("customer_code");
+
+        if (code) {
+            return code.trim();
+        }
+
+        const customerInput =
+            document.getElementById(
+                "customerCode"
+            );
+
+        if (
+            customerInput &&
+            customerInput.value
+        ) {
+            return customerInput.value.trim();
+        }
+
+        const bodyCode =
+            document.body.dataset.customerCode;
+
+        if (bodyCode) {
+            return bodyCode.trim();
+        }
+
+        /*
+         * اگر صفحه از مسیر /customers/C0003/
+         * باز شده باشد
+         */
+        const pathMatch =
+            window.location.pathname.match(
+                /customers\/([^\/]+)/i
+            );
+
+        if (pathMatch) {
+            return pathMatch[1];
+        }
+
+        return null;
+    }
+
+
+    function formatNumber(value) {
+
+        if (
+            value === null ||
+            value === undefined ||
+            value === ""
+        ) {
+            return "۰";
+        }
+
+        const number =
+            Number(value);
+
+        if (Number.isNaN(number)) {
+            return value;
+        }
+
+        return new Intl.NumberFormat(
+            "fa-IR"
+        ).format(number);
+    }
+
+
+    function formatMoney(value) {
+
+        if (
+            value === null ||
+            value === undefined ||
+            value === ""
+        ) {
+            return "۰";
+        }
+
+        const number =
+            Number(value);
+
+        if (Number.isNaN(number)) {
+            return value;
+        }
+
+        return new Intl.NumberFormat(
+            "fa-IR",
+            {
+                maximumFractionDigits: 0
+            }
+        ).format(number);
+    }
+
+
+    function formatPercent(value) {
+
+        if (
+            value === null ||
+            value === undefined ||
+            value === ""
+        ) {
+            return "۰٪";
+        }
+
+        const number =
+            Number(value);
+
+        if (Number.isNaN(number)) {
+            return value;
+        }
+
+        return new Intl.NumberFormat(
+            "fa-IR",
+            {
+                maximumFractionDigits: 1
+            }
+        ).format(number) + "٪";
+    }
+
+
+    function recommendationTypeLabel(type) {
+
+        const labels = {
+
+            "REPEAT_PURCHASE":
+                "خرید مجدد",
+
+            "CROSS_SELL":
+                "فروش مکمل",
+
+            "CATEGORY":
+                "دسته محصول",
+
+            "SIMILAR_PRODUCT":
+                "محصول مشابه",
+
+            "UPSELL":
+                "فروش ارتقایی"
+        };
+
+        return (
+            labels[type] ||
+            type ||
+            "نامشخص"
+        );
+    }
+
+
+    function clearPerformanceTable() {
+
+        if (tableBody) {
+            tableBody.innerHTML = "";
+        }
+    }
+
+
+    /* ---------------------------------------------------------
+       UI states
+       --------------------------------------------------------- */
+
+    function setLoadingState() {
+
+        if (loading) {
+            loading.style.display = "block";
+        }
+
+        if (errorBox) {
+            errorBox.style.display = "none";
+            errorBox.textContent = "";
+        }
+
+        if (emptyBox) {
+            emptyBox.style.display = "none";
+        }
+
+        if (tableWrap) {
+            tableWrap.style.display = "none";
+        }
+    }
+
+
+    function setErrorState(message) {
+
+        if (loading) {
+            loading.style.display = "none";
+        }
+
+        if (tableWrap) {
+            tableWrap.style.display = "none";
+        }
+
+        if (emptyBox) {
+            emptyBox.style.display = "none";
+        }
+
+        if (errorBox) {
+            errorBox.textContent =
+                message ||
+                "خطا در دریافت عملکرد پیشنهادها.";
+
+            errorBox.style.display = "block";
+        }
+    }
+
+
+    function setEmptyState() {
+
+        if (loading) {
+            loading.style.display = "none";
+        }
+
+        if (errorBox) {
+            errorBox.style.display = "none";
+            errorBox.textContent = "";
+        }
+
+        if (tableWrap) {
+            tableWrap.style.display = "none";
+        }
+
+        if (emptyBox) {
+            emptyBox.style.display = "block";
+        }
+    }
+
+
+    /* ---------------------------------------------------------
+       Summary
+       --------------------------------------------------------- */
+
+    function renderSummary(summary) {
+
+        if (!summary) {
+            return;
+        }
+
+        if (presented) {
+
+            presented.textContent =
+                formatNumber(
+                    summary.presented
+                );
+        }
+
+        if (purchased) {
+
+            purchased.textContent =
+                formatNumber(
+                    summary.purchased
+                );
+        }
+
+        if (interested) {
+
+            interested.textContent =
+                formatNumber(
+                    summary.interested
+                );
+        }
+
+        if (revenue) {
+
+            revenue.textContent =
+                formatMoney(
+                    summary.revenue
+                );
+        }
+
+        if (conversion) {
+
+            conversion.textContent =
+                formatPercent(
+                    summary.conversion_rate
+                );
+        }
+
+        if (interestRate) {
+
+            interestRate.textContent =
+                formatPercent(
+                    summary.interest_rate
+                );
+        }
+    }
+
+
+    /* ---------------------------------------------------------
+       Performance table
+       --------------------------------------------------------- */
+
+    function renderPerformanceTable(
+        performance
+    ) {
+
+        clearPerformanceTable();
+
+        if (
+            !performance ||
+            !performance.length
+        ) {
+
+            setEmptyState();
+
+            return;
+        }
+
+        performance.forEach(
+            function (item) {
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
+
+                row.innerHTML = `
+
+                    <td>
+                        <span class="performance-type">
+                            ${recommendationTypeLabel(
+                                item.recommendation_type
+                            )}
+                        </span>
+                    </td>
+
+                    <td>
+                        ${formatNumber(
+                            item.presented
+                        )}
+                    </td>
+
+                    <td class="performance-positive">
+                        ${formatNumber(
+                            item.purchased
+                        )}
+                    </td>
+
+                    <td class="performance-interest">
+                        ${formatNumber(
+                            item.interested
+                        )}
+                    </td>
+
+                    <td>
+                        ${formatNumber(
+                            item.rejected
+                        )}
+                    </td>
+
+                    <td>
+                        ${formatNumber(
+                            item.follow_up
+                        )}
+                    </td>
+
+                    <td class="performance-revenue">
+                        ${formatMoney(
+                            item.revenue
+                        )}
+                    </td>
+
+                    <td>
+                        ${formatMoney(
+                            item.average_revenue
+                        )}
+                    </td>
+
+                    <td>
+                        <strong>
+                            ${formatPercent(
+                                item.conversion_rate
+                            )}
+                        </strong>
+                    </td>
+
+                    <td>
+                        ${formatPercent(
+                            item.interest_rate
+                        )}
+                    </td>
+
+                `;
+
+                tableBody.appendChild(
+                    row
+                );
+            }
+        );
+
+        if (loading) {
+            loading.style.display = "none";
+        }
+
+        if (errorBox) {
+            errorBox.style.display = "none";
+            errorBox.textContent = "";
+        }
+
+        if (emptyBox) {
+            emptyBox.style.display = "none";
+        }
+
+        if (tableWrap) {
+            tableWrap.style.display = "block";
+        }
+    }
+
+
+    /* ---------------------------------------------------------
+       API
+       --------------------------------------------------------- */
+
+    async function loadRecommendationPerformance() {
+
+        const customerCode =
+            getCustomerCode();
+
+        if (!customerCode) {
+
+            setErrorState(
+                "کد مشتری برای دریافت عملکرد پیشنهادها پیدا نشد."
+            );
+
+            return;
+        }
+
+        setLoadingState();
+
+        /*
+         * جلوگیری از cache شدن درخواست
+         */
+        const url =
+            `/api/recommendations/v1/customers/${encodeURIComponent(
+                customerCode
+            )}/performance/?_=${Date.now()}`;
+
+        try {
+
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Accept":
+                                "application/json"
+                        },
+
+                        cache: "no-store"
+                    }
+                );
+
+            if (!response.ok) {
+
+                let message =
+                    `خطا در دریافت اطلاعات عملکرد (${response.status})`;
+
+                try {
+
+                    const errorData =
+                        await response.json();
+
+                    if (
+                        errorData &&
+                        errorData.detail
+                    ) {
+                        message =
+                            errorData.detail;
+                    }
+
+                } catch (e) {
+                    // ignore JSON parsing error
+                }
+
+                throw new Error(
+                    message
+                );
+            }
+
+            const data =
+                await response.json();
+
+            console.log(
+                "Recommendation Performance:",
+                data
+            );
+
+            if (!data) {
+
+                setEmptyState();
+
+                return;
+            }
+
+            renderSummary(
+                data.summary
+            );
+
+            renderPerformanceTable(
+                data.performance
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Recommendation performance error:",
+                error
+            );
+
+            setErrorState(
+                error.message ||
+                "خطا در دریافت عملکرد پیشنهادها."
+            );
+        }
+    }
+
+
+    /* ---------------------------------------------------------
+       Refresh button
+       --------------------------------------------------------- */
+
+    if (refreshButton) {
+
+        refreshButton.addEventListener(
+            "click",
+            function () {
+
+                loadRecommendationPerformance();
+
+            }
+        );
+    }
+
+
+    /* ---------------------------------------------------------
+       Initial load
+       --------------------------------------------------------- */
+
+    loadRecommendationPerformance();
+
+})();
+</script>
+
+</body>
+</html>

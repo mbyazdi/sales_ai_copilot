@@ -1,0 +1,72 @@
+<section class="explainability-section">
+        {% with primary=recommendations.0 %}
+        <div class="explainability-grid">
+<div class="why-ai-card">
+<div class="ai-card-head">
+<div>
+<div class="section-eyebrow">AI EXPLAINABILITY</div>
+<h2 class="ai-card-title">🧠 چرا AI این پیشنهاد را انتخاب کرده؟</h2>
+<div class="ai-card-subtitle">دلایل قابل فهم برای فروشنده؛ بدون پنهان کردن منطق تصمیم</div>
+</div>
+<div class="confidence-badge">Confidence <span class="confidence-value">{{ primary.score|floatformat:0 }}%</span></div>
+</div>
+<div class="reason-list">
+<div class="reason-item">
+<div class="reason-icon">✓</div>
+<div class="reason-text"><strong>الگوی خرید مشتری</strong><span>رفتار خرید قبلی با این نوع پیشنهاد همخوانی دارد.</span></div>
+<div class="reason-weight">High</div>
+</div>
+<div class="reason-item">
+<div class="reason-icon">✓</div>
+<div class="reason-text"><strong>زمان‌بندی خرید</strong><span>{{ customer_360.days_since_last_purchase }} روز از آخرین خرید گذشته است.</span></div>
+<div class="reason-weight">High</div>
+</div>
+<div class="reason-item">
+<div class="reason-icon">✓</div>
+<div class="reason-text"><strong>هم‌خوانی با دسته خرید</strong><span>دسته اصلی خرید مشتری: {{ customer_360.top_category }}</span></div>
+<div class="reason-weight">Medium</div>
+</div>
+<div class="reason-item">
+<div class="reason-icon">✓</div>
+<div class="reason-text"><strong>ارزش مشتری</strong><span>مشتری از نظر ارزش خرید در گروه {{ customer.grade.name|default:"قابل توجه" }} قرار دارد.</span></div>
+<div class="reason-weight">Medium</div>
+</div>
+</div>
+
+                {% if recommendations|length > 1 %}
+                {% with second=recommendations.1 %}
+                <div class="alternative-insight">
+<div class="alternative-insight-title">🔁 اگر پیشنهاد اصلی مناسب نبود؟</div>
+<div class="alternative-insight-text">گزینه جایگزین AI: <strong>{{ second.product.name }}</strong> با امتیاز <strong>{{ second.score|floatformat:0 }}</strong>. فروشنده می‌تواند بدون خروج از جلسه به گزینه دوم سوییچ کند.</div>
+</div>
+                {% endwith %}
+                {% endif %}
+            </div>
+<div class="outcome-card">
+<div class="ai-card-head">
+<div>
+<div class="section-eyebrow">SALES LEARNING LOOP</div>
+<h2 class="ai-card-title">🎯 نتیجه جلسه فروش</h2>
+<div class="ai-card-subtitle">نتیجه واقعی جلسه را ثبت کنید تا Recommendation Engine بهتر شود.</div>
+</div>
+</div>
+<div class="outcome-product">
+<div class="outcome-product-label">پیشنهاد مورد ارزیابی</div>
+<div class="outcome-product-name">{{ primary.product.name }}</div>
+<div class="outcome-product-code">{{ primary.product.product_code }}</div>
+</div>
+<div class="outcome-buttons" id="outcomeButtons">
+<button class="outcome-btn purchased" data-outcome="PURCHASED" data-product-code="{{ primary.product.product_code|escape }}" data-product-name="{{ primary.product.name|escape }}" data-recommendation-id="{{ primary.id }}" type="button">✓ خرید شد</button>
+<button class="outcome-btn interested" data-outcome="INTERESTED" data-product-code="{{ primary.product.product_code|escape }}" data-product-name="{{ primary.product.name|escape }}" data-recommendation-id="{{ primary.id }}" type="button">♥ علاقه‌مند شد</button>
+<button class="outcome-btn followup" data-outcome="FOLLOW_UP" data-product-code="{{ primary.product.product_code|escape }}" data-product-name="{{ primary.product.name|escape }}" data-recommendation-id="{{ primary.id }}" type="button">↻ نیاز به پیگیری</button>
+<button class="outcome-btn rejected" data-outcome="REJECTED" data-product-code="{{ primary.product.product_code|escape }}" data-product-name="{{ primary.product.name|escape }}" data-recommendation-id="{{ primary.id }}" type="button">✕ رد شد</button>
+<button class="outcome-btn not-presented" data-outcome="NOT_PRESENTED" data-product-code="{{ primary.product.product_code|escape }}" data-product-name="{{ primary.product.name|escape }}" data-recommendation-id="{{ primary.id }}" type="button">— مطرح نشد</button>
+</div>
+<div class="outcome-status" id="outcomeStatus">
+                    هنوز نتیجه‌ای ثبت نشده است.
+                </div>
+<div class="learning-loop"><span class="learning-dot"></span> این نتیجه در نسخه واقعی سیستم به بازخورد موتور پیشنهاددهی تبدیل خواهد شد.</div>
+</div>
+</div>
+        {% endwith %}
+    </section>

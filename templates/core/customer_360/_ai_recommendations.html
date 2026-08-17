@@ -1,0 +1,276 @@
+<section class="recommendations-hero">
+
+    <div class="section-head">
+        <div class="section-head-main">
+
+            <div class="section-eyebrow">
+                AI SALES COPILOT
+            </div>
+
+            <h1 class="section-title">
+                پیشنهادهای هوشمند فروش
+            </h1>
+
+            <p class="section-description">
+                پیشنهادهای تولیدشده بر اساس رفتار خرید مشتری
+            </p>
+
+        </div>
+
+        <div class="count-badge">
+            {{ recommendations|length }} پیشنهاد
+        </div>
+    </div>
+
+
+    {% if recommendations %}
+
+        <!-- =====================================================
+             ALL RECOMMENDATIONS
+             هر Recommendation یک Outcome مستقل دارد
+        ====================================================== -->
+
+        <div class="recommendations-list">
+
+            {% for recommendation in recommendations %}
+
+                <article
+                    class="recommendation-outcome-card {% if forloop.first %}is-primary{% endif %}"
+                    data-recommendation-id="{{ recommendation.id }}"
+                    data-product-code="{{ recommendation.product.product_code }}"
+                >
+
+                    <!-- =========================================
+                         HEADER
+                    ========================================== -->
+
+                    <div class="recommendation-card-head">
+
+                        <div class="recommendation-rank">
+
+                            {% if forloop.first %}
+                                <span class="primary-badge">
+                                    🎯 پیشنهاد اصلی
+                                </span>
+                            {% else %}
+                                <span class="rank-number">
+                                    #{{ recommendation.rank }}
+                                </span>
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="recommendation-score">
+
+                            <span class="score-caption">
+                                امتیاز AI
+                            </span>
+
+                            <strong class="score-number">
+                                {{ recommendation.score|floatformat:0 }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =========================================
+                         PRODUCT
+                    ========================================== -->
+
+                    <div class="recommendation-product">
+
+                        <div class="recommendation-product-main">
+
+                            <h3 class="recommendation-product-name">
+                                {{ recommendation.product.name }}
+                            </h3>
+
+                            <div class="recommendation-product-code">
+                                {{ recommendation.product.product_code }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="recommendation-product-category">
+
+                            {{ recommendation.product.category }}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =========================================
+                         RECOMMENDATION TYPE
+                    ========================================== -->
+
+                    <div class="recommendation-meta">
+
+                        <span class="recommendation-type-pill">
+
+                            {% if recommendation.recommendation_type == "REPEAT_PURCHASE" %}
+                                🔄 خرید مجدد
+
+                            {% elif recommendation.recommendation_type == "CROSS_SELL" %}
+                                🛒 فروش مکمل
+
+                            {% elif recommendation.recommendation_type == "CATEGORY" %}
+                                📂 پیشنهاد دسته
+
+                            {% elif recommendation.recommendation_type == "SIMILAR_PRODUCT" %}
+                                🔁 محصول مشابه
+
+                            {% elif recommendation.recommendation_type == "UP_SELL" %}
+                                ⭐ فروش ارتقایی
+
+                            {% else %}
+                                💡 پیشنهاد هوشمند
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- =========================================
+                         WHY THIS PRODUCT?
+                    ========================================== -->
+
+                    {% if recommendation.reason %}
+
+                        <div class="recommendation-reason">
+
+                            <strong>
+                                چرا این محصول؟
+                            </strong>
+
+                            <div>
+                                {{ recommendation.reason }}
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- =========================================
+                         SALES OUTCOME
+                    ========================================== -->
+
+                    <div class="recommendation-outcome">
+
+                        <div class="outcome-title">
+                            نتیجه جلسه فروش
+                        </div>
+
+                        <div class="outcome-subtitle">
+                            نتیجه تعامل مشتری با این پیشنهاد را ثبت کنید.
+                        </div>
+
+
+                        <div class="outcome-actions">
+
+                            <button
+                                type="button"
+                                class="outcome-btn outcome-purchased"
+                                data-outcome="PURCHASED"
+                                data-recommendation-id="{{ recommendation.id }}"
+                            >
+                                🛒
+                                <span>خرید شد</span>
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="outcome-btn outcome-interested"
+                                data-outcome="INTERESTED"
+                                data-recommendation-id="{{ recommendation.id }}"
+                            >
+                                ❤️
+                                <span>علاقه‌مند شد</span>
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="outcome-btn outcome-followup"
+                                data-outcome="FOLLOW_UP"
+                                data-recommendation-id="{{ recommendation.id }}"
+                            >
+                                🔄
+                                <span>نیاز به پیگیری</span>
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="outcome-btn outcome-rejected"
+                                data-outcome="REJECTED"
+                                data-recommendation-id="{{ recommendation.id }}"
+                            >
+                                ✕
+                                <span>رد شد</span>
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="outcome-btn outcome-not-presented"
+                                data-outcome="NOT_PRESENTED"
+                                data-recommendation-id="{{ recommendation.id }}"
+                            >
+                                —
+                                <span>مطرح نشد</span>
+                            </button>
+
+                        </div>
+
+
+                        <!-- وضعیت فعلی -->
+                        <div
+                            class="recommendation-outcome-status"
+                            data-outcome-status="{{ recommendation.id }}"
+                        >
+                            <span class="status-label">
+                                وضعیت:
+                            </span>
+
+                            <span class="status-value">
+                                هنوز ثبت نشده
+                            </span>
+                        </div>
+
+                    </div>
+
+                </article>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="recommendations-empty">
+
+            <div class="empty-icon">
+                🤖
+            </div>
+
+            <h3>
+                در حال حاضر پیشنهاد فعالی وجود ندارد
+            </h3>
+
+            <p>
+                برای این مشتری هنوز Recommendation فعالی توسط موتور پیشنهاددهی ایجاد نشده است.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</section>

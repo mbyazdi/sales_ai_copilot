@@ -1,0 +1,101 @@
+<section class="lower-grid">
+<!-- RFM -->
+<div class="card">
+<div class="card-header">
+<div class="card-heading">
+<div class="heading-icon">
+                        ⭐
+                    </div>
+<div>
+<h2 class="card-title">
+                            امتیاز و ارزش مشتری
+                        </h2>
+</div>
+</div>
+</div>
+<div class="rfm-score">
+                {{ customer_360.rfm_score }}
+            </div>
+<div class="segment-wrap">
+<span class="segment">
+                    {{ customer_360.segment }}
+                </span>
+</div>
+<div class="score-row">
+<span>تازگی خرید</span>
+<strong>
+                    {{ customer_360.recency_score }}
+                </strong>
+<div class="progress">
+<div class="progress-bar" style="width:{% widthratio customer_360.recency_score 5 100 %}%"></div>
+</div>
+</div>
+<div class="score-row">
+<span>تعداد خرید</span>
+<strong>
+                    {{ customer_360.frequency_score }}
+                </strong>
+<div class="progress">
+<div class="progress-bar" style="width:{% widthratio customer_360.frequency_score 5 100 %}%"></div>
+</div>
+</div>
+<div class="score-row">
+<span>ارزش خرید</span>
+<strong>
+                    {{ customer_360.monetary_score }}
+                </strong>
+<div class="progress">
+<div class="progress-bar" style="width:{% widthratio customer_360.monetary_score 5 100 %}%"></div>
+</div>
+</div>
+</div>
+<!-- SALES -->
+<div class="card">
+<div class="card-header">
+<div class="card-heading">
+<div class="heading-icon">
+                        📈
+                    </div>
+<div>
+<h2 class="card-title">
+                            عملکرد فروش
+                        </h2>
+</div>
+</div>
+</div>
+<div class="sales-grid">
+<div class="sales-box">
+<div class="sales-label">
+                        فروش ۳۰ روز اخیر
+                    </div>
+<div class="sales-value">
+                        {{ customer_360.sales_30d|floatformat:0 }}
+                    </div>
+</div>
+<div class="sales-box">
+<div class="sales-label">
+                        فروش ۹۰ روز اخیر
+                    </div>
+<div class="sales-value">
+                        {{ customer_360.sales_90d|floatformat:0 }}
+                    </div>
+</div>
+<div class="sales-box">
+<div class="sales-label">
+                        اولین خرید
+                    </div>
+<div class="sales-value">
+                        {{ customer_360.first_purchase_date }}
+                    </div>
+</div>
+<div class="sales-box">
+<div class="sales-label">
+                        آخرین خرید
+                    </div>
+<div class="sales-value">
+                        {{ customer_360.last_purchase_date }}
+                    </div>
+</div>
+</div>
+</div>
+</section>

@@ -1,17 +1,23 @@
 from django.urls import path
 
-from . import views
-
-
-app_name = "recommendations"
+from .views import (
+    CustomerRecommendationAPIView,
+    CustomerRecommendationPerformanceAPIView,
+)
 
 
 urlpatterns = [
 
     path(
-        "",
-        views.customer_recommendations,
-        name="customer_recommendations",
+        "v1/recommendations/<str:customer_code>/",
+        CustomerRecommendationAPIView.as_view(),
+        name="customer-recommendations",
+    ),
+
+    path(
+        "v1/customers/<str:customer_code>/performance/",
+        CustomerRecommendationPerformanceAPIView.as_view(),
+        name="customer-recommendation-performance",
     ),
 
 ]

@@ -28,11 +28,14 @@ def get_customer_by_code(customer_code):
 
 def get_customer_360(customer_code):
     """
-    Return customer and its Customer360 snapshot.
-
-    Returns:
-        tuple: (customer, customer_360)
+    Return customer, Customer360 snapshot,
+    salesperson assignment and latest visit.
     """
+
+    from apps.visits.models import (
+        CustomerAssignment,
+        Visit,
+    )
 
     customer = get_customer_by_code(customer_code)
 
@@ -42,7 +45,41 @@ def get_customer_360(customer_code):
         None,
     )
 
-    return customer, customer_360
+    # -------------------------------------------------
+    # Active salesperson assignment
+    # -------------------------------------------------
+
+    assignment = (
+        CustomerAssignment.objects
+        .filter(
+            customer=customer,
+            is_active=True,
+        )
+        .select_related("salesperson")
+        .order_by("-start_date", "-id")
+        .first()
+    )
+
+    # -------------------------------------------------
+    # Latest visit
+    # -------------------------------------------------
+
+    latest_visit = (
+        Visit.objects
+        .filter(
+            customer=customer,
+        )
+        .select_related("salesperson")
+        .order_by("-visit_date", "-id")
+        .first()
+    )
+
+    return {
+        "customer": customer,
+        "customer_360": customer_360,
+        "assignment": assignment,
+        "latest_visit": latest_visit,
+    }
 
 
 def build_customer_360(customer):

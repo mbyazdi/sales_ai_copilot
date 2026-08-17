@@ -1,0 +1,46 @@
+<section class="customer-hero">
+<div class="customer-identity">
+<div class="customer-avatar">
+                {{ customer.name|first }}
+            </div>
+<div class="customer-info">
+<div class="eyebrow">CUSTOMER 360</div>
+<div class="customer-name">
+                    {{ customer.name }}
+                </div>
+<div class="customer-code">
+                    {{ customer.customer_code }}
+                </div>
+<div class="customer-tags">
+
+                    {% if customer.grade %}
+                        <span class="tag grade">
+                            {{ customer.grade.name }}
+                        </span>
+                    {% endif %}
+
+                    <span class="tag">
+                        {{ customer.customer_type }}
+                    </span>
+<span class="tag">
+                        {{ customer.city }}
+                    </span>
+</div>
+</div>
+</div>
+
+        {% if customer_360 %}
+            <div class="last-purchase">
+<div class="last-purchase-label">
+                    روز از آخرین خرید
+                </div>
+<div class="last-purchase-value">
+                    {{ customer_360.days_since_last_purchase }}
+                </div>
+<div class="last-purchase-unit">
+                    روز
+                </div>
+</div>
+        {% endif %}
+
+    </section>

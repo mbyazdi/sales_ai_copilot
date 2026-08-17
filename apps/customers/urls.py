@@ -1,17 +1,23 @@
 from django.urls import path
 
-from . import views
-
-
-app_name = "customers"
+from .views import (
+    customer_search,
+    Customer360APIView,
+)
 
 
 urlpatterns = [
 
     path(
         "",
-        views.customer_search,
-        name="search",
+        customer_search,
+        name="customer-search",
+    ),
+
+    path(
+        "v1/customer-360/<str:customer_code>/",
+        Customer360APIView.as_view(),
+        name="customer-360-api",
     ),
 
 ]

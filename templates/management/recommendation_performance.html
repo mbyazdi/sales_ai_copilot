@@ -1,0 +1,283 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Recommendation Performance
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'management/css/recommendation_performance.css' %}"
+    >
+
+</head>
+
+<body>
+
+<div class="management-page">
+
+    <header class="dashboard-header">
+
+        <div>
+
+            <div class="dashboard-eyebrow">
+                SALES AI COPILOT
+            </div>
+
+            <h1>
+                عملکرد پیشنهادهای هوشمند فروش
+            </h1>
+
+            <p>
+                ارزیابی عملکرد Recommendation Engine بر اساس
+                نتایج واقعی جلسات فروش
+            </p>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================
+         SUMMARY
+    ========================================== -->
+
+    <section class="summary-section">
+
+        <div class="section-title">
+            خلاصه عملکرد
+        </div>
+
+        <div class="summary-grid">
+
+            <article class="summary-card">
+
+                <div class="summary-label">
+                    پیشنهادهای ارائه‌شده
+                </div>
+
+                <div
+                    class="summary-value"
+                    id="summaryPresented"
+                >
+                    —
+                </div>
+
+            </article>
+
+
+            <article class="summary-card success">
+
+                <div class="summary-label">
+                    خرید موفق
+                </div>
+
+                <div
+                    class="summary-value"
+                    id="summaryPurchased"
+                >
+                    —
+                </div>
+
+            </article>
+
+
+            <article class="summary-card warning">
+
+                <div class="summary-label">
+                    مشتریان علاقه‌مند
+                </div>
+
+                <div
+                    class="summary-value"
+                    id="summaryInterested"
+                >
+                    —
+                </div>
+
+            </article>
+
+
+            <article class="summary-card revenue">
+
+                <div class="summary-label">
+                    فروش حاصل
+                </div>
+
+                <div
+                    class="summary-value"
+                    id="summaryRevenue"
+                >
+                    —
+                </div>
+
+            </article>
+
+
+            <article class="summary-card">
+
+                <div class="summary-label">
+                    نرخ تبدیل
+                </div>
+
+                <div
+                    class="summary-value"
+                    id="summaryConversion"
+                >
+                    —
+                </div>
+
+            </article>
+
+
+            <article class="summary-card">
+
+                <div class="summary-label">
+                    نرخ علاقه‌مندی
+                </div>
+
+                <div
+                    class="summary-value"
+                    id="summaryInterest"
+                >
+                    —
+                </div>
+
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         PERFORMANCE TABLE
+    ========================================== -->
+
+    <section class="performance-section">
+
+        <div class="section-header">
+
+            <div>
+
+                <div class="section-eyebrow">
+                    RECOMMENDATION PERFORMANCE
+                </div>
+
+                <h2>
+                    عملکرد انواع پیشنهاد
+                </h2>
+
+                <p>
+                    مقایسه عملکرد Recommendation Typeهای مختلف
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="table-loading"
+            id="performanceLoading"
+        >
+            در حال دریافت اطلاعات...
+        </div>
+
+
+        <div
+            class="table-error"
+            id="performanceError"
+        ></div>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            نوع پیشنهاد
+                        </th>
+
+                        <th>
+                            ارائه
+                        </th>
+
+                        <th>
+                            خرید
+                        </th>
+
+                        <th>
+                            علاقه‌مند
+                        </th>
+
+                        <th>
+                            رد
+                        </th>
+
+                        <th>
+                            پیگیری
+                        </th>
+
+                        <th>
+                            تبدیل
+                        </th>
+
+                        <th>
+                            علاقه‌مندی
+                        </th>
+
+                        <th>
+                            فروش
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody
+                    id="performanceTableBody"
+                >
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<script>
+
+window.salesRecommendationPerformance = {
+    apiUrl: "/api/visits/v1/recommendations/performance/"
+};
+
+</script>
+
+
+<script
+    src="{% static 'management/js/recommendation_performance.js' %}"
+></script>
+
+</body>
+
+</html>

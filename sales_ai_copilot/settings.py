@@ -29,23 +29,25 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
 
-    'apps.core.apps.CoreConfig',
-    'apps.customers.apps.CustomersConfig',
-    'apps.products.apps.ProductsConfig',
-    'apps.sales.apps.SalesConfig',
-    'apps.recommendations.apps.RecommendationsConfig',
-    'apps.promotions.apps.PromotionsConfig',
-    'apps.inventory.apps.InventoryConfig',
-    'apps.visits.apps.VisitsConfig',
+    "rest_framework",
+
+    "apps.core.apps.CoreConfig",
+    "apps.customers.apps.CustomersConfig",
+    "apps.products.apps.ProductsConfig",
+    "apps.sales.apps.SalesConfig",
+    "apps.recommendations.apps.RecommendationsConfig",
+    "apps.promotions.apps.PromotionsConfig",
+    "apps.inventory.apps.InventoryConfig",
+    "apps.visits.apps.VisitsConfig",
+    "apps.management.apps.ManagementConfig",
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,196 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family:
+        Tahoma,
+        Arial,
+        sans-serif;
+    background: #f5f7fb;
+    color: #172033;
+}
+
+.management-page {
+    width: min(1400px, 94%);
+    margin: 40px auto;
+}
+
+.dashboard-header {
+    margin-bottom: 32px;
+}
+
+.dashboard-eyebrow,
+.section-eyebrow {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #6577a8;
+    margin-bottom: 8px;
+}
+
+.dashboard-header h1 {
+    margin: 0 0 10px;
+    font-size: 30px;
+}
+
+.dashboard-header p {
+    margin: 0;
+    color: #68738a;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(6, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.summary-card {
+    background: white;
+    border: 1px solid #e3e7ef;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow:
+        0 5px 18px rgba(30, 45, 75, 0.05);
+}
+
+.summary-card.success {
+    border-top: 4px solid #20a36a;
+}
+
+.summary-card.warning {
+    border-top: 4px solid #e6a23c;
+}
+
+.summary-card.revenue {
+    border-top: 4px solid #536dfe;
+}
+
+.summary-label {
+    color: #69748a;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.summary-value {
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.performance-section {
+    margin-top: 35px;
+    background: white;
+    border: 1px solid #e3e7ef;
+    border-radius: 18px;
+    padding: 26px;
+}
+
+.section-header h2 {
+    margin: 0 0 8px;
+}
+
+.section-header p {
+    margin: 0 0 24px;
+    color: #68738a;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+}
+
+th,
+td {
+    padding: 15px 12px;
+    text-align: center;
+    border-bottom: 1px solid #edf0f5;
+}
+
+th {
+    background: #f8f9fc;
+    color: #5d6880;
+    font-size: 13px;
+}
+
+td {
+    font-size: 14px;
+}
+
+.recommendation-type {
+    font-weight: 700;
+    text-align: right;
+}
+
+.purchased {
+    color: #168a5a;
+    font-weight: 700;
+}
+
+.interested {
+    color: #c37a08;
+    font-weight: 700;
+}
+
+.conversion {
+    font-weight: 800;
+}
+
+.revenue {
+    font-weight: 700;
+}
+
+.table-loading {
+    padding: 20px;
+    text-align: center;
+    color: #68738a;
+}
+
+.table-error {
+    display: none;
+    padding: 15px;
+    border-radius: 10px;
+    background: #fff1f1;
+    color: #c62828;
+    margin-bottom: 15px;
+}
+
+.table-empty {
+    padding: 35px !important;
+    color: #7b8496;
+}
+
+@media (max-width: 1100px) {
+
+    .summary-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+}
+
+@media (max-width: 650px) {
+
+    .summary-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .management-page {
+        width: 92%;
+        margin: 25px auto;
+    }
+
+}

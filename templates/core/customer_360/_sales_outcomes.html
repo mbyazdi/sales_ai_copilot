@@ -1,0 +1,62 @@
+<section class="sales-intelligence-section" id="salesIntelligenceSection">
+<div class="sales-feedback-card">
+<div class="feedback-head">
+<div>
+<div class="section-eyebrow">RECOMMENDATION FEEDBACK</div>
+<h2 class="feedback-title">عملکرد پیشنهادهای فروش</h2>
+<p class="feedback-subtitle">نتایج واقعی جلسات نشان می‌دهد پیشنهادهای AI در عمل چقدر موفق بوده‌اند.</p>
+</div>
+<button class="feedback-refresh" id="refreshSalesHistory" type="button">↻ بروزرسانی</button>
+</div>
+<div class="feedback-metrics" id="feedbackMetrics">
+<div class="feedback-metric">
+<div class="feedback-metric-label">تعامل فروش</div>
+<div class="feedback-metric-value" id="feedbackTotal">—</div>
+<div class="feedback-metric-note">نتیجه‌های ثبت‌شده</div>
+</div>
+<div class="feedback-metric success">
+<div class="feedback-metric-label">خرید موفق</div>
+<div class="feedback-metric-value" id="feedbackPurchased">—</div>
+<div class="feedback-metric-note">نتیجه PURCHASED</div>
+</div>
+<div class="feedback-metric warning">
+<div class="feedback-metric-label">علاقه‌مند</div>
+<div class="feedback-metric-value" id="feedbackInterested">—</div>
+<div class="feedback-metric-note">فرصت پیگیری فروش</div>
+</div>
+<div class="feedback-metric info">
+<div class="feedback-metric-label">فروش حاصل</div>
+<div class="feedback-metric-value" id="feedbackRevenue">—</div>
+<div class="feedback-metric-note">مجموع مبلغ ثبت‌شده</div>
+</div>
+</div>
+<div class="feedback-conversion">
+<div class="feedback-conversion-top">
+<span class="feedback-conversion-label">نرخ تبدیل پیشنهاد به خرید</span>
+<strong class="feedback-conversion-value" id="feedbackConversion">0%</strong>
+</div>
+<div class="feedback-progress"><div class="feedback-progress-bar" id="feedbackProgressBar"></div></div>
+</div>
+<div class="feedback-learning">
+<strong>🧠 Learning Loop:</strong>
+                هر نتیجه ثبت‌شده به عنوان بازخورد واقعی عملکرد Recommendation Engine نگهداری می‌شود و در مراحل بعد برای بهبود امتیازدهی پیشنهادها استفاده خواهد شد.
+            </div>
+</div>
+<div class="sales-history-card">
+<div class="history-head">
+<div>
+<div class="section-eyebrow">SALES OUTCOME HISTORY</div>
+<h2 class="history-title">تاریخچه تعاملات فروش</h2>
+<p class="history-subtitle">آخرین نتیجه‌های ثبت‌شده برای پیشنهادهای ارائه‌شده به این مشتری</p>
+</div>
+</div>
+<div class="history-loading" id="salesHistoryLoading">در حال دریافت تاریخچه فروش...</div>
+<div class="history-error" id="salesHistoryError"></div>
+<div class="feedback-empty" id="salesHistoryEmpty">هنوز نتیجه‌ای برای این مشتری ثبت نشده است.</div>
+<div class="history-list" id="salesHistoryList"></div>
+<div class="history-footer">
+<span id="salesHistoryCount">۰ تعامل ثبت شده</span>
+<span>آخرین بروزرسانی: <strong id="salesHistoryUpdated">—</strong></span>
+</div>
+</div>
+</section>
