@@ -12,7 +12,7 @@ from apps.customers.models import Customer
 from apps.recommendations.models import CustomerRecommendation
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
-
+from django.utils import timezone
 
 def recommendation_performance_dashboard(request):
     return render(
@@ -21,6 +21,8 @@ def recommendation_performance_dashboard(request):
     )
 
 def salesperson_dashboard(request):
+
+    today = timezone.localdate()
 
     salesperson = (
         Salesperson.objects
@@ -38,7 +40,15 @@ def salesperson_dashboard(request):
             "visits/dashboard.html",
             {
                 "salesperson": None,
+                "today": today,
                 "visits": [],
+                "summary": {
+                    "total": 0,
+                    "planned": 0,
+                    "in_progress": 0,
+                    "completed": 0,
+                    "cancelled": 0,
+                },
                 "error": (
                     "فروشنده مورد نظر پیدا نشد."
                 ),
@@ -48,7 +58,7 @@ def salesperson_dashboard(request):
     visits = (
         salesperson.visits
         .filter(
-            visit_date__isnull=False,
+            visit_date=today,
         )
         .select_related(
             "customer",
@@ -56,21 +66,37 @@ def salesperson_dashboard(request):
             "customer__customer_360",
         )
         .order_by(
-            "visit_date",
             "id",
         )
     )
+
+    summary = {
+        "total": visits.count(),
+        "planned": visits.filter(
+            status=Visit.VisitStatus.PLANNED
+        ).count(),
+        "in_progress": visits.filter(
+            status=Visit.VisitStatus.IN_PROGRESS
+        ).count(),
+        "completed": visits.filter(
+            status=Visit.VisitStatus.COMPLETED
+        ).count(),
+        "cancelled": visits.filter(
+            status=Visit.VisitStatus.CANCELLED
+        ).count(),
+    }
 
     return render(
         request,
         "visits/dashboard.html",
         {
             "salesperson": salesperson,
+            "today": today,
             "visits": visits,
+            "summary": summary,
             "error": None,
         },
     )
-
 class CustomerVisitsAPIView(APIView):
 
     def get(self, request, customer_code):

@@ -1,0 +1,144 @@
+<div
+    id="outcomeModal"
+    class="outcome-modal"
+    aria-hidden="true"
+>
+    <div
+        class="outcome-modal-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="outcomeModalTitle"
+    >
+
+        <div class="outcome-modal-header">
+
+            <div>
+
+                <div
+                    id="outcomeModalTitle"
+                    class="outcome-modal-title"
+                >
+                    ثبت نتیجه جلسه فروش
+                </div>
+
+                <div
+                    id="outcomeModalProduct"
+                    class="outcome-modal-product"
+                ></div>
+
+                <div
+                    id="outcomeModalOutcome"
+                    class="outcome-modal-outcome"
+                ></div>
+
+            </div>
+
+            <button
+                type="button"
+                id="outcomeModalClose"
+                class="outcome-modal-close"
+                aria-label="بستن"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="outcomeForm">
+
+            <div class="outcome-form-group">
+
+                <label
+                    class="outcome-form-label"
+                    for="outcomeQuantity"
+                >
+                    تعداد
+                </label>
+
+                <input
+                    id="outcomeQuantity"
+                    class="outcome-form-input"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value="0"
+                >
+
+            </div>
+
+
+            <div class="outcome-form-group">
+
+                <label
+                    class="outcome-form-label"
+                    for="outcomeSalesAmount"
+                >
+                    مبلغ فروش
+                </label>
+
+                <input
+                    id="outcomeSalesAmount"
+                    class="outcome-form-input"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value="0"
+                >
+
+            </div>
+
+
+            <div class="outcome-form-group">
+
+                <label
+                    class="outcome-form-label"
+                    for="outcomeNotes"
+                >
+                    یادداشت فروشنده
+                </label>
+
+                <textarea
+                    id="outcomeNotes"
+                    class="outcome-form-textarea"
+                    placeholder="توضیح کوتاه درباره نتیجه جلسه..."
+                ></textarea>
+
+            </div>
+
+
+            <div
+                id="outcomeError"
+                class="outcome-error"
+            ></div>
+
+            <div
+                id="outcomeSuccess"
+                class="outcome-success"
+            ></div>
+
+
+            <div class="outcome-modal-actions">
+
+                <button
+                    type="button"
+                    id="outcomeCancel"
+                    class="outcome-cancel-btn"
+                >
+                    انصراف
+                </button>
+
+                <button
+                    type="submit"
+                    id="outcomeSubmit"
+                    class="outcome-submit-btn"
+                >
+                    ثبت نتیجه جلسه
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>

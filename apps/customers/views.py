@@ -15,17 +15,33 @@ def customer_search(request):
         "customer_code",
         ""
     ).strip()
+        
+    visit_id = request.GET.get(
+        "visit_id",
+        ""
+    ).strip()
 
     context = {
         "customer_code": customer_code,
+        "visit_id": visit_id,
+
         "customer": None,
         "customer_360": None,
+
         "recommendations": [],
+
         "sales_session": None,
+
         "assignment": None,
+
         "latest_visit": None,
+
+        "current_visit": None,
+
         "sales_outcome": None,
+
         "sales_history": None,
+
         "not_found": False,
     }
 
@@ -42,6 +58,50 @@ def customer_search(request):
 
             context["customer"] = customer
             context["customer_360"] = customer_360
+
+            # -----------------------------------------
+            # CURRENT VISIT CONTEXT
+            # -----------------------------------------
+
+            if visit_id:
+
+                try:
+
+                    current_visit_id = int(
+                        visit_id
+                    )
+
+                except (
+                    TypeError,
+                    ValueError,
+                ):
+
+                    current_visit_id = None
+
+
+                if current_visit_id:
+
+                    current_visit = (
+                        Visit.objects
+                        .filter(
+                            id=current_visit_id,
+                            customer=customer,
+                        )
+                        .select_related(
+                            "salesperson",
+                        )
+                        .first()
+                    )
+
+                    if current_visit:
+
+                        context["current_visit"] = (
+                            current_visit
+                        )
+
+                    else:
+
+                        context["visit_not_found"] = True
 
             context["assignment"] = result.get(
                 "assignment"

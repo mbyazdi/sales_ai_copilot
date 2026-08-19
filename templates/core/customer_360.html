@@ -24,12 +24,15 @@
         {% endif %}
     {% endif %}
 </div>
+{% include "core/customer_360/_outcome_modal.html" %}
+
 <script>
-window.salesAiCopilot = {
-    customerCode: "{{ customer.customer_code|default:''|escapejs }}",
-    visitId: {% if latest_visit %}{{ latest_visit.id }}{% else %}null{% endif %}
-};
+    window.salesAiCopilot = {
+        customerCode: "{{ customer.customer_code|escapejs }}",
+        visitId: {% if current_visit %}{{ current_visit.id }}{% else %}null{% endif %}
+    };
 </script>
+
 <script src="{% static 'core/js/customer_360.js' %}"></script>
 </body>
 </html>
