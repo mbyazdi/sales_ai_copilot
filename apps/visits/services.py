@@ -88,85 +88,145 @@ def resolve_recommendation_outcome(
         "last_event_at": outcomes[0].created_at,
     }
 def get_recommendation_performance(customer=None):
-    from django.db.models import Avg, Count, Q, Sum
+    """
+    Calculate recommendation performance using
+    resolved final outcomes per Visit + Recommendation.
+    """
+
+    from collections import defaultdict
+
     from apps.visits.models import SalesOutcome
 
-    queryset = SalesOutcome.objects.all()
+    queryset = (
+        SalesOutcome.objects
+        .filter(
+            recommendation__isnull=False,
+        )
+        .select_related(
+            "visit",
+            "recommendation",
+        )
+    )
 
     if customer is not None:
         queryset = queryset.filter(
             visit__customer=customer
         )
 
-    performance = (
+    pairs = (
         queryset
+        .order_by()
         .values(
-            "recommendation__recommendation_type"
+            "visit_id",
+            "recommendation_id",
+            "recommendation__recommendation_type",
         )
-        .annotate(
-            presented=Count("id"),
-
-            purchased=Count(
-                "id",
-                filter=Q(
-                    outcome="PURCHASED"
-                ),
-            ),
-
-            interested=Count(
-                "id",
-                filter=Q(
-                    outcome="INTERESTED"
-                ),
-            ),
-
-            rejected=Count(
-                "id",
-                filter=Q(
-                    outcome="REJECTED"
-                ),
-            ),
-
-            follow_up=Count(
-                "id",
-                filter=Q(
-                    outcome="FOLLOW_UP"
-                ),
-            ),
-
-            not_presented=Count(
-                "id",
-                filter=Q(
-                    outcome="NOT_PRESENTED"
-                ),
-            ),
-
-            revenue=Sum(
-                "sales_amount"
-            ),
-
-            average_revenue=Avg(
-                "sales_amount",
-                filter=Q(
-                    outcome="PURCHASED"
-                ),
-            ),
-        )
-        .order_by(
-            "recommendation__recommendation_type"
-        )
+        .distinct()
     )
+
+    performance = defaultdict(
+        lambda: {
+            "recommendation_type": None,
+            "presented": 0,
+            "purchased": 0,
+            "interested": 0,
+            "rejected": 0,
+            "follow_up": 0,
+            "not_presented": 0,
+            "revenue": 0.0,
+            "purchase_revenues": [],
+        }
+    )
+
+    for pair in pairs:
+
+        visit_id = pair["visit_id"]
+        recommendation_id = pair["recommendation_id"]
+
+        resolved = resolve_recommendation_outcome(
+            visit_id=visit_id,
+            recommendation_id=recommendation_id,
+        )
+
+        if not resolved:
+            continue
+
+        recommendation_type = (
+            pair[
+                "recommendation__recommendation_type"
+            ]
+        )
+
+        if not recommendation_type:
+            continue
+
+        item = performance[
+            recommendation_type
+        ]
+
+        item["recommendation_type"] = (
+            recommendation_type
+        )
+
+        item["presented"] += 1
+
+        outcome_name = resolved["outcome"]
+
+        if outcome_name == "PURCHASED":
+
+            item["purchased"] += 1
+
+            revenue = float(
+                resolved["sales_amount"] or 0
+            )
+
+            item["revenue"] += revenue
+
+            if revenue > 0:
+                item[
+                    "purchase_revenues"
+                ].append(
+                    revenue
+                )
+
+        elif outcome_name == "INTERESTED":
+
+            item["interested"] += 1
+
+        elif outcome_name == "REJECTED":
+
+            item["rejected"] += 1
+
+        elif outcome_name == "FOLLOW_UP":
+
+            item["follow_up"] += 1
+
+        elif outcome_name == "NOT_PRESENTED":
+
+            item["not_presented"] += 1
 
     result = []
 
-    for item in performance:
+    for item in performance.values():
 
-        presented = item["presented"] or 0
-        purchased = item["purchased"] or 0
-        interested = item["interested"] or 0
-        rejected = item["rejected"] or 0
-        follow_up = item["follow_up"] or 0
-        not_presented = item["not_presented"] or 0
+        presented = item["presented"]
+        purchased = item["purchased"]
+        interested = item["interested"]
+        rejected = item["rejected"]
+        follow_up = item["follow_up"]
+        not_presented = item["not_presented"]
+        revenue = item["revenue"]
+
+        purchase_revenues = (
+            item["purchase_revenues"]
+        )
+
+        average_revenue = (
+            sum(purchase_revenues)
+            / len(purchase_revenues)
+            if purchase_revenues
+            else 0
+        )
 
         conversion_rate = (
             (purchased / presented) * 100
@@ -180,73 +240,6 @@ def get_recommendation_performance(customer=None):
             else 0
         )
 
-        # =====================================================
-        # DATA SUFFICIENCY
-        # =====================================================
-
-        if presented < 3:
-            data_quality = "INSUFFICIENT_DATA"
-
-        elif presented < 10:
-            data_quality = "LIMITED_DATA"
-
-        else:
-            data_quality = "SUFFICIENT_DATA"
-
-        # =====================================================
-        # PERFORMANCE LEVEL
-        # =====================================================
-
-        if presented < 3:
-
-            performance_level = "UNKNOWN"
-
-        elif conversion_rate >= 40:
-
-            performance_level = "HIGH"
-
-        elif conversion_rate >= 20:
-
-            performance_level = "MEDIUM"
-
-        else:
-
-            performance_level = "LOW"
-
-        # =====================================================
-        # LEARNING SIGNAL
-        # =====================================================
-
-        if presented < 3:
-
-            learning_signal = "INSUFFICIENT_DATA"
-
-        elif conversion_rate >= 40:
-
-            learning_signal = "POSITIVE"
-
-        elif (
-            conversion_rate < 20
-            and interest_rate >= 40
-        ):
-
-            learning_signal = "PROMISING"
-
-        elif (
-            conversion_rate < 20
-            and interest_rate < 40
-        ):
-
-            learning_signal = "WEAK"
-
-        else:
-
-            learning_signal = "NEUTRAL"
-
-        # =====================================================
-        # RECOMMENDATION EFFECTIVENESS
-        # =====================================================
-
         engagement_rate = (
             (
                 purchased
@@ -259,64 +252,94 @@ def get_recommendation_performance(customer=None):
             else 0
         )
 
-        # =====================================================
-        # RESULT
-        # =====================================================
+        if presented < 3:
+            data_quality = "INSUFFICIENT_DATA"
+
+        elif presented < 10:
+            data_quality = "LIMITED_DATA"
+
+        else:
+            data_quality = "SUFFICIENT_DATA"
+
+        if presented < 3:
+            performance_level = "UNKNOWN"
+
+        elif conversion_rate >= 40:
+            performance_level = "HIGH"
+
+        elif conversion_rate >= 20:
+            performance_level = "MEDIUM"
+
+        else:
+            performance_level = "LOW"
+
+        if presented < 3:
+            learning_signal = "INSUFFICIENT_DATA"
+
+        elif conversion_rate >= 40:
+            learning_signal = "POSITIVE"
+
+        elif (
+            conversion_rate < 20
+            and interest_rate >= 40
+        ):
+            learning_signal = "PROMISING"
+
+        elif (
+            conversion_rate < 20
+            and interest_rate < 40
+        ):
+            learning_signal = "WEAK"
+
+        else:
+            learning_signal = "NEUTRAL"
 
         result.append({
-
             "recommendation_type": (
-                item[
-                    "recommendation__recommendation_type"
-                ]
+                item["recommendation_type"]
             ),
-
             "presented": presented,
-
             "purchased": purchased,
-
             "interested": interested,
-
             "rejected": rejected,
-
             "follow_up": follow_up,
-
             "not_presented": not_presented,
-
-            "revenue": float(
-                item["revenue"] or 0
+            "revenue": round(
+                revenue,
+                2,
             ),
-
-            "average_revenue": float(
-                item["average_revenue"] or 0
+            "average_revenue": round(
+                average_revenue,
+                2,
             ),
-
             "conversion_rate": round(
                 conversion_rate,
                 2,
             ),
-
             "interest_rate": round(
                 interest_rate,
                 2,
             ),
-
             "engagement_rate": round(
                 engagement_rate,
                 2,
             ),
-
             "performance_level": (
                 performance_level
             ),
-
             "learning_signal": (
                 learning_signal
             ),
-
             "data_quality": (
                 data_quality
             ),
         })
+
+    result.sort(
+        key=lambda item: (
+            item["recommendation_type"]
+            or ""
+        )
+    )
 
     return result
