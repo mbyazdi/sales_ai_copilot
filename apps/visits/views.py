@@ -2,7 +2,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 
-from .models import Visit, SalesOutcome
+from .models import (
+    Visit,
+    SalesOutcome,
+    Salesperson,
+    CustomerAssignment,
+)
 from apps.customers.models import Customer
 from apps.recommendations.models import CustomerRecommendation
 from django.shortcuts import get_object_or_404
@@ -462,7 +467,11 @@ class CustomerSalesOutcomeHistoryAPIView(APIView):
         for outcome in outcomes:
 
             recommendation = outcome.recommendation
-            product = recommendation.product
+            product = (
+                recommendation.product
+                if recommendation
+                else None
+            )
 
             data.append({
 
@@ -475,20 +484,44 @@ class CustomerSalesOutcomeHistoryAPIView(APIView):
                 ),
 
                 "product": {
-                    "code": product.product_code,
-                    "name": product.name,
-                    "category": str(
-                        product.category
+                    "code": (
+                        product.product_code
+                        if product
+                        else None
+                    ),
+                    "name": (
+                        product.name
+                        if product
+                        else None
+                    ),
+                    "category": (
+                        str(product.category)
+                        if product
+                        else None
                     ),
                 },
 
                 "recommendation": {
-                    "id": recommendation.id,
-                    "rank": recommendation.rank,
+                    "id": (
+                        recommendation.id
+                        if recommendation
+                        else None
+                    ),
+                    "rank": (
+                        recommendation.rank
+                        if recommendation
+                        else None
+                    ),
                     "type": (
                         recommendation.recommendation_type
+                        if recommendation
+                        else None
                     ),
-                    "score": recommendation.score,
+                    "score": (
+                        recommendation.score
+                        if recommendation
+                        else None
+                    ),
                 },
 
                 "outcome": outcome.outcome,
