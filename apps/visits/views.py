@@ -347,35 +347,74 @@ class SalesOutcomeCreateAPIView(APIView):
         # UPDATE VISIT
         # =========================================
 
-        visit.status = "COMPLETED"
+        update_fields = []
 
-        visit.order_created = (
-            outcome == "PURCHASED"
-        )
+        # -----------------------------------------
+        # START VISIT AUTOMATICALLY
+        # -----------------------------------------
 
-        if outcome == "PURCHASED":
+        if (
+            visit.status
+            == Visit.VisitStatus.PLANNED
+        ):
+
+            visit.status = (
+                Visit.VisitStatus.IN_PROGRESS
+            )
+
+            update_fields.append(
+                "status"
+            )
+
+
+        # -----------------------------------------
+        # PURCHASE RESULT
+        # -----------------------------------------
+
+        if outcome == SalesOutcome.Outcome.PURCHASED:
+
+            visit.order_created = True
 
             visit.order_amount = (
                 sales_amount
             )
 
-        if outcome == "FOLLOW_UP":
+            update_fields.extend([
+                "order_created",
+                "order_amount",
+            ])
+
+
+        # -----------------------------------------
+        # FOLLOW-UP RESULT
+        # -----------------------------------------
+
+        if outcome == SalesOutcome.Outcome.FOLLOW_UP:
 
             visit.follow_up_required = True
 
-        else:
+            update_fields.append(
+                "follow_up_required"
+            )
 
-            visit.follow_up_required = False
 
-        visit.save(
-            update_fields=[
-                "status",
-                "order_created",
-                "order_amount",
-                "follow_up_required",
-                "updated_at",
-            ]
-        )
+        # -----------------------------------------
+        # SAVE VISIT
+        # -----------------------------------------
+
+        if update_fields:
+
+            update_fields.append(
+                "updated_at"
+            )
+
+            visit.save(
+                update_fields=list(
+                    dict.fromkeys(
+                        update_fields
+                    )
+                )
+            )
 
         # =========================================
         # RESPONSE
@@ -681,3 +720,131 @@ class RecommendationPerformanceAPIView(APIView):
             "performance": performance,
 
         })
+    
+    
+class VisitCompleteAPIView(APIView):
+
+    def post(self, request, visit_id):
+
+        visit = get_object_or_404(
+            Visit.objects.select_related(
+                "customer",
+                "salesperson",
+            ),
+            id=visit_id,
+        )
+
+        if (
+            visit.status
+            == Visit.VisitStatus.CANCELLED
+        ):
+
+            return Response(
+                {
+                    "detail": (
+                        "Cancelled visit cannot "
+                        "be completed."
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        visit.status = (
+            Visit.VisitStatus.COMPLETED
+        )
+
+        visit.save(
+            update_fields=[
+                "status",
+                "updated_at",
+            ]
+        )
+
+        return Response(
+            {
+                "success": True,
+
+                "visit": {
+                    "id": visit.id,
+                    "status": visit.status,
+                    "customer_code": (
+                        visit.customer.customer_code
+                    ),
+                    "salesperson_code": (
+                        visit.salesperson.employee_code
+                    ),
+                },
+            },
+            status=status.HTTP_200_OK,
+        )
+
+class VisitStartAPIView(APIView):
+
+    def post(self, request, visit_id):
+
+        visit = get_object_or_404(
+            Visit.objects.select_related(
+                "customer",
+                "salesperson",
+            ),
+            id=visit_id,
+        )
+
+        if (
+            visit.status
+            == Visit.VisitStatus.CANCELLED
+        ):
+
+            return Response(
+                {
+                    "detail": (
+                        "Cancelled visit cannot "
+                        "be started."
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if (
+            visit.status
+            == Visit.VisitStatus.COMPLETED
+        ):
+
+            return Response(
+                {
+                    "detail": (
+                        "Completed visit cannot "
+                        "be started again."
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        visit.status = (
+            Visit.VisitStatus.IN_PROGRESS
+        )
+
+        visit.save(
+            update_fields=[
+                "status",
+                "updated_at",
+            ]
+        )
+
+        return Response(
+            {
+                "success": True,
+
+                "visit": {
+                    "id": visit.id,
+                    "status": visit.status,
+                    "customer_code": (
+                        visit.customer.customer_code
+                    ),
+                    "salesperson_code": (
+                        visit.salesperson.employee_code
+                    ),
+                },
+            },
+            status=status.HTTP_200_OK,
+        )    

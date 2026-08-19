@@ -11,6 +11,8 @@ from .views import (
 from .views import (
     RecommendationPerformanceAPIView,
 )
+from .views import VisitCompleteAPIView
+from .views import VisitStartAPIView
 
 urlpatterns = [
     path(
@@ -37,5 +39,15 @@ urlpatterns = [
         "v1/recommendations/performance/",
         RecommendationPerformanceAPIView.as_view(),
         name="recommendation-performance-all",
+    ),
+    path(
+        "v1/visits/<int:visit_id>/complete/",
+        VisitCompleteAPIView.as_view(),
+        name="visit-complete",
+    ),
+    path(
+        "v1/visits/<int:visit_id>/start/",
+        VisitStartAPIView.as_view(),
+        name="visit-start",
     ),
 ]

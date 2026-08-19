@@ -1,0 +1,166 @@
+<section class="sales-context-card">
+
+    {% if current_visit %}
+
+        <div class="sales-context-header">
+
+            <div>
+
+                <div class="section-eyebrow">
+                    CURRENT VISIT
+                </div>
+
+                <h2 class="sales-context-title">
+                    ویزیت جاری
+                </h2>
+
+            </div>
+
+            <div
+                id="currentVisitStatus"
+                class="
+                    visit-status-badge
+                    visit-status-{{ current_visit.status|lower }}
+                "
+            >
+
+                {% if current_visit.status == "PLANNED" %}
+                    برنامه‌ریزی‌شده
+
+                {% elif current_visit.status == "IN_PROGRESS" %}
+                    در حال انجام
+
+                {% elif current_visit.status == "COMPLETED" %}
+                    تکمیل‌شده
+
+                {% elif current_visit.status == "CANCELLED" %}
+                    لغوشده
+
+                {% else %}
+                    {{ current_visit.status }}
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <div class="sales-context-grid">
+
+            <div class="sales-context-item">
+
+                <span class="sales-context-label">
+                    شماره ویزیت
+                </span>
+
+                <strong>
+                    #{{ current_visit.id }}
+                </strong>
+
+            </div>
+
+
+            <div class="sales-context-item">
+
+                <span class="sales-context-label">
+                    تاریخ
+                </span>
+
+                <strong>
+                    {{ current_visit.visit_date }}
+                </strong>
+
+            </div>
+
+
+            <div class="sales-context-item">
+
+                <span class="sales-context-label">
+                    بازاریاب
+                </span>
+
+                <strong>
+                    {{ current_visit.salesperson.full_name }}
+                </strong>
+
+            </div>
+
+
+            <div class="sales-context-item">
+
+                <span class="sales-context-label">
+                    کد بازاریاب
+                </span>
+
+                <strong>
+                    {{ current_visit.salesperson.employee_code }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="visit-workflow-actions">
+
+            {% if current_visit.status == "PLANNED" %}
+
+                <button
+                    type="button"
+                    id="startVisitButton"
+                    class="visit-action-btn visit-start-btn"
+                    data-visit-id="{{ current_visit.id }}"
+                >
+                    شروع ویزیت
+                </button>
+
+            {% elif current_visit.status == "IN_PROGRESS" %}
+
+                <button
+                    type="button"
+                    id="completeVisitButton"
+                    class="visit-action-btn visit-complete-btn"
+                    data-visit-id="{{ current_visit.id }}"
+                >
+                    پایان ویزیت
+                </button>
+
+            {% elif current_visit.status == "COMPLETED" %}
+
+                <div class="visit-completed-message">
+                    این ویزیت تکمیل شده است.
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <div
+            id="visitWorkflowMessage"
+            class="visit-workflow-message"
+        ></div>
+
+
+        <div class="visit-navigation">
+
+            <a
+                href="/api/visits/"
+                class="visit-back-link"
+            >
+                بازگشت به برنامه ویزیت امروز
+            </a>
+
+        </div>
+
+    {% else %}
+
+        <div class="sales-context-no-visit">
+
+            این صفحه خارج از برنامه ویزیت روزانه باز شده است.
+
+        </div>
+
+    {% endif %}
+
+</section>

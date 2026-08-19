@@ -1584,6 +1584,494 @@
         );
     }
 
+    /* =========================================================
+    STAGE 9
+    CURRENT VISIT WORKFLOW
+    ========================================================= */
+
+    const currentVisitStatus =
+        document.getElementById(
+            "currentVisitStatus"
+        );
+
+
+    const visitWorkflowActions =
+        document.querySelector(
+            ".visit-workflow-actions"
+        );
+
+
+    const visitWorkflowMessage =
+        document.getElementById(
+            "visitWorkflowMessage"
+        );
+
+
+    /* =========================================================
+    VISIT HELPERS
+    ========================================================= */
+
+    function setVisitMessage(
+        message,
+        type = ""
+    ) {
+
+        if (!visitWorkflowMessage) {
+            return;
+        }
+
+
+        visitWorkflowMessage.textContent =
+            message || "";
+
+
+        visitWorkflowMessage.classList.remove(
+            "is-success",
+            "is-error"
+        );
+
+
+        if (type) {
+
+            visitWorkflowMessage.classList.add(
+                `is-${type}`
+            );
+        }
+    }
+
+
+    function setOutcomeButtonsEnabled(
+        enabled
+    ) {
+
+        document
+            .querySelectorAll(
+                ".outcome-btn"
+            )
+            .forEach(
+                function (button) {
+
+                    button.disabled =
+                        !enabled;
+
+                }
+            );
+    }
+
+
+    function updateVisitStatusBadge(
+        status
+    ) {
+
+        if (!currentVisitStatus) {
+            return;
+        }
+
+
+        currentVisitStatus.classList.remove(
+            "visit-status-planned",
+            "visit-status-in_progress",
+            "visit-status-in-progress",
+            "visit-status-completed",
+            "visit-status-cancelled"
+        );
+
+
+        if (status === "PLANNED") {
+
+            currentVisitStatus.textContent =
+                "برنامه‌ریزی‌شده";
+
+            currentVisitStatus.classList.add(
+                "visit-status-planned"
+            );
+
+        }
+
+        else if (status === "IN_PROGRESS") {
+
+            currentVisitStatus.textContent =
+                "در حال انجام";
+
+            currentVisitStatus.classList.add(
+                "visit-status-in-progress"
+            );
+
+        }
+
+        else if (status === "COMPLETED") {
+
+            currentVisitStatus.textContent =
+                "تکمیل‌شده";
+
+            currentVisitStatus.classList.add(
+                "visit-status-completed"
+            );
+
+        }
+
+        else if (status === "CANCELLED") {
+
+            currentVisitStatus.textContent =
+                "لغوشده";
+
+            currentVisitStatus.classList.add(
+                "visit-status-cancelled"
+            );
+
+        }
+
+        else {
+
+            currentVisitStatus.textContent =
+                status || "—";
+        }
+    }
+
+
+    /* =========================================================
+    VISIT API
+    ========================================================= */
+
+    async function changeVisitStatus(
+        action
+    ) {
+
+        if (!visitId) {
+
+            throw new Error(
+                "ویزیت جاری مشخص نیست."
+            );
+        }
+
+
+        const url =
+            `/api/visits/v1/visits/${encodeURIComponent(
+                visitId
+            )}/${action}/`;
+
+
+        const response =
+            await fetch(
+                url,
+                {
+                    method:
+                        "POST",
+
+                    headers: {
+                        "Accept":
+                            "application/json",
+
+                        "Content-Type":
+                            "application/json",
+
+                        "X-CSRFToken":
+                            getCsrfToken()
+                    },
+
+                    credentials:
+                        "same-origin"
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.detail ||
+                data.error ||
+                "تغییر وضعیت ویزیت ناموفق بود."
+            );
+        }
+
+
+        return data;
+    }
+
+
+    /* =========================================================
+    COMPLETE BUTTON
+    ========================================================= */
+
+    function renderCompleteButton() {
+
+        if (!visitWorkflowActions) {
+            return;
+        }
+
+
+        visitWorkflowActions.innerHTML = `
+            <button
+                type="button"
+                id="completeVisitButton"
+                class="visit-action-btn visit-complete-btn"
+                data-visit-id="${visitId}"
+            >
+                پایان ویزیت
+            </button>
+        `;
+
+
+        const completeButton =
+            document.getElementById(
+                "completeVisitButton"
+            );
+
+
+        if (completeButton) {
+
+            completeButton.addEventListener(
+                "click",
+                completeVisit
+            );
+        }
+    }
+
+
+    /* =========================================================
+    COMPLETED STATE
+    ========================================================= */
+
+    function renderCompletedVisit() {
+
+        if (!visitWorkflowActions) {
+            return;
+        }
+
+
+        visitWorkflowActions.innerHTML = `
+            <div class="visit-completed-message">
+                ✓ این ویزیت تکمیل شده است.
+            </div>
+        `;
+    }
+
+
+    /* =========================================================
+    START VISIT
+    ========================================================= */
+
+    async function startVisit() {
+
+        const startButton =
+            document.getElementById(
+                "startVisitButton"
+            );
+
+
+        if (startButton) {
+
+            startButton.disabled =
+                true;
+
+            startButton.textContent =
+                "در حال شروع...";
+        }
+
+
+        setVisitMessage(
+            ""
+        );
+
+
+        try {
+
+            const data =
+                await changeVisitStatus(
+                    "start"
+                );
+
+
+            updateVisitStatusBadge(
+                data.visit.status
+            );
+
+
+            setOutcomeButtonsEnabled(
+                true
+            );
+
+
+            renderCompleteButton();
+
+
+            setVisitMessage(
+                "✓ ویزیت شروع شد. اکنون می‌توانید نتایج پیشنهادها را ثبت کنید.",
+                "success"
+            );
+
+        }
+
+        catch (error) {
+
+            if (startButton) {
+
+                startButton.disabled =
+                    false;
+
+                startButton.textContent =
+                    "شروع ویزیت";
+            }
+
+
+            setVisitMessage(
+                error.message ||
+                "شروع ویزیت ناموفق بود.",
+                "error"
+            );
+        }
+    }
+
+
+    /* =========================================================
+    COMPLETE VISIT
+    ========================================================= */
+
+    async function completeVisit() {
+
+        const completeButton =
+            document.getElementById(
+                "completeVisitButton"
+            );
+
+
+        if (completeButton) {
+
+            completeButton.disabled =
+                true;
+
+            completeButton.textContent =
+                "در حال پایان...";
+        }
+
+
+        setVisitMessage(
+            ""
+        );
+
+
+        try {
+
+            const data =
+                await changeVisitStatus(
+                    "complete"
+                );
+
+
+            updateVisitStatusBadge(
+                data.visit.status
+            );
+
+
+            /*
+            * بعد از پایان رسمی ویزیت،
+            * ثبت Outcome جدید غیرفعال می‌شود.
+            */
+
+            setOutcomeButtonsEnabled(
+                false
+            );
+
+
+            renderCompletedVisit();
+
+
+            setVisitMessage(
+                "✓ ویزیت با موفقیت تکمیل شد.",
+                "success"
+            );
+
+        }
+
+        catch (error) {
+
+            if (completeButton) {
+
+                completeButton.disabled =
+                    false;
+
+                completeButton.textContent =
+                    "پایان ویزیت";
+            }
+
+
+            setVisitMessage(
+                error.message ||
+                "پایان ویزیت ناموفق بود.",
+                "error"
+            );
+        }
+    }
+
+
+    /* =========================================================
+    VISIT BUTTON EVENTS
+    ========================================================= */
+
+    const initialStartButton =
+        document.getElementById(
+            "startVisitButton"
+        );
+
+
+    const initialCompleteButton =
+        document.getElementById(
+            "completeVisitButton"
+        );
+
+
+    if (initialStartButton) {
+
+        /*
+        * قبل از شروع رسمی ویزیت،
+        * ثبت Outcome غیرفعال است.
+        */
+
+        setOutcomeButtonsEnabled(
+            false
+        );
+
+
+        initialStartButton.addEventListener(
+            "click",
+            startVisit
+        );
+    }
+
+
+    if (initialCompleteButton) {
+
+        setOutcomeButtonsEnabled(
+            true
+        );
+
+
+        initialCompleteButton.addEventListener(
+            "click",
+            completeVisit
+        );
+    }
+
+
+    /*
+    * اگر Template اعلام کند Visit قبلاً
+    * COMPLETED شده، Outcomeها نیز غیرفعال می‌شوند.
+    */
+
+    if (
+        currentVisitStatus &&
+        currentVisitStatus.textContent
+            .trim() === "تکمیل‌شده"
+    ) {
+
+        setOutcomeButtonsEnabled(
+            false
+        );
+    }
 
     /* =========================================================
        INITIAL LOAD

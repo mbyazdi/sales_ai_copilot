@@ -3280,3 +3280,19 @@ select:focus-visible {
     }
 
 }
+.outcome-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+    filter: grayscale(0.35);
+}
+
+.outcome-btn:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+.visit-action-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: none;
+}

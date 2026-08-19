@@ -13,6 +13,7 @@
     {% if not_found %}<div class="not-found">مشتری موردنظر پیدا نشد.</div>{% endif %}
     {% if customer %}
         {% include "core/customer_360/_customer_hero.html" %}
+        {% include "core/customer_360/_sales_context.htm" %}
         {% if customer_360 %}
             {% if recommendations %}{% include "core/customer_360/_ai_recommendations.html" %}{% endif %}
             {% include "core/customer_360/_customer_kpis.html" %}
