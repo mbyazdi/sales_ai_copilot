@@ -409,3 +409,180 @@ def build_all_customer_360():
         count += 1
 
     return count
+
+def build_sales_ai_context(
+    customer,
+    customer_360,
+    current_visit=None,
+    sales_session=None,
+    recommendations=None,
+):
+    """
+    Build a normalized sales context for AI Copilot.
+
+    Important:
+    Recommendation decisions are already made
+    by the Rule-Based Recommendation Engine.
+
+    This context is only used to explain,
+    summarize, and assist the salesperson.
+    """
+
+    recommendations = (
+        recommendations or []
+    )
+
+    # =====================================================
+    # CUSTOMER
+    # =====================================================
+
+    customer_data = {
+        "customer_code": (
+            customer.customer_code
+        ),
+        "name": (
+            customer.name
+        ),
+        "customer_type": (
+            customer.customer_type
+        ),
+        "city": (
+            customer.city
+        ),
+        "grade": (
+            customer.grade.code
+            if customer.grade
+            else None
+        ),
+    }
+
+    # =====================================================
+    # CUSTOMER 360
+    # =====================================================
+
+    customer_360_data = None
+
+    if customer_360:
+
+        customer_360_data = {
+            "segment": (
+                customer_360.segment
+            ),
+            "total_orders": (
+                customer_360.total_orders
+            ),
+            "total_sales_amount": (
+                customer_360.total_sales_amount
+            ),
+            "average_order_value": (
+                customer_360.average_order_value
+            ),
+            "last_purchase_date": (
+                customer_360.last_purchase_date
+            ),
+            "days_since_last_purchase": (
+                customer_360.days_since_last_purchase
+            ),
+            "top_category": (
+                customer_360.top_category
+            ),
+            "top_product_code": (
+                customer_360.top_product_code
+            ),
+            "rfm_score": (
+                customer_360.rfm_score
+            ),
+        }
+
+    # =====================================================
+    # CURRENT VISIT
+    # =====================================================
+
+    current_visit_data = None
+
+    if current_visit:
+
+        current_visit_data = {
+            "visit_id": (
+                current_visit.id
+            ),
+            "visit_date": (
+                current_visit.visit_date
+            ),
+            "status": (
+                current_visit.status
+            ),
+            "salesperson": {
+                "employee_code": (
+                    current_visit
+                    .salesperson
+                    .employee_code
+                ),
+                "full_name": (
+                    current_visit
+                    .salesperson
+                    .full_name
+                ),
+            },
+        }
+
+    # =====================================================
+    # RECOMMENDATIONS
+    # =====================================================
+
+    recommendation_data = []
+
+    for recommendation in recommendations:
+
+        recommendation_data.append({
+            "id": (
+                recommendation.id
+            ),
+            "rank": (
+                recommendation.rank
+            ),
+            "product_code": (
+                recommendation
+                .product
+                .product_code
+            ),
+            "product_name": (
+                recommendation
+                .product
+                .name
+            ),
+            "recommendation_type": (
+                recommendation
+                .recommendation_type
+            ),
+            "score": (
+                recommendation.score
+            ),
+            "reason": (
+                recommendation.reason
+            ),
+        })
+
+    # =====================================================
+    # FINAL CONTEXT
+    # =====================================================
+
+    return {
+        "customer": customer_data,
+
+        "customer_360": (
+            customer_360_data
+        ),
+
+        "current_visit": (
+            current_visit_data
+        ),
+
+        "sales_session": (
+            sales_session or {}
+        ),
+
+        "recommendations": (
+            recommendation_data
+        ),
+    }

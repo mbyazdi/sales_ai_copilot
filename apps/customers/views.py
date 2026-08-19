@@ -4,7 +4,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Customer
-from .services import get_customer_360
+from .services import (
+    get_customer_360,
+    build_sales_ai_context,
+)
 from apps.recommendations.models import CustomerRecommendation
 from apps.visits.models import CustomerAssignment, Visit
 from apps.sales.services import get_customer_sales_history
@@ -43,6 +46,8 @@ def customer_search(request):
         "sales_history": None,
 
         "not_found": False,
+
+        "sales_ai_context": None,
     }
 
     if customer_code:
@@ -264,6 +269,82 @@ def customer_search(request):
                         "این مشتری ثبت نشده است."
                     )
 
+                # -----------------------------------------
+                # NEXT BEST ACTION
+                # -----------------------------------------
+
+                if primary_recommendation:
+
+                    if (
+                        recommendation_type
+                        == "REPEAT_PURCHASE"
+                    ):
+
+                        next_best_action = (
+                            f"پیشنهاد خرید مجدد "
+                            f"{primary_product} "
+                            "را در ابتدای گفتگو مطرح کنید."
+                        )
+
+                    elif (
+                        recommendation_type
+                        == "CROSS_SELL"
+                    ):
+
+                        next_best_action = (
+                            f"بعد از مرور خرید قبلی، "
+                            f"{primary_product} "
+                            "را به عنوان محصول مکمل پیشنهاد دهید."
+                        )
+
+                    elif (
+                        recommendation_type
+                        == "UP_SELL"
+                    ):
+
+                        next_best_action = (
+                            f"مشتری را به گزینه بالاتر "
+                            f"{primary_product} "
+                            "هدایت کنید."
+                        )
+
+                    elif (
+                        recommendation_type
+                        == "CATEGORY"
+                    ):
+
+                        next_best_action = (
+                            f"محصول "
+                            f"{primary_product} "
+                            "را از دسته مورد علاقه مشتری معرفی کنید."
+                        )
+
+                    elif (
+                        recommendation_type
+                        == "SIMILAR_PRODUCT"
+                    ):
+
+                        next_best_action = (
+                            f"محصول "
+                            f"{primary_product} "
+                            "را به عنوان گزینه جایگزین معرفی کنید."
+                        )
+
+                    else:
+
+                        next_best_action = (
+                            f"محصول "
+                            f"{primary_product} "
+                            "را به عنوان پیشنهاد اصلی مطرح کنید."
+                        )
+
+                else:
+
+                    next_best_action = (
+                        "در حال حاضر اقدام پیشنهادی مشخصی "
+                        "برای این مشتری وجود ندارد."
+                    )
+
                 context["sales_session"] = {
 
                     "customer_status": customer_status,
@@ -284,6 +365,10 @@ def customer_search(request):
                         primary_reason
                     ),
 
+                    "next_best_action": (
+                        next_best_action
+                    ),
+                    
                     "talking_point": (
                         talking_point
                     ),
@@ -292,6 +377,20 @@ def customer_search(request):
                         recommendation_type
                     ),
                 }
+
+                context["sales_ai_context"] = (
+                    build_sales_ai_context(
+                        customer=customer,
+                        customer_360=customer_360,
+                        current_visit=context.get(
+                            "current_visit"
+                        ),
+                        sales_session=context.get(
+                            "sales_session"
+                        ),
+                        recommendations=recommendations,
+                    )
+                )
 
         except Customer.DoesNotExist:
 
