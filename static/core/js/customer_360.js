@@ -2074,6 +2074,227 @@
     }
 
     /* =========================================================
+    STAGE 10
+    SALES COPILOT CHAT
+    ========================================================= */
+
+    const salesCopilotMessage =
+        document.getElementById(
+            "salesCopilotMessage"
+        );
+
+    const salesCopilotSubmit =
+        document.getElementById(
+            "salesCopilotSubmit"
+        );
+
+    const salesCopilotLoading =
+        document.getElementById(
+            "salesCopilotLoading"
+        );
+
+    const salesCopilotError =
+        document.getElementById(
+            "salesCopilotError"
+        );
+
+    const salesCopilotResponse =
+        document.getElementById(
+            "salesCopilotResponse"
+        );
+
+
+    async function askSalesCopilot() {
+
+        if (
+            !salesCopilotMessage ||
+            !salesCopilotSubmit
+        ) {
+            return;
+        }
+
+        const message =
+            salesCopilotMessage.value.trim();
+
+        if (!message) {
+
+            if (salesCopilotError) {
+
+                salesCopilotError.textContent =
+                    "لطفاً سوال خود را وارد کنید.";
+
+                salesCopilotError.style.display =
+                    "block";
+            }
+
+            return;
+        }
+
+        if (!customerCode) {
+
+            if (salesCopilotError) {
+
+                salesCopilotError.textContent =
+                    "کد مشتری مشخص نیست.";
+
+                salesCopilotError.style.display =
+                    "block";
+            }
+
+            return;
+        }
+
+        if (salesCopilotError) {
+            salesCopilotError.style.display =
+                "none";
+            salesCopilotError.textContent =
+                "";
+        }
+
+        if (salesCopilotResponse) {
+            salesCopilotResponse.style.display =
+                "none";
+            salesCopilotResponse.textContent =
+                "";
+        }
+
+        if (salesCopilotLoading) {
+            salesCopilotLoading.style.display =
+                "block";
+        }
+
+        salesCopilotSubmit.disabled =
+            true;
+
+        salesCopilotSubmit.textContent =
+            "در حال پردازش...";
+
+        try {
+
+            const payload = {
+
+                customer_code:
+                    customerCode,
+
+                visit_id:
+                    visitId
+                        ? Number(visitId)
+                        : null,
+
+                message:
+                    message
+            };
+
+            const response =
+                await fetch(
+                    "/api/ai/v1/sales-copilot/",
+                    {
+                        method:
+                            "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json",
+
+                            "Accept":
+                                "application/json",
+
+                            "X-CSRFToken":
+                                getCsrfToken()
+                        },
+
+                        credentials:
+                            "same-origin",
+
+                        body:
+                            JSON.stringify(
+                                payload
+                            )
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.detail ||
+                    data.error ||
+                    "دریافت پاسخ از Sales Copilot ناموفق بود."
+                );
+            }
+
+            if (salesCopilotResponse) {
+
+                salesCopilotResponse.textContent =
+                    data.response ||
+                    "پاسخی دریافت نشد.";
+
+                salesCopilotResponse.style.display =
+                    "block";
+            }
+
+        }
+
+        catch (error) {
+
+            if (salesCopilotError) {
+
+                salesCopilotError.textContent =
+                    error.message ||
+                    "خطا در ارتباط با Sales Copilot.";
+
+                salesCopilotError.style.display =
+                    "block";
+            }
+        }
+
+        finally {
+
+            if (salesCopilotLoading) {
+                salesCopilotLoading.style.display =
+                    "none";
+            }
+
+            salesCopilotSubmit.disabled =
+                false;
+
+            salesCopilotSubmit.textContent =
+                "از Copilot بپرس";
+        }
+    }
+
+
+    if (salesCopilotSubmit) {
+
+        salesCopilotSubmit.addEventListener(
+            "click",
+            askSalesCopilot
+        );
+    }
+
+
+    if (salesCopilotMessage) {
+
+        salesCopilotMessage.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Enter" &&
+                    !event.shiftKey
+                ) {
+
+                    event.preventDefault();
+
+                    askSalesCopilot();
+                }
+            }
+        );
+    }
+
+    /* =========================================================
        INITIAL LOAD
     ========================================================= */
 

@@ -1,70 +1,304 @@
 <section class="command-center">
-<div class="command-grid">
-            {% with primary=recommendations.0 %}
+
+    <div class="command-grid">
+
+        {% with primary=recommendations.0 %}
+
             <div class="command-card next-action-card">
-<div class="command-eyebrow">AI DECISION ENGINE</div>
-<h2 class="command-title">بهترین اقدام بعدی برای این مشتری</h2>
-<div class="command-subtitle">یک پیشنهاد مشخص، همراه با دلیل و شواهد رفتاری</div>
-<div class="action-main">
-<div class="action-product">
-<div class="action-product-label">🎯 اقدام پیشنهادی</div>
-<div class="action-product-name">{{ primary.product.name }}</div>
-<div class="action-product-code">کد محصول: {{ primary.product.product_code }}</div>
-</div>
-<div class="action-score">
-<div class="score-ring" style="--score: {{ primary.score|floatformat:0 }}">
-<div class="score-ring-content">
-<span class="score-ring-number">{{ primary.score|floatformat:0 }}</span>
-<span class="score-ring-label">AI SCORE</span>
-</div>
-</div>
-</div>
-<div class="next-best-action">
 
-    <div class="next-best-action-label">
-        NEXT BEST ACTION
-    </div>
+                <div class="command-eyebrow">
+                    AI DECISION ENGINE
+                </div>
 
-    <div class="next-best-action">
+                <h2 class="command-title">
+                    بهترین اقدام بعدی برای این مشتری
+                </h2>
 
-    <div class="next-best-action-label">
-        NEXT BEST ACTION
-    </div>
+                <div class="command-subtitle">
+                    یک پیشنهاد مشخص، همراه با دلیل و شواهد رفتاری
+                </div>
 
-    <div class="next-best-action-text">
-        {{ sales_session.next_best_action }}
-    </div>
 
-</div>
+                <div class="action-main">
 
-</div>
-</div>
-<div class="evidence-row">
-<div class="evidence-chip">🕒 {{ customer_360.days_since_last_purchase }} روز از آخرین خرید</div>
-<div class="evidence-chip">📦 دسته اصلی: {{ customer_360.top_category }}</div>
-<div class="evidence-chip">⭐ محصول پرتکرار: {{ customer_360.top_product_code }}</div>
-</div>
+                    <div class="action-product">
+
+                        <div class="action-product-label">
+                            🎯 اقدام پیشنهادی
+                        </div>
+
+                        <div class="action-product-name">
+                            {{ primary.product.name }}
+                        </div>
+
+                        <div class="action-product-code">
+                            کد محصول:
+                            {{ primary.product.product_code }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="action-score">
+
+                        <div
+                            class="score-ring"
+                            style="--score: {{ primary.score|floatformat:0 }}"
+                        >
+                            <div class="score-ring-content">
+
+                                <span class="score-ring-number">
+                                    {{ primary.score|floatformat:0 }}
+                                </span>
+
+                                <span class="score-ring-label">
+                                    AI SCORE
+                                </span>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {% if sales_session.next_best_action %}
+
+                    <div class="next-best-action">
+
+                        <div class="next-best-action-label">
+                            NEXT BEST ACTION
+                        </div>
+
+                        <div class="next-best-action-text">
+                            {{ sales_session.next_best_action }}
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+
+                <div class="evidence-row">
+
+                    <div class="evidence-chip">
+                        🕒
+                        {{ customer_360.days_since_last_purchase }}
+                        روز از آخرین خرید
+                    </div>
+
+                    <div class="evidence-chip">
+                        📦
+                        دسته اصلی:
+                        {{ customer_360.top_category }}
+                    </div>
+
+                    <div class="evidence-chip">
+                        ⭐
+                        محصول پرتکرار:
+                        {{ customer_360.top_product_code }}
+                    </div>
+
+                </div>
+
+
                 {% if primary.reason %}
-                <div class="why-action"><strong>چرا این اقدام؟</strong>{{ primary.reason }}</div>
-                {% endif %}
-            </div>
-            {% endwith %}
 
-            {% if sales_session %}
-            <div class="command-card copilot-card">
-<div class="copilot-head">
-<div class="copilot-icon">🤖</div>
-<div><h2 class="copilot-title">Sales Copilot</h2><div class="copilot-subtitle">MEETING PLAYBOOK</div></div>
-</div>
-<div class="copilot-step"><div class="step-number">1</div><div><div class="step-label">وضعیت مشتری</div><div class="step-text">{{ sales_session.customer_status }}</div></div></div>
-<div class="copilot-step"><div class="step-number">2</div><div><div class="step-label">فرصت فروش</div><div class="step-text">{{ sales_session.sales_opportunity }}</div></div></div>
-                {% if sales_session.primary_product %}
-                <div class="copilot-step"><div class="step-number">3</div><div><div class="step-label">محصولی که در جلسه مطرح شود</div><div class="step-text"><strong>{{ sales_session.primary_product }}</strong> · {{ sales_session.primary_product_code }}</div></div></div>
+                    <div class="why-action">
+
+                        <strong>
+                            چرا این اقدام؟
+                        </strong>
+
+                        {{ primary.reason }}
+
+                    </div>
+
                 {% endif %}
-                {% if sales_session.talking_point %}
-                <div class="talk-track"><div class="talk-track-label">🗣️ جمله پیشنهادی برای فروشنده</div><div class="talk-track-text">«{{ sales_session.talking_point }}»</div></div>
-                {% endif %}
+
             </div>
-            {% endif %}
-        </div>
+
+        {% endwith %}
+
+
+        {% if sales_session %}
+
+            <div class="command-card copilot-card">
+
+                <div class="copilot-head">
+
+                    <div class="copilot-icon">
+                        🤖
+                    </div>
+
+                    <div>
+
+                        <h2 class="copilot-title">
+                            Sales Copilot
+                        </h2>
+
+                        <div class="copilot-subtitle">
+                            MEETING PLAYBOOK
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="copilot-step">
+
+                    <div class="step-number">
+                        1
+                    </div>
+
+                    <div>
+
+                        <div class="step-label">
+                            وضعیت مشتری
+                        </div>
+
+                        <div class="step-text">
+                            {{ sales_session.customer_status }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="copilot-step">
+
+                    <div class="step-number">
+                        2
+                    </div>
+
+                    <div>
+
+                        <div class="step-label">
+                            فرصت فروش
+                        </div>
+
+                        <div class="step-text">
+                            {{ sales_session.sales_opportunity }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {% if sales_session.primary_product %}
+
+                    <div class="copilot-step">
+
+                        <div class="step-number">
+                            3
+                        </div>
+
+                        <div>
+
+                            <div class="step-label">
+                                محصولی که در جلسه مطرح شود
+                            </div>
+
+                            <div class="step-text">
+
+                                <strong>
+                                    {{ sales_session.primary_product }}
+                                </strong>
+
+                                ·
+
+                                {{ sales_session.primary_product_code }}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+
+                {% if sales_session.talking_point %}
+
+                    <div class="talk-track">
+
+                        <div class="talk-track-label">
+                            🗣️ جمله پیشنهادی برای فروشنده
+                        </div>
+
+                        <div class="talk-track-text">
+                            «{{ sales_session.talking_point }}»
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- =========================================
+                     INTERACTIVE SALES COPILOT
+                ========================================== -->
+
+                <div class="copilot-chat">
+
+                    <div class="copilot-chat-title">
+                        از Sales Copilot بپرسید
+                    </div>
+
+                    <div class="copilot-chat-subtitle">
+                        سوال خود را درباره این جلسه فروش مطرح کنید.
+                    </div>
+
+
+                    <textarea
+                        id="salesCopilotMessage"
+                        class="copilot-chat-input"
+                        rows="3"
+                        placeholder="مثلاً: در این جلسه چه چیزی را اول مطرح کنم؟"
+                    ></textarea>
+
+
+                    <button
+                        type="button"
+                        id="salesCopilotSubmit"
+                        class="copilot-chat-submit"
+                    >
+                        از Copilot بپرس
+                    </button>
+
+
+                    <div
+                        id="salesCopilotLoading"
+                        class="copilot-chat-loading"
+                        style="display: none;"
+                    >
+                        در حال دریافت پاسخ...
+                    </div>
+
+
+                    <div
+                        id="salesCopilotError"
+                        class="copilot-chat-error"
+                        style="display: none;"
+                    ></div>
+
+
+                    <div
+                        id="salesCopilotResponse"
+                        class="copilot-chat-response"
+                        style="display: none;"
+                    ></div>
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
 </section>

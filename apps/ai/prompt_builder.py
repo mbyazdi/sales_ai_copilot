@@ -126,13 +126,8 @@ def build_sales_copilot_prompt(
     for key in [
         "segment",
         "total_orders",
-        "total_sales_amount",
-        "average_order_value",
         "last_purchase_date",
         "days_since_last_purchase",
-        "top_category",
-        "top_product_code",
-        "rfm_score",
     ]:
 
         value = _serialize_value(
@@ -203,12 +198,12 @@ def build_sales_copilot_prompt(
     )
 
     lines.append(
-        f"- Next Best Action: "
+        f"- Approved Next Best Action: "
         f"{sales_session.get('next_best_action')}"
     )
 
     lines.append(
-        f"- Talking Point: "
+        f"- Approved Talking Point: "
         f"{sales_session.get('talking_point')}"
     )
 
@@ -219,47 +214,186 @@ def build_sales_copilot_prompt(
     lines.append(
         "RECOMMENDATIONS:"
     )
+    lines.append(
+        ""
+    )
+
+    # =====================================================
+    # AUTHORITATIVE RECOMMENDATION
+    # =====================================================
+
+    lines.append(
+        "AUTHORITATIVE RECOMMENDATION:"
+    )
 
     if recommendations:
 
-        for recommendation in recommendations:
+        primary = recommendations[0]
+
+        lines.append(
+            f"- Product: "
+            f"{primary.get('product_name')}"
+        )
+
+        lines.append(
+            f"- Product Code: "
+            f"{primary.get('product_code')}"
+        )
+
+        lines.append(
+            f"- Recommendation Type: "
+            f"{primary.get('recommendation_type')}"
+        )
+
+        lines.append(
+            f"- Score: "
+            f"{_serialize_value(primary.get('score'))}"
+        )
+
+        explanation = (
+            primary.get(
+                "authoritative_explanation"
+            )
+            or primary.get(
+                "reason"
+            )
+        )
+
+        if explanation:
 
             lines.append(
-                (
-                    f"- Rank {recommendation.get('rank')}: "
-                    f"{recommendation.get('product_name')} "
-                    f"({recommendation.get('product_code')}) | "
-                    f"Type: "
-                    f"{recommendation.get('recommendation_type')} | "
-                    f"Score: "
-                    f"{_serialize_value(recommendation.get('score'))}"
-                )
+                f"- Authoritative Explanation: "
+                f"{explanation}"
             )
-
-            if recommendation.get("reason"):
-
-                lines.append(
-                    f"  Reason: "
-                    f"{recommendation.get('reason')}"
-                )
 
     else:
 
         lines.append(
-            "- No active recommendations."
+            "- No active recommendation."
         )
 
+
+    # =====================================================
+    # FINAL RESPONSE RULES
+    # =====================================================
+    lines.append(
+        "- When asked what the salesperson should do, "
+        "base the answer primarily on Approved Next Best Action."
+    )
+
+    lines.append(
+        "- When suggesting what the salesperson should say, "
+        "base the answer primarily on Approved Talking Point."
+    )
+    
+    lines.append(
+        "- You MAY use sales_session.next_best_action "
+        "as approved sales guidance."
+    )
+
+    lines.append(
+        "- You MAY use sales_session.talking_point "
+        "as approved wording for the salesperson."
+    )
     lines.append(
         ""
     )
 
     lines.append(
-        "Respond as a practical sales assistant."
+        "FINAL RESPONSE RULES:"
     )
 
     lines.append(
-        "Keep the response concise, actionable, "
-        "and grounded only in the provided context."
+        "- Use only facts explicitly present "
+        "in this context."
+    )
+
+    lines.append(
+        "- The Authoritative Recommendation is "
+        "the only product recommendation you may discuss."
+    )
+
+    lines.append(
+        "- Treat Authoritative Explanation as the only "
+        "authoritative source for why the recommendation exists."
+    )
+
+    lines.append(
+        "- Do not extend, reinterpret, strengthen, "
+        "or add meaning to Authoritative Explanation."
+    )
+
+    lines.append(
+        "- Do not infer relationships between customer metrics "
+        "and the recommended product unless explicitly stated."
+    )
+
+    lines.append(
+        "- Do NOT say the customer previously purchased "
+        "the recommended product unless that exact fact "
+        "is explicitly present in the context."
+    )
+
+    lines.append(
+        "- Do NOT say the recommended product belongs to "
+        "the customer's historical or preferred category "
+        "unless that exact relationship is explicitly provided."
+    )
+
+    lines.append(
+        "- Do NOT infer anything from customer grade or segment "
+        "about the recommended product."
+    )
+
+    lines.append(
+        "- Treat Recommendation Type only as a label produced "
+        "by the Recommendation Engine."
+    )
+
+    lines.append(
+        "- Recommendation Type is NOT evidence of past "
+        "or future customer behavior."
+    )
+
+    lines.append(
+        "- Never predict that the customer will purchase "
+        "the recommended product."
+    )
+
+    lines.append(
+        "- Never convert recommendation evidence into "
+        "a new fact about customer behavior."
+    )
+
+    lines.append(
+        "- Do not invent prices, promotions, inventory, "
+        "product relationships, purchase history, "
+        "customer preferences, objections, or intent."
+    )
+
+    lines.append(
+        "- When explaining why the product was recommended, "
+        "attribute the explanation to the Recommendation Engine."
+    )
+
+    lines.append(
+        "- Prefer wording such as: "
+        "'طبق موتور پیشنهاددهی...' or "
+        "'بر اساس دلیل ثبت‌شده برای این پیشنهاد...'."
+    )
+
+    lines.append(
+        "- If the available context does not support a new factual claim, "
+        "do not invent one. Instead, rely on Next Best Action, "
+        "Talking Point, and Authoritative Explanation."
+    )
+
+    lines.append(
+        "- Answer in concise, practical, professional Persian."
+    )
+
+    lines.append(
+        "- Do not expose internal reasoning."
     )
 
     return "\n".join(lines)

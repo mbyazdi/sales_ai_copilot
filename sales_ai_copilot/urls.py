@@ -44,4 +44,8 @@ urlpatterns = [
         "api/sales/",
         include("apps.sales.urls"),
     ),
+    path(
+        "api/ai/",
+        include("apps.ai.urls"),
+    ),
 ]

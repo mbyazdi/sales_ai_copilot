@@ -1,7 +1,7 @@
 import json
 import urllib.error
 import urllib.request
-
+from django.conf import settings
 
 class OllamaClientError(Exception):
     pass
@@ -11,13 +11,25 @@ class OllamaClient:
 
     def __init__(
         self,
-        base_url="http://127.0.0.1:11434",
-        model="qwen2.5:7b",
-        timeout=60,
+        base_url=None,
+        model=None,
+        timeout=None,
     ):
-        self.base_url = base_url.rstrip("/")
-        self.model = model
-        self.timeout = timeout
+        self.base_url = (
+            base_url
+            or settings.OLLAMA_BASE_URL
+        ).rstrip("/")
+
+        self.model = (
+            model
+            or settings.OLLAMA_MODEL
+        )
+
+        self.timeout = (
+            timeout
+            if timeout is not None
+            else settings.OLLAMA_TIMEOUT
+        )
 
     def generate(
         self,
@@ -33,8 +45,11 @@ class OllamaClient:
             "model": self.model,
             "prompt": prompt,
             "stream": False,
+            "think": False,
+            "options": {
+                "temperature": 0.1,
+            },
         }
-
         if system:
             payload["system"] = system
 

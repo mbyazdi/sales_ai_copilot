@@ -561,6 +561,9 @@ def build_sales_ai_context(
             "reason": (
                 recommendation.reason
             ),
+            "authoritative_explanation": (
+                recommendation.reason
+            ),
         })
 
     # =====================================================

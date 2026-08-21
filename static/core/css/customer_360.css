@@ -3296,3 +3296,168 @@ select:focus-visible {
     cursor: not-allowed;
     pointer-events: none;
 }
+
+/* =========================================================
+   SALES COPILOT CHAT
+========================================================= */
+
+.copilot-chat {
+    margin-top: 24px;
+    padding-top: 22px;
+    border-top: 1px solid #e8eaf2;
+}
+
+.copilot-chat-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #172033;
+    margin-bottom: 6px;
+}
+
+.copilot-chat-subtitle {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 14px;
+    line-height: 1.8;
+}
+
+.copilot-chat-input {
+    width: 100%;
+    min-height: 96px;
+    resize: vertical;
+    padding: 14px 16px;
+    border: 1px solid #d9deea;
+    border-radius: 14px;
+    background: #ffffff;
+    color: #172033;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.8;
+    outline: none;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.copilot-chat-input:focus {
+    border-color: #536dfe;
+    box-shadow:
+        0 0 0 3px rgba(83, 109, 254, 0.12);
+}
+
+.copilot-chat-input::placeholder {
+    color: #9ca3af;
+}
+
+.copilot-chat-submit {
+    margin-top: 12px;
+    min-height: 42px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 12px;
+    background: #536dfe;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.copilot-chat-submit:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow:
+        0 8px 18px rgba(83, 109, 254, 0.22);
+}
+
+.copilot-chat-submit:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.copilot-chat-loading {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #f6f7ff;
+    color: #536dfe;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.copilot-chat-error {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #fff1f1;
+    border: 1px solid #ffd4d4;
+    color: #c62828;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.copilot-chat-response {
+    margin-top: 16px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    background: #f7f8ff;
+    border: 1px solid #e1e5ff;
+    color: #20283a;
+    font-size: 13px;
+    line-height: 2;
+    white-space: pre-wrap;
+}
+
+.copilot-chat-response::before {
+    content: "پاسخ Sales Copilot";
+    display: block;
+    margin-bottom: 8px;
+    color: #536dfe;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+}
+
+@media (max-width: 768px) {
+
+    .copilot-chat {
+        margin-top: 18px;
+        padding-top: 18px;
+    }
+
+    .copilot-chat-input {
+        min-height: 110px;
+    }
+
+    .copilot-chat-submit {
+        width: 100%;
+    }
+
+}
+/* =========================================================
+   COMMAND CENTER - INDEPENDENT CARD HEIGHT
+========================================================= */
+
+.command-grid {
+    align-items: start;
+}
+
+.command-card {
+    align-self: start;
+}
+
+.copilot-card {
+    height: auto;
+}
+
+.copilot-chat-response {
+    max-height: 320px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-break: break-word;
+}
