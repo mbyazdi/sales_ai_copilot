@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+from datetime import datetime
 
 from .models import (
     Visit,
@@ -217,7 +218,9 @@ class SalesOutcomeCreateAPIView(APIView):
             "notes",
             ""
         )
-
+        follow_up_date = request.data.get(
+            "follow_up_date"
+        )
         # =========================================
         # VALIDATION
         # =========================================
@@ -261,7 +264,49 @@ class SalesOutcomeCreateAPIView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        # =========================================
+        # FOLLOW-UP DATE VALIDATION
+        # =========================================
 
+        parsed_follow_up_date = None
+
+        if outcome == SalesOutcome.Outcome.FOLLOW_UP:
+
+            if not follow_up_date:
+
+                return Response(
+                    {
+                        "detail": (
+                            "follow_up_date is required "
+                            "when outcome is FOLLOW_UP."
+                        )
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            try:
+
+                parsed_follow_up_date = (
+                    datetime.strptime(
+                        follow_up_date,
+                        "%Y-%m-%d",
+                    ).date()
+                )
+
+            except (
+                TypeError,
+                ValueError,
+            ):
+
+                return Response(
+                    {
+                        "detail": (
+                            "follow_up_date must use "
+                            "YYYY-MM-DD format."
+                        )
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         # =========================================
         # GET VISIT
         # =========================================
@@ -323,7 +368,27 @@ class SalesOutcomeCreateAPIView(APIView):
                     },
                     status=status.HTTP_404_NOT_FOUND,
                 )
+        # =========================================
+        # VISIT STATUS VALIDATION
+        # =========================================
 
+        if (
+            visit.status
+            != Visit.VisitStatus.IN_PROGRESS
+        ):
+
+            return Response(
+                {
+                    "detail": (
+                        "Sales outcome can only be recorded "
+                        "while the visit is in progress."
+                    ),
+                    "visit_status": (
+                        visit.status
+                    ),
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
         # =========================================
         # CREATE SALES OUTCOME
         # =========================================
@@ -348,24 +413,6 @@ class SalesOutcomeCreateAPIView(APIView):
         # =========================================
 
         update_fields = []
-
-        # -----------------------------------------
-        # START VISIT AUTOMATICALLY
-        # -----------------------------------------
-
-        if (
-            visit.status
-            == Visit.VisitStatus.PLANNED
-        ):
-
-            visit.status = (
-                Visit.VisitStatus.IN_PROGRESS
-            )
-
-            update_fields.append(
-                "status"
-            )
-
 
         # -----------------------------------------
         # PURCHASE RESULT
@@ -393,9 +440,14 @@ class SalesOutcomeCreateAPIView(APIView):
 
             visit.follow_up_required = True
 
-            update_fields.append(
-                "follow_up_required"
+            visit.follow_up_date = (
+                parsed_follow_up_date
             )
+
+            update_fields.extend([
+                "follow_up_required",
+                "follow_up_date",
+            ])
 
 
         # -----------------------------------------

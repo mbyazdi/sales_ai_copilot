@@ -372,7 +372,7 @@
         const submitButton =
             document.getElementById(
                 "outcomeSubmit"
-            );
+            )
 
 
         const quantityInput =
@@ -386,7 +386,15 @@
                 "outcomeSalesAmount"
             );
 
+        const followUpDateGroup =
+            document.getElementById(
+                "outcomeFollowUpDateGroup"
+            );
 
+        const followUpDateInput =
+            document.getElementById(
+                "outcomeFollowUpDate"
+            );
         const notesInput =
             document.getElementById(
                 "outcomeNotes"
@@ -512,6 +520,25 @@
             }
 
 
+            if (
+                followUpDateGroup &&
+                followUpDateInput
+            ) {
+
+                const isFollowUp =
+                    selectedOutcome === "FOLLOW_UP";
+
+                followUpDateGroup.hidden =
+                    !isFollowUp;
+
+                followUpDateInput.required =
+                    isFollowUp;
+
+                followUpDateInput.value =
+                    "";
+            }
+
+
             if (notesInput) {
 
                 notesInput.value =
@@ -601,6 +628,23 @@
 
             selectedButton =
                 null;
+
+
+            if (followUpDateInput) {
+
+                followUpDateInput.value =
+                    "";
+
+                followUpDateInput.required =
+                    false;
+            }
+
+
+            if (followUpDateGroup) {
+
+                followUpDateGroup.hidden =
+                    true;
+            }
 
 
             clearMessages();
@@ -777,6 +821,23 @@
                     return;
                 }
 
+                if (
+                    selectedOutcome === "FOLLOW_UP" &&
+                    followUpDateInput &&
+                    !followUpDateInput.value
+                ) {
+
+                    if (errorBox) {
+
+                        errorBox.textContent =
+                            "لطفاً تاریخ پیگیری را وارد کنید.";
+
+                        errorBox.style.display =
+                            "block";
+                    }
+
+                    return;
+                }
 
                 const quantity =
                     Number(
@@ -826,6 +887,14 @@
 
                     sales_amount:
                         salesAmount,
+
+                    follow_up_date:
+                        (
+                            selectedOutcome === "FOLLOW_UP" &&
+                            followUpDateInput
+                        )
+                            ? followUpDateInput.value
+                            : null,
 
                     notes:
                         notesInput
@@ -1658,6 +1727,15 @@
             );
     }
 
+    function syncOutcomeButtonsWithVisitStatus() {
+
+        const visitStatus =
+            currentVisitStatus?.dataset.status;
+
+        setOutcomeButtonsEnabled(
+            visitStatus === "IN_PROGRESS"
+        );
+    }
 
     function updateVisitStatusBadge(
         status
@@ -1726,6 +1804,62 @@
             currentVisitStatus.textContent =
                 status || "—";
         }
+        currentVisitStatus.dataset.status =
+            status;
+
+
+        const salesWorkspace =
+            document.querySelector(
+                ".sales-workspace"
+            );
+
+
+        if (salesWorkspace) {
+
+            salesWorkspace.classList.remove(
+                "visit-state-planned",
+                "visit-state-in_progress",
+                "visit-state-completed",
+                "visit-state-cancelled",
+                "visit-state-none"
+            );
+
+
+            let workspaceState =
+                "visit-state-none";
+
+
+            if (status === "PLANNED") {
+
+                workspaceState =
+                    "visit-state-planned";
+
+            } else if (status === "IN_PROGRESS") {
+
+                workspaceState =
+                    "visit-state-in_progress";
+
+            } else if (status === "COMPLETED") {
+
+                workspaceState =
+                    "visit-state-completed";
+
+            } else if (status === "CANCELLED") {
+
+                workspaceState =
+                    "visit-state-cancelled";
+            }
+
+
+            salesWorkspace.classList.add(
+                workspaceState
+            );
+        }
+
+
+        setOutcomeButtonsEnabled(
+            status === "IN_PROGRESS"
+        );
     }
 
 
@@ -1985,6 +2119,15 @@
                 "success"
             );
 
+            window.setTimeout(
+                function () {
+
+                    window.location.reload();
+
+                },
+                700
+            );
+
         }
 
         catch (error) {
@@ -2062,16 +2205,7 @@
     * COMPLETED شده، Outcomeها نیز غیرفعال می‌شوند.
     */
 
-    if (
-        currentVisitStatus &&
-        currentVisitStatus.textContent
-            .trim() === "تکمیل‌شده"
-    ) {
-
-        setOutcomeButtonsEnabled(
-            false
-        );
-    }
+    syncOutcomeButtonsWithVisitStatus();
 
     /* =========================================================
     STAGE 10
@@ -2103,7 +2237,63 @@
             "salesCopilotResponse"
         );
 
+        /* =========================================================
+        STAGE 6.11
+        FOLLOW-UP PREPARATION CTA
+        ========================================================= */
 
+        const followUpPrepAction =
+            document.querySelector(
+                ".visit-summary-next-step-action"
+            );
+
+
+        if (
+            followUpPrepAction &&
+            salesCopilotMessage
+        ) {
+
+            followUpPrepAction.addEventListener(
+                "click",
+                function (event) {
+
+                    event.preventDefault();
+
+                    const workspaceCopilot =
+                        document.getElementById(
+                            "workspace-copilot"
+                        );
+
+                    if (workspaceCopilot) {
+
+                        workspaceCopilot.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start"
+                        });
+                    }
+
+
+                    salesCopilotMessage.value =
+                        "برای پیگیری این مشتری، "
+                        "به‌صورت کوتاه بگو چه موضوعی را مطرح کنم "
+                        "و گفتگو را چگونه شروع کنم.";
+
+
+                    window.setTimeout(
+                        function () {
+
+                            salesCopilotMessage.focus();
+
+                            salesCopilotMessage.setSelectionRange(
+                                salesCopilotMessage.value.length,
+                                salesCopilotMessage.value.length
+                            );
+                        },
+                        350
+                    );
+                }
+            );
+        }
     async function askSalesCopilot() {
 
         if (
@@ -2293,6 +2483,186 @@
             }
         );
     }
+    /* =========================================================
+    STAGE 6.7
+    ACTIVE WORKSPACE NAVIGATION
+    ========================================================= */
+
+    const workspaceNavLinks =
+        Array.from(
+            document.querySelectorAll(
+                ".workspace-nav-link"
+            )
+        );
+
+
+    const workspaceSections = [
+        "workspace-copilot",
+        "workspace-recommendations",
+        "workspace-kpis",
+        "workspace-details"
+    ]
+        .map(
+            function (id) {
+
+                return document.getElementById(
+                    id
+                );
+            }
+        )
+        .filter(Boolean);
+
+
+    function setActiveWorkspaceNav(
+        sectionId
+    ) {
+
+        workspaceNavLinks.forEach(
+            function (link) {
+
+                const isActive =
+                    link.getAttribute("href") ===
+                    `#${sectionId}`;
+
+
+                link.classList.toggle(
+                    "is-active",
+                    isActive
+                );
+
+
+                if (isActive) {
+
+                    link.setAttribute(
+                        "aria-current",
+                        "location"
+                    );
+
+                } else {
+
+                    link.removeAttribute(
+                        "aria-current"
+                    );
+                }
+            }
+        );
+    }
+
+
+    function updateActiveWorkspaceNav() {
+
+        if (!workspaceSections.length) {
+            return;
+        }
+
+
+        /*
+        * کمی پایین‌تر از Navigation Sticky
+        * را به‌عنوان خط فعال شدن در نظر می‌گیریم.
+        */
+
+        const activationPoint =
+            window.scrollY + 140;
+
+
+        let activeSection =
+            workspaceSections[0];
+
+
+        workspaceSections.forEach(
+            function (section) {
+
+                if (
+                    section.offsetTop <=
+                    activationPoint
+                ) {
+
+                    activeSection =
+                        section;
+                }
+            }
+        );
+
+
+        setActiveWorkspaceNav(
+            activeSection.id
+        );
+    }
+
+
+    /*
+    * جلوگیری از اجرای بیش از حد هنگام Scroll
+    */
+
+    let workspaceScrollTicking =
+        false;
+
+
+    window.addEventListener(
+        "scroll",
+        function () {
+
+            if (workspaceScrollTicking) {
+                return;
+            }
+
+
+            workspaceScrollTicking =
+                true;
+
+
+            window.requestAnimationFrame(
+                function () {
+
+                    updateActiveWorkspaceNav();
+
+                    workspaceScrollTicking =
+                        false;
+                }
+            );
+        },
+        {
+            passive: true
+        }
+    );
+
+
+    /*
+    * کلیک روی Navigation
+    */
+
+    workspaceNavLinks.forEach(
+        function (link) {
+
+            link.addEventListener(
+                "click",
+                function () {
+
+                    const href =
+                        link.getAttribute(
+                            "href"
+                        );
+
+
+                    if (!href) {
+                        return;
+                    }
+
+
+                    setActiveWorkspaceNav(
+                        href.substring(1)
+                    );
+                }
+            );
+        }
+    );
+
+
+    /*
+    * حالت اولیه
+    */
+
+    updateActiveWorkspaceNav();
 
     /* =========================================================
        INITIAL LOAD

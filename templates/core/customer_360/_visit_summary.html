@@ -1,0 +1,290 @@
+{% if visit_summary %}
+
+<section class="visit-summary-card">
+
+    <div class="visit-summary-head">
+
+        <div>
+
+            <div class="section-eyebrow">
+                VISIT SUMMARY
+            </div>
+
+            <h2 class="visit-summary-title">
+                خلاصه نتیجه ویزیت
+            </h2>
+
+        </div>
+
+        <div class="visit-summary-status">
+            ✓ تکمیل‌شده
+        </div>
+
+    </div>
+
+
+    <div class="visit-summary-grid">
+
+        <div class="visit-summary-item">
+
+            <span class="visit-summary-label">
+                شماره ویزیت
+            </span>
+
+            <strong class="visit-summary-value">
+                #{{ current_visit.id }}
+            </strong>
+
+        </div>
+
+
+        <div class="visit-summary-item">
+
+            <span class="visit-summary-label">
+                پیشنهادهای ارزیابی‌شده
+            </span>
+
+            <strong class="visit-summary-value">
+                {{ visit_summary.evaluated_recommendations }}
+            </strong>
+
+        </div>
+
+
+        <div class="visit-summary-item">
+
+            <span class="visit-summary-label">
+                سفارش ثبت شده
+            </span>
+
+            <strong class="visit-summary-value">
+
+                {% if visit_summary.order_created %}
+                    بله
+                {% else %}
+                    خیر
+                {% endif %}
+
+            </strong>
+
+        </div>
+
+
+        <div class="visit-summary-item">
+
+            <span class="visit-summary-label">
+                مبلغ فروش
+            </span>
+
+            <strong class="visit-summary-value">
+                {{ visit_summary.order_amount }}
+            </strong>
+
+        </div>
+
+
+        <div class="visit-summary-item">
+
+            <span class="visit-summary-label">
+                نیاز به پیگیری
+            </span>
+
+            <strong class="visit-summary-value">
+
+                {% if visit_summary.follow_up_required %}
+                    بله
+                {% else %}
+                    خیر
+                {% endif %}
+
+            </strong>
+
+        </div>
+
+
+        <div class="visit-summary-item">
+
+            <span class="visit-summary-label">
+                تاریخ پیگیری
+            </span>
+
+            <strong class="visit-summary-value">
+
+                {% if visit_summary.follow_up_date %}
+                    {{ visit_summary.follow_up_date }}
+                {% else %}
+                    —
+                {% endif %}
+
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    {% if visit_summary.resolved_outcomes %}
+
+        <div class="visit-summary-outcomes">
+
+            <div class="visit-summary-outcomes-title">
+                نتیجه نهایی پیشنهادها
+            </div>
+
+
+            {% for outcome in visit_summary.resolved_outcomes %}
+
+                <div class="visit-summary-outcome-row">
+
+                    <span class="visit-summary-outcome-label">
+                        پیشنهاد #{{ outcome.recommendation_id }}
+                    </span>
+
+
+                    <strong class="visit-summary-outcome-value">
+
+                        {% if outcome.outcome == "PURCHASED" %}
+                            خرید شد
+
+                        {% elif outcome.outcome == "INTERESTED" %}
+                            علاقه‌مند شد
+
+                        {% elif outcome.outcome == "FOLLOW_UP" %}
+                            نیاز به پیگیری
+
+                        {% elif outcome.outcome == "REJECTED" %}
+                            رد شد
+
+                        {% elif outcome.outcome == "NOT_PRESENTED" %}
+                            مطرح نشد
+
+                        {% else %}
+                            {{ outcome.outcome }}
+                        {% endif %}
+
+                    </strong>
+
+
+                    {% if outcome.outcome == "PURCHASED" %}
+
+                        <span class="visit-summary-outcome-meta">
+                            تعداد:
+                            {{ outcome.quantity }}
+
+                            ·
+
+                            مبلغ:
+                            {{ outcome.sales_amount }}
+                        </span>
+
+                    {% endif %}
+
+
+                    {% if outcome.events_count > 1 %}
+
+                        <span class="visit-summary-outcome-meta">
+                            {{ outcome.events_count }}
+                            رویداد ثبت‌شده
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+        <div class="visit-summary-next-step">
+
+    <div class="visit-summary-next-step-label">
+        NEXT STEP
+    </div>
+
+
+    {% if visit_summary.follow_up_required %}
+
+        <div class="visit-summary-next-step-content">
+
+            <div>
+
+                <strong>
+                    پیگیری مشتری لازم است
+                </strong>
+
+                <div class="visit-summary-next-step-text">
+
+                    {% if visit_summary.follow_up_date %}
+
+                        تاریخ پیگیری:
+                        {{ visit_summary.follow_up_date }}
+
+                    {% else %}
+
+                        برای این ویزیت نیاز به پیگیری ثبت شده است.
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            <a
+                href="#workspace-copilot"
+                class="visit-summary-next-step-action"
+            >
+                آماده‌سازی پیگیری
+            </a>
+
+        </div>
+
+
+    {% elif visit_summary.order_created %}
+
+        <div class="visit-summary-next-step-content">
+
+            <div>
+
+                <strong>
+                    فروش ثبت شده است
+                </strong>
+
+                <div class="visit-summary-next-step-text">
+                    نتیجه این ویزیت با ثبت سفارش نهایی شده است.
+                </div>
+
+            </div>
+
+            <span class="visit-summary-next-step-done">
+                ✓ انجام شد
+            </span>
+
+        </div>
+
+
+    {% else %}
+
+        <div class="visit-summary-next-step-content">
+
+            <div>
+
+                <strong>
+                    ویزیت برای مرور آماده است
+                </strong>
+
+                <div class="visit-summary-next-step-text">
+                    نتیجه‌های ثبت‌شده را مرور کنید.
+                </div>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</div>
+    {% endif %}
+
+</section>
+
+{% endif %}

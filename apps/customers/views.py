@@ -12,6 +12,10 @@ from apps.recommendations.models import CustomerRecommendation
 from apps.visits.models import CustomerAssignment, Visit
 from apps.sales.services import get_customer_sales_history
 
+from apps.visits.services import (
+    resolve_recommendation_outcome,
+)
+
 def customer_search(request):
 
     customer_code = request.GET.get(
@@ -390,6 +394,75 @@ def customer_search(request):
                         ),
                         recommendations=recommendations,
                     )
+                )
+
+                # -----------------------------------------
+                # VISIT SUMMARY
+                # -----------------------------------------
+
+                visit_summary = None
+
+                current_visit = context.get(
+                    "current_visit"
+                )
+
+                if (
+                    current_visit
+                    and current_visit.status
+                    == Visit.VisitStatus.COMPLETED
+                ):
+
+                    recommendation_ids = (
+                        current_visit.sales_outcomes
+                        .exclude(
+                            recommendation_id__isnull=True
+                        )
+                        .values_list(
+                            "recommendation_id",
+                            flat=True,
+                        )
+                        .distinct()
+                    )
+
+                    resolved_outcomes = []
+
+                    for recommendation_id in recommendation_ids:
+
+                        resolved = (
+                            resolve_recommendation_outcome(
+                                visit_id=current_visit.id,
+                                recommendation_id=recommendation_id,
+                            )
+                        )
+
+                        if resolved:
+                            resolved_outcomes.append(
+                                resolved
+                            )
+
+                    visit_summary = {
+                        "evaluated_recommendations": (
+                            len(resolved_outcomes)
+                        ),
+                        "resolved_outcomes": (
+                            resolved_outcomes
+                        ),
+                        "order_created": (
+                            current_visit.order_created
+                        ),
+                        "order_amount": (
+                            current_visit.order_amount
+                        ),
+                        "follow_up_required": (
+                            current_visit.follow_up_required
+                        ),
+                        "follow_up_date": (
+                            current_visit.follow_up_date
+                        ),
+                    }
+
+                context["visit_summary"] = (
+                    visit_summary
                 )
 
         except Customer.DoesNotExist:

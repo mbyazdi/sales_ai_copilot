@@ -1,39 +1,365 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sales AI Copilot</title>
-    <link rel="stylesheet" href="{% static 'core/css/customer_360.css' %}">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Sales AI Copilot
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'core/css/customer_360.css' %}"
+    >
+
 </head>
+
 <body>
+
 <div class="page">
+
+    <!-- =====================================================
+         SEARCH
+    ====================================================== -->
+
     {% include "core/customer_360/_search.html" %}
-    {% if not_found %}<div class="not-found">مشتری موردنظر پیدا نشد.</div>{% endif %}
-    {% if customer %}
-        {% include "core/customer_360/_customer_hero.html" %}
-        {% include "core/customer_360/_sales_context.htm" %}
-        {% if customer_360 %}
-            {% if recommendations %}{% include "core/customer_360/_ai_recommendations.html" %}{% endif %}
-            {% include "core/customer_360/_customer_kpis.html" %}
-            {% include "core/customer_360/_sales_history.html" %}
-            {% include "core/customer_360/_ai_command_center.html" %}
-            {% include "core/customer_360/_ai_explainability.html" %}
-            {% include "core/customer_360/_sales_outcomes.html" %}
-            {% include "core/customer_360/_customer_insights.html" %}
-        {% endif %}
+
+
+    {% if not_found %}
+
+        <div class="not-found">
+            مشتری موردنظر پیدا نشد.
+        </div>
+
     {% endif %}
+
+
+    {% if customer %}
+
+        <!-- =================================================
+             SALES REP WORKSPACE
+        ================================================== -->
+        <nav class="workspace-nav" aria-label="ناوبری فضای کاری فروش">
+
+            <a href="#workspace-copilot" class="workspace-nav-link">
+                <span>🤖</span>
+                Copilot
+            </a>
+
+            <a href="#workspace-recommendations" class="workspace-nav-link">
+                <span>🎯</span>
+                پیشنهادها
+            </a>
+
+            <a href="#workspace-kpis" class="workspace-nav-link">
+                <span>📊</span>
+                شاخص‌ها
+            </a>
+
+            <a href="#workspace-details" class="workspace-nav-link">
+                <span>📋</span>
+                جزئیات
+            </a>
+
+        </nav>
+        <main
+            class="
+                sales-workspace
+                {% if current_visit %}
+                    visit-state-{{ current_visit.status|lower }}
+                {% else %}
+                    visit-state-none
+                {% endif %}
+            "
+        >
+
+            <!-- =============================================
+                 CUSTOMER + VISIT CONTEXT
+            ============================================== -->
+            {% if current_visit %}
+
+                <section class="visit-state-banner">
+
+                    {% if current_visit.status == "PLANNED" %}
+
+                        <div class="visit-state-banner-icon">
+                            🗓️
+                        </div>
+
+                        <div class="visit-state-banner-content">
+
+                            <div class="visit-state-banner-title">
+                                جلسه هنوز شروع نشده است
+                            </div>
+
+                            <div class="visit-state-banner-text">
+                                قبل از شروع ویزیت، پیشنهادها و اطلاعات مشتری را مرور کنید.
+                                ثبت نتیجه فروش بعد از شروع رسمی ویزیت فعال می‌شود.
+                            </div>
+
+                        </div>
+
+
+                    {% elif current_visit.status == "IN_PROGRESS" %}
+
+                        <div class="visit-state-banner-icon">
+                            ⚡
+                        </div>
+
+                        <div class="visit-state-banner-content">
+
+                            <div class="visit-state-banner-title">
+                                ویزیت در حال انجام است
+                            </div>
+
+                            <div class="visit-state-banner-text">
+                                اکنون می‌توانید از Sales Copilot استفاده کنید،
+                                پیشنهادها را مطرح کنید و نتیجه هر تعامل را ثبت کنید.
+                            </div>
+
+                        </div>
+
+
+                    {% elif current_visit.status == "COMPLETED" %}
+
+                        <div class="visit-state-banner-icon">
+                            ✓
+                        </div>
+
+                        <div class="visit-state-banner-content">
+
+                            <div class="visit-state-banner-title">
+                                این ویزیت تکمیل شده است
+                            </div>
+
+                            <div class="visit-state-banner-text">
+                                این صفحه اکنون در حالت مرور قرار دارد.
+                                نتایج ثبت‌شده قابل مشاهده هستند اما Outcome جدید ثبت نمی‌شود.
+                            </div>
+
+                        </div>
+
+
+                    {% elif current_visit.status == "CANCELLED" %}
+
+                        <div class="visit-state-banner-icon">
+                            ✕
+                        </div>
+
+                        <div class="visit-state-banner-content">
+
+                            <div class="visit-state-banner-title">
+                                این ویزیت لغو شده است
+                            </div>
+
+                            <div class="visit-state-banner-text">
+                                عملیات فروش برای این ویزیت غیرفعال است.
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+                </section>
+
+            {% endif %}
+
+            {% include "core/customer_360/_visit_summary.html" %}
+
+            <section class="sales-workspace-context">
+
+                {% include "core/customer_360/_customer_hero.html" %}
+
+                {% include "core/customer_360/_sales_context.htm" %}
+
+            </section>
+
+
+            {% if customer_360 %}
+
+                <!-- =========================================
+                     PRIMARY SALES WORKSPACE
+                ========================================== -->
+
+                <section class="sales-workspace-primary">
+
+                    <!-- =====================================
+                         AI ACTION / COPILOT
+                    ====================================== -->
+
+                    <div class="sales-workspace-ai">
+
+                        {% if recommendations %}
+
+                            {% include "core/customer_360/_ai_command_center.html" %}
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- =====================================
+                         RECOMMENDATIONS / OUTCOME
+                    ====================================== -->
+
+                    <div class="sales-workspace-recommendations">
+
+                        {% if recommendations %}
+
+                            {% include "core/customer_360/_ai_recommendations.html" %}
+
+                        {% endif %}
+
+                    </div>
+
+                </section>
+
+
+                <!-- =========================================
+                     CUSTOMER SNAPSHOT
+                ========================================== -->
+
+                <section class="sales-workspace-snapshot">
+
+                    {% include "core/customer_360/_customer_kpis.html" %}
+
+                </section>
+
+
+                <!-- =========================================
+                     SUPPORTING DETAILS
+                ========================================== -->
+
+                <section    id="workspace-details"    class="sales-workspace-details">
+
+                    <details class="workspace-detail-card">
+
+                        <summary class="workspace-detail-summary">
+                            <span>
+                                چرا AI این پیشنهاد را انتخاب کرده؟
+                            </span>
+
+                            <span class="workspace-detail-hint">
+                                توضیح منطق پیشنهاد
+                            </span>
+                        </summary>
+
+                        <div class="workspace-detail-content">
+                            {% include "core/customer_360/_ai_explainability.html" %}
+                        </div>
+
+                    </details>
+
+
+                    <details class="workspace-detail-card">
+
+                        <summary class="workspace-detail-summary">
+                            <span>
+                                بینش‌های مشتری
+                            </span>
+
+                            <span class="workspace-detail-hint">
+                                تحلیل رفتار و وضعیت مشتری
+                            </span>
+                        </summary>
+
+                        <div class="workspace-detail-content">
+                            {% include "core/customer_360/_customer_insights.html" %}
+                        </div>
+
+                    </details>
+
+
+                    <details class="workspace-detail-card">
+
+                        <summary class="workspace-detail-summary">
+                            <span>
+                                تاریخچه فروش
+                            </span>
+
+                            <span class="workspace-detail-hint">
+                                سفارش‌ها و خریدهای قبلی
+                            </span>
+                        </summary>
+
+                        <div class="workspace-detail-content">
+                            {% include "core/customer_360/_sales_history.html" %}
+                        </div>
+
+                    </details>
+
+
+                    <details class="workspace-detail-card">
+
+                        <summary class="workspace-detail-summary">
+                            <span>
+                                نتایج جلسات فروش
+                            </span>
+
+                            <span class="workspace-detail-hint">
+                                Outcomeهای ثبت‌شده
+                            </span>
+                        </summary>
+
+                        <div class="workspace-detail-content">
+                            {% include "core/customer_360/_sales_outcomes.html" %}
+                        </div>
+
+                    </details>
+
+                </section>
+
+            {% endif %}
+
+        </main>
+
+    {% endif %}
+
 </div>
+
+
+<!-- =========================================================
+     OUTCOME MODAL
+========================================================= -->
+
 {% include "core/customer_360/_outcome_modal.html" %}
 
+
+<!-- =========================================================
+     PAGE CONTEXT
+========================================================= -->
+
 <script>
+
     window.salesAiCopilot = {
-        customerCode: "{{ customer.customer_code|escapejs }}",
-        visitId: {% if current_visit %}{{ current_visit.id }}{% else %}null{% endif %}
+
+        customerCode:
+            "{{ customer.customer_code|escapejs }}",
+
+        visitId:
+            {% if current_visit %}
+                {{ current_visit.id }}
+            {% else %}
+                null
+            {% endif %}
     };
+
 </script>
 
-<script src="{% static 'core/js/customer_360.js' %}"></script>
+
+<script
+    src="{% static 'core/js/customer_360.js' %}"
+></script>
+
 </body>
+
 </html>

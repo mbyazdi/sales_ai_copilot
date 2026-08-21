@@ -3461,3 +3461,1534 @@ select:focus-visible {
     overflow-x: hidden;
     word-break: break-word;
 }
+/* =========================================================
+   STAGE 6
+   SALES REP WORKSPACE
+========================================================= */
+
+.sales-workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+
+/* =========================================================
+   WORKSPACE CONTEXT
+========================================================= */
+
+.sales-workspace-context {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+
+/* =========================================================
+   PRIMARY SALES AREA
+========================================================= */
+
+.sales-workspace-primary {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+
+/*
+ * Command Center already contains the main
+ * Next Best Action + Sales Copilot grid.
+ */
+
+.sales-workspace-ai {
+    min-width: 0;
+}
+
+
+/* =========================================================
+   RECOMMENDATIONS
+========================================================= */
+
+.sales-workspace-recommendations {
+    min-width: 0;
+}
+
+
+/* =========================================================
+   CUSTOMER SNAPSHOT
+========================================================= */
+
+.sales-workspace-snapshot {
+    min-width: 0;
+}
+
+
+/* =========================================================
+   SUPPORTING DETAILS
+========================================================= */
+
+.sales-workspace-details {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+
+    gap: 18px;
+    align-items: start;
+}
+
+
+/*
+ * Sales history is information-dense and should
+ * receive the full workspace width.
+ */
+
+.sales-workspace-details .sales-history-section {
+    grid-column: 1 / -1;
+}
+
+
+/*
+ * Sales outcomes also work better across
+ * the full available width.
+ */
+
+.sales-workspace-details .sales-outcomes-section {
+    grid-column: 1 / -1;
+}
+
+
+/* =========================================================
+   GRID SAFETY
+========================================================= */
+
+.sales-workspace *,
+.sales-workspace *::before,
+.sales-workspace *::after {
+    box-sizing: border-box;
+}
+
+.sales-workspace section,
+.sales-workspace div {
+    min-width: 0;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .sales-workspace-details {
+        grid-template-columns: 1fr;
+    }
+
+    .sales-workspace-details .sales-history-section,
+    .sales-workspace-details .sales-outcomes-section {
+        grid-column: auto;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .sales-workspace {
+        gap: 14px;
+    }
+
+    .sales-workspace-context,
+    .sales-workspace-primary {
+        gap: 12px;
+    }
+
+    .sales-workspace-details {
+        gap: 14px;
+    }
+
+}
+/* =========================================================
+   STAGE 6.3
+   COMPACT CUSTOMER + VISIT CONTEXT
+========================================================= */
+
+/* Customer Hero */
+
+.customer-hero-compact {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.customer-hero-compact .customer-identity {
+    flex: 1;
+    min-width: 0;
+}
+
+.customer-hero-metrics {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.hero-metric {
+    min-width: 105px;
+    padding: 10px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #f9fafb;
+    text-align: center;
+}
+
+.hero-metric-label {
+    display: block;
+    margin-bottom: 4px;
+    color: #8b93a3;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.hero-metric-value {
+    display: block;
+    color: #172033;
+    font-size: 19px;
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+.hero-metric-text {
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   COMPACT CURRENT VISIT
+========================================================= */
+
+.sales-context-compact {
+    padding-top: 16px;
+    padding-bottom: 14px;
+}
+
+.sales-context-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.sales-context-identity {
+    min-width: 0;
+}
+
+.sales-context-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 2px;
+}
+
+.sales-context-compact .sales-context-title {
+    margin: 0;
+    font-size: 18px;
+}
+
+.sales-context-inline-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 7px;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.meta-separator {
+    color: #c4c8d0;
+}
+
+.sales-context-compact .visit-workflow-actions {
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.sales-context-compact .visit-completed-message {
+    margin: 0;
+}
+
+.sales-context-compact .visit-workflow-message:empty {
+    display: none;
+}
+
+.sales-context-compact .visit-navigation {
+    margin-top: 10px;
+    padding-top: 9px;
+    border-top: 1px solid #f0f1f4;
+}
+
+
+/* =========================================================
+   RESPONSIVE CONTEXT
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .customer-hero-compact {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .customer-hero-metrics {
+        width: 100%;
+    }
+
+    .hero-metric {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .sales-context-main {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .customer-hero-metrics {
+        flex-direction: column;
+    }
+
+    .hero-metric {
+        width: 100%;
+    }
+
+    .sales-context-title-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .sales-context-compact .visit-workflow-actions,
+    .sales-context-compact .visit-action-btn {
+        width: 100%;
+    }
+
+}
+
+/* =========================================================
+   STAGE 6.4
+   COLLAPSIBLE WORKSPACE DETAILS
+========================================================= */
+
+.sales-workspace-details {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+
+/* =========================================================
+   DETAIL CARD
+========================================================= */
+
+.workspace-detail-card {
+    width: 100%;
+    overflow: hidden;
+
+    background: #ffffff;
+
+    border: 1px solid #e3e7ef;
+    border-radius: 16px;
+
+    box-shadow:
+        0 4px 14px rgba(15, 23, 42, 0.035);
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.workspace-detail-summary {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    min-height: 68px;
+
+    padding: 16px 52px 16px 20px;
+
+    cursor: pointer;
+
+    color: #172033;
+
+    font-size: 14px;
+    font-weight: 800;
+
+    user-select: none;
+
+    list-style: none;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+
+/*
+ * حذف marker پیش‌فرض details
+ */
+
+.workspace-detail-summary::-webkit-details-marker {
+    display: none;
+}
+
+.workspace-detail-summary::marker {
+    display: none;
+    content: "";
+}
+
+
+/* =========================================================
+   CUSTOM ARROW
+========================================================= */
+
+.workspace-detail-summary::before {
+    content: "‹";
+
+    position: absolute;
+
+    right: 20px;
+    top: 50%;
+
+    transform:
+        translateY(-50%)
+        rotate(0deg);
+
+    width: 24px;
+    height: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+
+    background: #f0f2ff;
+
+    color: #536dfe;
+
+    font-size: 22px;
+    font-weight: 800;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+
+/*
+ * وقتی details باز است
+ */
+
+.workspace-detail-card[open]
+.workspace-detail-summary::before {
+
+    transform:
+        translateY(-50%)
+        rotate(-90deg);
+}
+
+
+/* =========================================================
+   SUMMARY HOVER
+========================================================= */
+
+.workspace-detail-summary:hover {
+    background: #fafbff;
+}
+
+
+/* =========================================================
+   HINT
+========================================================= */
+
+.workspace-detail-hint {
+    color: #8a94a7;
+
+    font-size: 11px;
+    font-weight: 500;
+
+    text-align: left;
+}
+
+
+/* =========================================================
+   OPEN STATE
+========================================================= */
+
+.workspace-detail-card[open]
+.workspace-detail-summary {
+
+    background: #fafbff;
+
+    border-bottom:
+        1px solid #edf0f5;
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.workspace-detail-content {
+    padding: 18px;
+}
+
+
+/*
+ * جلوگیری از margin اضافی اولین/آخرین
+ * section داخلی
+ */
+
+.workspace-detail-content > :first-child {
+    margin-top: 0;
+}
+
+.workspace-detail-content > :last-child {
+    margin-bottom: 0;
+}
+
+
+/* =========================================================
+   KEYBOARD FOCUS
+========================================================= */
+
+.workspace-detail-summary:focus-visible {
+    outline: 3px solid rgba(83, 109, 254, 0.18);
+    outline-offset: -3px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .workspace-detail-summary {
+        align-items: flex-start;
+        flex-direction: column;
+
+        gap: 4px;
+
+        min-height: 62px;
+
+        padding:
+            14px
+            46px
+            14px
+            14px;
+    }
+
+    .workspace-detail-summary::before {
+        right: 14px;
+    }
+
+    .workspace-detail-hint {
+        text-align: right;
+    }
+
+    .workspace-detail-content {
+        padding: 12px;
+    }
+
+}
+
+/* =========================================================
+   FIX DETAIL CARDS WIDTH
+========================================================= */
+
+.sales-workspace-details {
+    width: 100%;
+}
+
+.workspace-detail-card {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+}
+
+.workspace-detail-summary {
+    width: 100%;
+}
+
+.workspace-detail-content {
+    width: 100%;
+}
+
+/* =========================================================
+   STAGE 6.5
+   OPERATIONAL FOCUS
+========================================================= */
+
+.sales-workspace-primary {
+    gap: 16px;
+}
+
+/* Primary recommendation gets visual priority */
+
+.recommendation-outcome-card.is-primary {
+    border: 2px solid #536dfe;
+    box-shadow:
+        0 10px 30px rgba(83, 109, 254, 0.10);
+}
+
+/* Secondary recommendations are quieter */
+
+.recommendation-outcome-card:not(.is-primary) {
+    opacity: 0.96;
+    box-shadow:
+        0 4px 14px rgba(15, 23, 42, 0.035);
+}
+
+/* Outcome actions should stay visually compact */
+
+.recommendation-outcome {
+    margin-top: 14px;
+}
+
+.outcome-actions {
+    gap: 8px;
+}
+
+.outcome-btn {
+    min-height: 40px;
+    padding: 9px 12px;
+}
+
+/* Keep AI and action layers visually connected */
+
+.sales-workspace-ai + .sales-workspace-recommendations {
+    margin-top: 2px;
+}
+/* =========================================================
+   STAGE 6.5
+   PRIMARY RECOMMENDATION FOCUS
+========================================================= */
+
+.recommendation-outcome-card.is-primary {
+    border: 2px solid #536dfe;
+    box-shadow:
+        0 12px 30px rgba(83, 109, 254, 0.10);
+}
+
+.recommendation-outcome-card.is-primary .primary-badge {
+    background: #eef1ff;
+    color: #4054d6;
+    border: 1px solid #d9defe;
+}
+
+.recommendation-outcome-card:not(.is-primary) {
+    border-color: #e5e7eb;
+    box-shadow:
+        0 4px 14px rgba(15, 23, 42, 0.035);
+}
+
+.recommendation-outcome-card:not(.is-primary) .recommendation-product-name {
+    color: #374151;
+}
+
+.recommendation-outcome-card.is-primary .recommendation-product-name {
+    font-weight: 800;
+}
+
+.recommendation-outcome-card.is-primary .recommendation-score {
+    transform: scale(1.04);
+}
+/* =========================================================
+   STAGE 6.6
+   WORKSPACE NAVIGATION
+========================================================= */
+
+html {
+    scroll-behavior: smooth;
+}
+
+.workspace-nav {
+    position: sticky;
+    top: 12px;
+    z-index: 40;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 18px;
+    padding: 8px;
+
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(10px);
+
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+
+    box-shadow:
+        0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.workspace-nav-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    min-height: 38px;
+    padding: 0 14px;
+
+    border-radius: 10px;
+
+    color: #4b5563;
+    text-decoration: none;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.workspace-nav-link:hover {
+    background: #f0f2ff;
+    color: #4054d6;
+    transform: translateY(-1px);
+}
+
+
+/* Anchor offset for sticky navigation */
+
+#workspace-copilot,
+#workspace-recommendations,
+#workspace-kpis,
+#workspace-details {
+    scroll-margin-top: 88px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .workspace-nav {
+        overflow-x: auto;
+        justify-content: flex-start;
+    }
+
+    .workspace-nav-link {
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+
+}
+
+/* =========================================================
+   STAGE 6.7
+   ACTIVE WORKSPACE NAV ITEM
+========================================================= */
+
+.workspace-nav-link.is-active {
+    background: #536dfe;
+    color: #ffffff;
+    box-shadow:
+        0 6px 14px rgba(83, 109, 254, 0.18);
+}
+
+.workspace-nav-link.is-active:hover {
+    background: #475edc;
+    color: #ffffff;
+    transform: none;
+}
+
+/* =========================================================
+   STAGE 6.8
+   VISIT-AWARE WORKSPACE
+========================================================= */
+
+/* ---------------------------------------------------------
+   PLANNED
+--------------------------------------------------------- */
+
+.sales-workspace.visit-state-planned
+.sales-workspace-ai,
+.sales-workspace.visit-state-planned
+.sales-workspace-recommendations {
+    opacity: 0.92;
+}
+
+.sales-workspace.visit-state-planned
+.visit-start-btn {
+    box-shadow:
+        0 8px 20px rgba(83, 109, 254, 0.18);
+}
+
+
+/* ---------------------------------------------------------
+   IN PROGRESS
+--------------------------------------------------------- */
+
+.sales-workspace.visit-state-in_progress
+.sales-workspace-ai,
+.sales-workspace.visit-state-in_progress
+.sales-workspace-recommendations {
+    opacity: 1;
+}
+
+.sales-workspace.visit-state-in_progress
+.command-center {
+    border-radius: 18px;
+}
+
+.sales-workspace.visit-state-in_progress
+.recommendation-outcome-card.is-primary {
+    box-shadow:
+        0 12px 32px rgba(83, 109, 254, 0.14);
+}
+
+
+/* ---------------------------------------------------------
+   COMPLETED
+--------------------------------------------------------- */
+
+.sales-workspace.visit-state-completed
+.sales-workspace-ai {
+    opacity: 0.92;
+}
+
+.sales-workspace.visit-state-completed
+.copilot-chat-input,
+.sales-workspace.visit-state-completed
+.copilot-chat-submit {
+    opacity: 0.65;
+}
+
+.sales-workspace.visit-state-completed
+.recommendation-outcome-card {
+    opacity: 0.94;
+}
+
+.sales-workspace.visit-state-completed
+.recommendation-outcome-card.is-primary {
+    opacity: 1;
+}
+
+.sales-workspace.visit-state-completed
+.visit-completed-message {
+    font-weight: 800;
+}
+
+
+/* ---------------------------------------------------------
+   NO VISIT
+--------------------------------------------------------- */
+
+.sales-workspace.visit-state-none
+.visit-workflow-actions {
+    display: none;
+}
+
+/* =========================================================
+   STAGE 6.9
+   VISIT STATE BANNER
+========================================================= */
+
+.visit-state-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    padding: 14px 16px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+
+    background: #ffffff;
+}
+
+.visit-state-banner-icon {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 10px;
+
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.visit-state-banner-content {
+    min-width: 0;
+}
+
+.visit-state-banner-title {
+    margin-bottom: 3px;
+
+    color: #172033;
+
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.visit-state-banner-text {
+    color: #6b7280;
+
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+
+/* =========================================================
+   PLANNED
+========================================================= */
+
+.visit-state-planned .visit-state-banner {
+    background: #fffaf0;
+    border-color: #f2dfb7;
+}
+
+.visit-state-planned .visit-state-banner-icon {
+    background: #fff1cf;
+    color: #9a6812;
+}
+
+
+/* =========================================================
+   IN PROGRESS
+========================================================= */
+
+.visit-state-in_progress .visit-state-banner {
+    background: #f5f7ff;
+    border-color: #dce2ff;
+}
+
+.visit-state-in_progress .visit-state-banner-icon {
+    background: #e7ebff;
+    color: #4054d6;
+}
+
+
+/* =========================================================
+   COMPLETED
+========================================================= */
+
+.visit-state-completed .visit-state-banner {
+    background: #f4fbf7;
+    border-color: #d5eadc;
+}
+
+.visit-state-completed .visit-state-banner-icon {
+    background: #e2f3e7;
+    color: #2f7a48;
+}
+
+
+/* =========================================================
+   CANCELLED
+========================================================= */
+
+.visit-state-cancelled .visit-state-banner {
+    background: #fff6f6;
+    border-color: #f1d4d4;
+}
+
+.visit-state-cancelled .visit-state-banner-icon {
+    background: #fde7e7;
+    color: #b53b3b;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .visit-state-banner {
+        align-items: flex-start;
+    }
+
+}
+/* =========================================================
+   STAGE 6.9
+   IN-PROGRESS WORKSPACE PRIORITY
+========================================================= */
+
+/*
+ * During an active visit, Copilot and recommendations
+ * become the primary working area.
+ */
+
+.visit-state-in_progress .sales-workspace-ai,
+.visit-state-in_progress .sales-workspace-recommendations {
+    position: relative;
+    z-index: 1;
+}
+
+
+/* Copilot = active working tool */
+
+.visit-state-in_progress .command-center {
+    border-color: #d8defc;
+    box-shadow:
+        0 8px 24px rgba(64, 84, 214, 0.08);
+}
+
+
+/* Recommendations = primary sales action area */
+
+.visit-state-in_progress .recommendations-hero {
+    border-color: #d8defc;
+}
+
+
+/*
+ * Supporting analytical sections remain available,
+ * but receive less visual emphasis during the visit.
+ */
+
+.visit-state-in_progress .sales-workspace-details {
+    opacity: 0.88;
+    transition:
+        opacity 0.2s ease;
+}
+
+.visit-state-in_progress .sales-workspace-details:hover {
+    opacity: 1;
+}
+
+/* =========================================================
+   STAGE 6.9
+   COMPLETED WORKSPACE / REVIEW MODE
+========================================================= */
+
+/*
+ * A completed visit is no longer an active selling session.
+ * Keep operational tools visible, but reduce their emphasis.
+ */
+
+.visit-state-completed .sales-workspace-ai,
+.visit-state-completed .sales-workspace-recommendations {
+    opacity: 0.78;
+    transition:
+        opacity 0.2s ease;
+}
+
+.visit-state-completed .sales-workspace-ai:hover,
+.visit-state-completed .sales-workspace-recommendations:hover {
+    opacity: 1;
+}
+
+
+/* Supporting / review information becomes visually stronger. */
+
+.visit-state-completed .sales-workspace-details {
+    opacity: 1;
+}
+
+
+/* Copilot should no longer look like the active focal tool. */
+
+.visit-state-completed .command-center {
+    border-color: #e5e7eb;
+    box-shadow:
+        0 4px 14px rgba(15, 23, 42, 0.04);
+}
+
+
+/* Recommendations remain readable as historical context. */
+
+.visit-state-completed .recommendations-hero {
+    border-color: #e5e7eb;
+}
+
+
+/*
+ * Outcome controls are already functionally disabled by JS.
+ * Make their read-only state visually clearer in Review Mode.
+ */
+
+.visit-state-completed .outcome-actions {
+    opacity: 0.65;
+}
+
+/* =========================================================
+   STAGE 6.9
+   PLANNED WORKSPACE / PREPARATION MODE
+========================================================= */
+
+/*
+ * Before the visit starts, the workspace is primarily
+ * a preparation environment.
+ */
+
+.visit-state-planned .sales-workspace-ai,
+.visit-state-planned .sales-workspace-recommendations {
+    position: relative;
+}
+
+
+/*
+ * Customer preparation / AI guidance remains clearly visible.
+ */
+
+.visit-state-planned .command-center {
+    border-color: #e4e7f5;
+    box-shadow:
+        0 5px 18px rgba(15, 23, 42, 0.05);
+}
+
+
+/*
+ * Recommendations are important before the meeting,
+ * so they remain fully visible.
+ */
+
+.visit-state-planned .recommendations-hero {
+    opacity: 1;
+    border-color: #e2e5f4;
+}
+
+
+/*
+ * Outcome controls are not relevant until the visit starts.
+ * JS already disables them; this only reinforces the UX.
+ */
+
+.visit-state-planned .outcome-actions {
+    opacity: 0.42;
+}
+
+.visit-state-planned .outcome-title,
+.visit-state-planned .outcome-subtitle {
+    opacity: 0.62;
+}
+
+
+/*
+ * Supporting customer information is useful during preparation,
+ * so unlike IN_PROGRESS we do not de-emphasize details.
+ */
+
+.visit-state-planned .sales-workspace-details {
+    opacity: 1;
+}
+
+/* =========================================================
+   STAGE 6.9
+   PLANNED / PRIMARY START-VISIT CTA
+========================================================= */
+
+.visit-state-planned .visit-workflow-actions {
+    margin-top: 16px;
+}
+
+
+/*
+ * Starting the visit is the primary action
+ * while the workspace is in preparation mode.
+ */
+.visit-state-planned #startVisitButton {
+    min-width: 150px;
+    min-height: 44px;
+
+    padding: 10px 22px;
+
+    border: 0;
+    border-radius: 12px;
+
+    font-size: 13px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 7px 18px rgba(64, 84, 214, 0.18);
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        opacity 0.15s ease;
+}
+
+.visit-state-planned #startVisitButton:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 9px 22px rgba(64, 84, 214, 0.23);
+}
+
+.visit-state-planned #startVisitButton:active {
+    transform: translateY(0);
+}
+
+
+/*
+ * Outcome controls stay visually secondary
+ * until the visit actually starts.
+ */
+.visit-state-planned .outcome-actions {
+    pointer-events: none;
+}
+
+/* =========================================================
+   STAGE 6.10
+   COMPLETED VISIT SUMMARY
+========================================================= */
+
+.visit-summary-card {
+    padding: 18px 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #dbe8df;
+    border-radius: 16px;
+
+    box-shadow:
+        0 4px 14px rgba(15, 23, 42, 0.04);
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.visit-summary-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+
+    border-bottom: 1px solid #eef2ef;
+}
+
+.visit-summary-title {
+    margin: 3px 0 0;
+
+    color: #172033;
+
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.visit-summary-status {
+    flex-shrink: 0;
+
+    padding: 6px 11px;
+
+    background: #e8f5ec;
+    color: #2f7a48;
+
+    border: 1px solid #d4eadb;
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   SUMMARY GRID
+========================================================= */
+
+.visit-summary-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 10px;
+}
+
+.visit-summary-item {
+    min-width: 0;
+
+    padding: 12px 14px;
+
+    background: #f8faf9;
+
+    border: 1px solid #eef2ef;
+    border-radius: 12px;
+}
+
+.visit-summary-label {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #8a9490;
+
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.visit-summary-value {
+    display: block;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    color: #26332b;
+
+    font-size: 13px;
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   COMPLETED STATE EMPHASIS
+========================================================= */
+
+.visit-state-completed .visit-summary-card {
+    border-color: #d5eadc;
+
+    box-shadow:
+        0 6px 20px rgba(47, 122, 72, 0.06);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .visit-summary-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .visit-summary-head {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .visit-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+/* =========================================================
+   VISIT SUMMARY - RESOLVED OUTCOMES
+========================================================= */
+
+.visit-summary-outcomes {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #edf1ee;
+}
+
+.visit-summary-outcomes-title {
+    margin-bottom: 10px;
+
+    color: #4b5563;
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.visit-summary-outcome-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 8px 12px;
+
+    padding: 9px 0;
+
+    border-bottom: 1px solid #f1f3f2;
+}
+
+.visit-summary-outcome-row:last-child {
+    border-bottom: none;
+}
+
+.visit-summary-outcome-label {
+    color: #6b7280;
+
+    font-size: 11px;
+}
+
+.visit-summary-outcome-value {
+    color: #26332b;
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.visit-summary-outcome-meta {
+    color: #8a9490;
+
+    font-size: 11px;
+}
+/* =========================================================
+   STAGE 6.11
+   VISIT SUMMARY - NEXT STEP
+========================================================= */
+
+.visit-summary-next-step {
+    margin-top: 16px;
+    padding-top: 14px;
+
+    border-top: 1px solid #edf1ee;
+}
+
+.visit-summary-next-step-label {
+    margin-bottom: 9px;
+
+    color: #8a9490;
+
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+}
+
+.visit-summary-next-step-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    padding: 12px 14px;
+
+    background: #f8faf9;
+
+    border: 1px solid #e7eeea;
+    border-radius: 12px;
+}
+
+.visit-summary-next-step-content strong {
+    display: block;
+
+    color: #26332b;
+
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.visit-summary-next-step-text {
+    margin-top: 4px;
+
+    color: #7b8580;
+
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+
+/* ---------------------------------------------------------
+   ACTION
+--------------------------------------------------------- */
+
+.visit-summary-next-step-action {
+    flex-shrink: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 34px;
+    padding: 0 14px;
+
+    background: #edf7f0;
+    color: #327449;
+
+    border: 1px solid #d3e9da;
+    border-radius: 9px;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.visit-summary-next-step-action:hover {
+    background: #e3f2e8;
+    border-color: #c5dfcd;
+
+    transform: translateY(-1px);
+}
+
+
+/* ---------------------------------------------------------
+   COMPLETED ACTION
+--------------------------------------------------------- */
+
+.visit-summary-next-step-done {
+    flex-shrink: 0;
+
+    padding: 5px 10px;
+
+    background: #e8f5ec;
+    color: #2f7a48;
+
+    border-radius: 999px;
+
+    font-size: 10px;
+    font-weight: 800;
+}
+
+
+/* ---------------------------------------------------------
+   RESPONSIVE
+--------------------------------------------------------- */
+
+@media (max-width: 600px) {
+
+    .visit-summary-next-step-content {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .visit-summary-next-step-action {
+        width: 100%;
+    }
+
+}

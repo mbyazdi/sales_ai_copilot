@@ -1,46 +1,90 @@
-<section class="customer-hero">
-<div class="customer-identity">
-<div class="customer-avatar">
-                {{ customer.name|first }}
+<section class="customer-hero customer-hero-compact">
+
+    <div class="customer-identity">
+
+        <div class="customer-avatar">
+            {{ customer.name|first }}
+        </div>
+
+        <div class="customer-info">
+
+            <div class="eyebrow">
+                CUSTOMER 360
             </div>
-<div class="customer-info">
-<div class="eyebrow">CUSTOMER 360</div>
-<div class="customer-name">
-                    {{ customer.name }}
-                </div>
-<div class="customer-code">
-                    {{ customer.customer_code }}
-                </div>
-<div class="customer-tags">
 
-                    {% if customer.grade %}
-                        <span class="tag grade">
-                            {{ customer.grade.name }}
-                        </span>
-                    {% endif %}
+            <div class="customer-name">
+                {{ customer.name }}
+            </div>
 
-                    <span class="tag">
-                        {{ customer.customer_type }}
+            <div class="customer-code">
+                {{ customer.customer_code }}
+            </div>
+
+            <div class="customer-tags">
+
+                {% if customer.grade %}
+                    <span class="tag grade">
+                        {{ customer.grade.name }}
                     </span>
-<span class="tag">
-                        {{ customer.city }}
-                    </span>
-</div>
-</div>
-</div>
+                {% endif %}
 
-        {% if customer_360 %}
-            <div class="last-purchase">
-<div class="last-purchase-label">
+                <span class="tag">
+                    {{ customer.customer_type }}
+                </span>
+
+                <span class="tag">
+                    {{ customer.city }}
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {% if customer_360 %}
+
+        <div class="customer-hero-metrics">
+
+            <div class="hero-metric">
+
+                <span class="hero-metric-label">
                     روز از آخرین خرید
-                </div>
-<div class="last-purchase-value">
-                    {{ customer_360.days_since_last_purchase }}
-                </div>
-<div class="last-purchase-unit">
-                    روز
-                </div>
-</div>
-        {% endif %}
+                </span>
 
-    </section>
+                <strong class="hero-metric-value">
+                    {{ customer_360.days_since_last_purchase }}
+                </strong>
+
+            </div>
+
+            <div class="hero-metric">
+
+                <span class="hero-metric-label">
+                    سگمنت
+                </span>
+
+                <strong class="hero-metric-value hero-metric-text">
+                    {{ customer_360.segment }}
+                </strong>
+
+            </div>
+
+            <div class="hero-metric">
+
+                <span class="hero-metric-label">
+                    سفارش‌ها
+                </span>
+
+                <strong class="hero-metric-value">
+                    {{ customer_360.total_orders }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</section>
