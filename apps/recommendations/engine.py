@@ -151,6 +151,23 @@ class RecommendationEngine:
 
     SIMILAR_PRODUCT_SCORE = Decimal("15")
 
+    # -----------------------------------------------------
+    # Historical Sales Outcome Feedback
+    # -----------------------------------------------------
+
+    OUTCOME_FEEDBACK_SCORES = {
+        "PURCHASED": Decimal("8"),
+        "INTERESTED": Decimal("4"),
+        "FOLLOW_UP": Decimal("2"),
+        "REJECTED": Decimal("-6"),
+        "NOT_PRESENTED": Decimal("0"),
+    }
+
+    OUTCOME_FEEDBACK_HISTORY_LIMIT = 5
+
+    OUTCOME_FEEDBACK_MIN_SCORE = Decimal("-12")
+    OUTCOME_FEEDBACK_MAX_SCORE = Decimal("15")
+
     # =====================================================
     # INITIALIZATION
     # =====================================================
@@ -478,6 +495,63 @@ class RecommendationEngine:
             association_max_score,
         )
     # =====================================================
+    # HISTORICAL OUTCOME FEEDBACK
+    # =====================================================
+
+    def _outcome_feedback_score(
+        self,
+        product,
+    ):
+        """
+        Return a conservative feedback score based on
+        historical salesperson outcomes for this customer
+        and this exact product.
+
+        Only the latest few outcomes are considered.
+
+        NOT_PRESENTED is intentionally neutral because it
+        does not represent customer preference.
+        """
+
+        # Local import avoids coupling the recommendation
+        # module to visits models during Django app loading.
+        from apps.visits.models import SalesOutcome
+
+        outcomes = (
+            SalesOutcome.objects
+            .filter(
+                visit__customer=self.customer,
+                recommendation__product=product,
+            )
+            .order_by(
+                "-id",
+            )[
+                :self.OUTCOME_FEEDBACK_HISTORY_LIMIT
+            ]
+        )
+
+        feedback_score = Decimal("0")
+
+        for sales_outcome in outcomes:
+
+            feedback_score += (
+                self.OUTCOME_FEEDBACK_SCORES.get(
+                    sales_outcome.outcome,
+                    Decimal("0"),
+                )
+            )
+
+        feedback_score = max(
+            self.OUTCOME_FEEDBACK_MIN_SCORE,
+            min(
+                feedback_score,
+                self.OUTCOME_FEEDBACK_MAX_SCORE,
+            ),
+        )
+
+        return feedback_score
+
+    # =====================================================
     # PRODUCT SCORING
     # =====================================================
 
@@ -616,13 +690,43 @@ class RecommendationEngine:
             )
 
         # -------------------------------------------------
+        # 8. Historical Outcome Feedback
+        # -------------------------------------------------
+
+        rule_score = score
+        feedback_score = (
+            self._outcome_feedback_score(
+                product
+            )
+        )
+
+        score += feedback_score
+
+        if feedback_score > 0:
+
+            reasons.append(
+                "بازخوردهای قبلی این مشتری نسبت به این محصول "
+                "سیگنال مثبتی برای پیشنهاد مجدد ایجاد کرده است."
+            )
+
+        elif feedback_score < 0:
+
+            reasons.append(
+                "بازخوردهای قبلی این مشتری نسبت به این محصول "
+                "امتیاز پیشنهاد را کاهش داده است."
+            )
+
+        # -------------------------------------------------
         # Final Score
         # -------------------------------------------------
 
-        score = min(
+        score = max(
+        Decimal("0"),
+        min(
             score,
             self.MAX_FINAL_SCORE,
-        )
+        ),
+    )
 
         recommendation_type = (
             self._determine_type(
@@ -642,6 +746,11 @@ class RecommendationEngine:
             "recommendation_type": (
                 recommendation_type
             ),
+            "score_breakdown": {
+                "rule_score": rule_score,
+                "feedback_score": feedback_score,
+                "final_score": score,
+            },
         }
 
     # =====================================================
@@ -1178,6 +1287,18 @@ class RecommendationEngine:
                     score=item[
                         "score"
                     ],
+
+                    score_breakdown={
+                        "rule_score": float(
+                            item["score_breakdown"]["rule_score"]
+                        ),
+                        "feedback_score": float(
+                            item["score_breakdown"]["feedback_score"]
+                        ),
+                        "final_score": float(
+                            item["score_breakdown"]["final_score"]
+                        ),
+                    },
 
                     rank=rank,
 

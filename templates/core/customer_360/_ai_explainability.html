@@ -10,6 +10,66 @@
 </div>
 <div class="confidence-badge">Confidence <span class="confidence-value">{{ primary.score|floatformat:0 }}%</span></div>
 </div>
+{% if primary.score_breakdown %}
+
+    <div class="ai-score-breakdown">
+
+        <div class="ai-score-breakdown-item">
+
+            <span class="ai-score-breakdown-label">
+                امتیاز قواعد
+            </span>
+
+            <strong class="ai-score-breakdown-value">
+                {{ primary.score_breakdown.rule_score|floatformat:0 }}
+            </strong>
+
+        </div>
+
+
+        <div class="ai-score-breakdown-item">
+
+            <span class="ai-score-breakdown-label">
+                اثر بازخورد تاریخی
+            </span>
+
+            <strong
+                class="
+                    ai-score-breakdown-value
+                    {% if primary.score_breakdown.feedback_score > 0 %}
+                        is-positive
+                    {% elif primary.score_breakdown.feedback_score < 0 %}
+                        is-negative
+                    {% endif %}
+                "
+            >
+                {% if primary.score_breakdown.feedback_score > 0 %}
+                    +
+                {% endif %}
+                {{ primary.score_breakdown.feedback_score|floatformat:0 }}
+            </strong>
+
+        </div>
+
+
+        <div class="ai-score-breakdown-item is-final">
+
+            <span class="ai-score-breakdown-label">
+                امتیاز نهایی
+            </span>
+
+            <strong class="ai-score-breakdown-value">
+                {{ primary.score_breakdown.final_score|floatformat:0 }}
+            </strong>
+
+        </div>
+
+    </div>
+
+{% endif %}
+
+
+<div class="reason-list">
 <div class="reason-list">
 <div class="reason-item">
 <div class="reason-icon">✓</div>

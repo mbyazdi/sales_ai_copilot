@@ -680,7 +680,7 @@ class CustomerSalesOutcomeHistoryAPIView(APIView):
 
             "sales_outcomes": data,
         })
-    
+
 class RecommendationPerformanceAPIView(APIView):
 
     def get(self, request, customer_code=None):
@@ -719,9 +719,36 @@ class RecommendationPerformanceAPIView(APIView):
             for item in performance
         )
 
+        total_follow_up = sum(
+            item["follow_up"]
+            for item in performance
+        )
+
+        total_rejected = sum(
+            item["rejected"]
+            for item in performance
+        )
+
+        total_not_presented = sum(
+            item["not_presented"]
+            for item in performance
+        )
+
         total_revenue = sum(
             item["revenue"]
             for item in performance
+        )
+
+        total_average_sales_amount = (
+            round(
+                (
+                    total_revenue
+                    / total_purchased
+                ),
+                2,
+            )
+            if total_purchased
+            else 0
         )
 
         total_conversion_rate = (
@@ -748,49 +775,120 @@ class RecommendationPerformanceAPIView(APIView):
             else 0
         )
 
-        return Response({
+        total_follow_up_rate = (
+            round(
+                (
+                    total_follow_up
+                    / total_presented
+                ) * 100,
+                2,
+            )
+            if total_presented
+            else 0
+        )
 
-            "customer": (
-                {
-                    "code": customer.customer_code,
-                    "name": customer.name,
-                }
-                if customer
-                else None
-            ),
+        total_rejection_rate = (
+            round(
+                (
+                    total_rejected
+                    / total_presented
+                ) * 100,
+                2,
+            )
+            if total_presented
+            else 0
+        )
 
-            "summary": {
+        total_engagement_rate = (
+            round(
+                (
+                    (
+                        total_purchased
+                        + total_interested
+                        + total_follow_up
+                    )
+                    / total_presented
+                ) * 100,
+                2,
+            )
+            if total_presented
+            else 0
+        )
 
-                "presented": (
-                    total_presented
+        return Response(
+            {
+                "customer": (
+                    {
+                        "code": customer.customer_code,
+                        "name": customer.name,
+                    }
+                    if customer
+                    else None
                 ),
 
-                "purchased": (
-                    total_purchased
+                "summary": {
+                    "presented": (
+                        total_presented
+                    ),
+
+                    "purchased": (
+                        total_purchased
+                    ),
+
+                    "interested": (
+                        total_interested
+                    ),
+
+                    "follow_up": (
+                        total_follow_up
+                    ),
+
+                    "rejected": (
+                        total_rejected
+                    ),
+
+                    "not_presented": (
+                        total_not_presented
+                    ),
+
+                    "revenue": (
+                        round(
+                            total_revenue,
+                            2,
+                        )
+                    ),
+
+                    "average_sales_amount": (
+                        total_average_sales_amount
+                    ),
+
+                    "conversion_rate": (
+                        total_conversion_rate
+                    ),
+
+                    "interest_rate": (
+                        total_interest_rate
+                    ),
+
+                    "follow_up_rate": (
+                        total_follow_up_rate
+                    ),
+
+                    "rejection_rate": (
+                        total_rejection_rate
+                    ),
+
+                    "engagement_rate": (
+                        total_engagement_rate
+                    ),
+                },
+
+                "performance": (
+                    performance
                 ),
+            }
+        )
 
-                "interested": (
-                    total_interested
-                ),
-
-                "revenue": (
-                    total_revenue
-                ),
-
-                "conversion_rate": (
-                    total_conversion_rate
-                ),
-
-                "interest_rate": (
-                    total_interest_rate
-                ),
-            },
-
-            "performance": performance,
-
-        })
-    
-    
 class VisitCompleteAPIView(APIView):
 
     def post(self, request, visit_id):

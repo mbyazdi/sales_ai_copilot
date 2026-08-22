@@ -36,6 +36,10 @@ class CustomerRecommendation(models.Model):
         decimal_places=4,
         default=0,
     )
+    score_breakdown = models.JSONField(
+        default=dict,
+        blank=True,
+    )
 
     reason = models.TextField(
         blank=True,
