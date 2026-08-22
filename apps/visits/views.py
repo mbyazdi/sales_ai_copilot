@@ -8,12 +8,15 @@ from .models import (
     SalesOutcome,
     Salesperson,
     CustomerAssignment,
+    FollowUpTask,
 )
 from apps.customers.models import Customer
 from apps.recommendations.models import CustomerRecommendation
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+from rest_framework.permissions import IsAuthenticated
 
 def recommendation_performance_dashboard(request):
     return render(
@@ -448,6 +451,20 @@ class SalesOutcomeCreateAPIView(APIView):
                 "follow_up_required",
                 "follow_up_date",
             ])
+            FollowUpTask.objects.update_or_create(
+                visit=visit,
+                customer=visit.customer,
+                salesperson=visit.salesperson,
+                status=FollowUpTask.Status.OPEN,
+                defaults={
+                    "due_date": (
+                        parsed_follow_up_date
+                    ),
+                    "notes": (
+                        notes
+                    ),
+                },
+            )
 
 
         # -----------------------------------------
@@ -899,4 +916,389 @@ class VisitStartAPIView(APIView):
                 },
             },
             status=status.HTTP_200_OK,
-        )    
+        )
+class FollowUpTaskListAPIView(APIView):
+
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    def get(self, request):
+
+        salesperson = getattr(
+            request.user,
+            "salesperson_profile",
+            None,
+        )
+
+        if not salesperson:
+
+            return Response(
+                {
+                    "detail": (
+                        "Salesperson profile not found "
+                        "for the current user."
+                    )
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        status_filter = request.GET.get(
+            "status"
+        )
+
+        time_state_filter = request.GET.get(
+            "time_state"
+        )
+
+        queryset = (
+            FollowUpTask.objects
+            .filter(
+                salesperson=salesperson,
+            )
+            .select_related(
+                "customer",
+                "visit",
+                "salesperson",
+            )
+            .order_by(
+                "status",
+                "due_date",
+                "id",
+            )
+        )
+
+        if status_filter:
+
+            queryset = queryset.filter(
+                status=status_filter
+            )
+
+        today = timezone.localdate()
+
+        if time_state_filter == "OVERDUE":
+
+            queryset = queryset.filter(
+                status=FollowUpTask.Status.OPEN,
+                due_date__lt=today,
+            )
+
+        elif time_state_filter == "TODAY":
+
+            queryset = queryset.filter(
+                status=FollowUpTask.Status.OPEN,
+                due_date=today,
+            )
+
+        elif time_state_filter == "UPCOMING":
+
+            queryset = queryset.filter(
+                status=FollowUpTask.Status.OPEN,
+                due_date__gt=today,
+            )
+
+        elif time_state_filter == "DONE":
+
+            queryset = queryset.filter(
+                status=FollowUpTask.Status.DONE,
+            )
+
+        elif time_state_filter == "CANCELLED":
+
+            queryset = queryset.filter(
+                status=FollowUpTask.Status.CANCELLED,
+            )
+
+        tasks = []
+
+        for task in queryset:
+
+            if task.status == FollowUpTask.Status.DONE:
+
+                time_state = "DONE"
+
+            elif task.status == FollowUpTask.Status.CANCELLED:
+
+                time_state = "CANCELLED"
+
+            elif task.due_date < today:
+
+                time_state = "OVERDUE"
+
+            elif task.due_date == today:
+
+                time_state = "TODAY"
+
+            else:
+
+                time_state = "UPCOMING"
+
+            tasks.append({
+                "id": task.id,
+                "status": task.status,
+                "time_state": time_state,
+                "due_date": task.due_date,
+
+                "customer": {
+                    "id": task.customer_id,
+                    "customer_code": (
+                        task.customer.customer_code
+                    ),
+                    "name": (
+                        task.customer.name
+                    ),
+                },
+
+                "salesperson": {
+                    "id": task.salesperson_id,
+                    "employee_code": (
+                        task.salesperson.employee_code
+                    ),
+                    "full_name": (
+                        task.salesperson.full_name
+                    ),
+                },
+
+                "visit": {
+                    "id": task.visit_id,
+                    "status": task.visit.status,
+                },
+
+                "notes": task.notes,
+
+                "completed_at": (
+                    task.completed_at
+                ),
+            })
+
+        return Response(
+            {
+                "count": len(tasks),
+                "tasks": tasks,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+class FollowUpTaskStatusAPIView(APIView):
+
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    def post(self, request, task_id):
+
+        salesperson = getattr(
+            request.user,
+            "salesperson_profile",
+            None,
+        )
+
+        if not salesperson:
+
+            return Response(
+                {
+                    "detail": (
+                        "Salesperson profile not found "
+                        "for the current user."
+                    )
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        new_status = request.data.get(
+            "status"
+        )
+
+        allowed_statuses = {
+            FollowUpTask.Status.DONE,
+            FollowUpTask.Status.CANCELLED,
+        }
+
+        if new_status not in allowed_statuses:
+
+            return Response(
+                {
+                    "detail": (
+                        "status must be DONE "
+                        "or CANCELLED."
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+
+            task = (
+                FollowUpTask.objects
+                .select_related(
+                    "visit",
+                )
+                .get(
+                    id=task_id,
+                    salesperson=salesperson,
+                )
+            )
+
+        except FollowUpTask.DoesNotExist:
+
+            return Response(
+                {
+                    "detail": (
+                        "Follow-up task not found."
+                    )
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        task.status = new_status
+
+        if new_status == FollowUpTask.Status.DONE:
+
+            task.completed_at = (
+                timezone.now()
+            )
+
+        else:
+
+            task.completed_at = None
+
+        task.save(
+            update_fields=[
+                "status",
+                "completed_at",
+                "updated_at",
+            ]
+        )
+
+        open_tasks = (
+            FollowUpTask.objects
+            .filter(
+                visit=task.visit,
+                status=FollowUpTask.Status.OPEN,
+            )
+            .order_by(
+                "due_date",
+                "id",
+            )
+        )
+
+        next_open_task = (
+            open_tasks.first()
+        )
+
+        if next_open_task:
+
+            task.visit.follow_up_required = True
+
+            task.visit.follow_up_date = (
+                next_open_task.due_date
+            )
+
+        else:
+
+            task.visit.follow_up_required = False
+
+            task.visit.follow_up_date = None
+
+        task.visit.save(
+            update_fields=[
+                "follow_up_required",
+                "follow_up_date",
+                "updated_at",
+            ]
+        )
+
+        return Response(
+            {
+                "success": True,
+
+                "task": {
+                    "id": task.id,
+                    "status": task.status,
+                    "completed_at": (
+                        task.completed_at
+                    ),
+                },
+            },
+            status=status.HTTP_200_OK,
+        )
+
+@login_required
+def follow_up_dashboard(request):
+
+    today = timezone.localdate()
+
+    salespersons = (
+        Salesperson.objects
+        .all()
+        .order_by(
+            "first_name",
+            "last_name",
+            "employee_code",
+        )
+    )
+
+    salesperson = getattr(
+        request.user,
+        "salesperson_profile",
+        None,
+    )
+
+    if not salesperson:
+
+        return render(
+            request,
+            "core/follow_up_dashboard.html",
+            {
+                "salesperson_missing": True,
+            },
+        )
+
+    open_tasks = (
+        FollowUpTask.objects
+        .filter(
+            status=FollowUpTask.Status.OPEN,
+            salesperson=salesperson,
+        )
+        .select_related(
+            "customer",
+            "visit",
+            "salesperson",
+        )
+        .order_by(
+            "due_date",
+            "id",
+        )
+    )
+
+    overdue_tasks = open_tasks.filter(
+        due_date__lt=today,
+    )
+
+    today_tasks = open_tasks.filter(
+        due_date=today,
+    )
+
+    upcoming_tasks = open_tasks.filter(
+        due_date__gt=today,
+    )
+
+    context = {
+        "today": today,
+
+        "overdue_tasks": overdue_tasks,
+        "today_tasks": today_tasks,
+        "upcoming_tasks": upcoming_tasks,
+
+        "overdue_count": overdue_tasks.count(),
+        "today_count": today_tasks.count(),
+        "upcoming_count": upcoming_tasks.count(),
+        "open_count": open_tasks.count(),
+        "salesperson": salesperson,
+    }
+
+    return render(
+        request,
+        "core/follow_up_dashboard.html",
+        context,
+    )

@@ -2,14 +2,18 @@ from django.shortcuts import get_object_or_404, render
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from django.utils import timezone
 from .models import Customer
 from .services import (
     get_customer_360,
     build_sales_ai_context,
 )
 from apps.recommendations.models import CustomerRecommendation
-from apps.visits.models import CustomerAssignment, Visit
+from apps.visits.models import (
+    CustomerAssignment,
+    Visit,
+    FollowUpTask,
+)
 from apps.sales.services import get_customer_sales_history
 
 from apps.visits.services import (
@@ -52,6 +56,10 @@ def customer_search(request):
         "not_found": False,
 
         "sales_ai_context": None,
+
+        "current_follow_up_task": None,
+
+        "current_follow_up_time_state": None,
     }
 
     if customer_code:
@@ -463,6 +471,58 @@ def customer_search(request):
 
                 context["visit_summary"] = (
                     visit_summary
+                )
+                # -----------------------------------------
+                # CURRENT FOLLOW-UP TASK
+                # -----------------------------------------
+
+                current_follow_up_task = (
+                    FollowUpTask.objects
+                    .filter(
+                        customer=customer,
+                        status=FollowUpTask.Status.OPEN,
+                    )
+                    .select_related(
+                        "visit",
+                        "salesperson",
+                    )
+                    .order_by(
+                        "due_date",
+                        "id",
+                    )
+                    .first()
+                )
+
+                context["current_follow_up_task"] = (
+                    current_follow_up_task
+                )
+
+                current_follow_up_time_state = None
+
+                if current_follow_up_task:
+
+                    today = timezone.localdate()
+
+                    if current_follow_up_task.due_date < today:
+
+                        current_follow_up_time_state = (
+                            "OVERDUE"
+                        )
+
+                    elif current_follow_up_task.due_date == today:
+
+                        current_follow_up_time_state = (
+                            "TODAY"
+                        )
+
+                    else:
+
+                        current_follow_up_time_state = (
+                            "UPCOMING"
+                        )
+
+                context["current_follow_up_time_state"] = (
+                    current_follow_up_time_state
                 )
 
         except Customer.DoesNotExist:

@@ -4992,3 +4992,795 @@ html {
     }
 
 }
+
+/* =========================================================
+   STAGE 7.2
+   FOLLOW-UP DASHBOARD
+========================================================= */
+
+.follow-up-dashboard {
+    padding: 24px 0 40px;
+}
+
+.follow-up-dashboard-title {
+    margin: 4px 0 6px;
+
+    color: #172033;
+
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.follow-up-dashboard-subtitle {
+    margin: 0 0 20px;
+
+    color: #7b8492;
+
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+
+/* =========================================================
+   COLUMNS
+========================================================= */
+
+.follow-up-columns {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 16px;
+}
+
+.follow-up-column {
+    min-width: 0;
+
+    padding: 14px;
+
+    background: #f8fafc;
+
+    border: 1px solid #e7ebf0;
+    border-radius: 16px;
+}
+
+.follow-up-column-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 12px;
+}
+
+.follow-up-column-head h2 {
+    margin: 0;
+
+    color: #263244;
+
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.follow-up-count {
+    min-width: 26px;
+    height: 26px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 8px;
+
+    background: #ffffff;
+
+    border: 1px solid #e1e6eb;
+    border-radius: 999px;
+
+    color: #5f6977;
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   TASK CARD
+========================================================= */
+
+.follow-up-task-card {
+    padding: 13px 14px;
+
+    background: #ffffff;
+
+    border: 1px solid #e6e9ee;
+    border-radius: 12px;
+
+    box-shadow:
+        0 3px 10px rgba(15, 23, 42, 0.04);
+
+    margin-bottom: 10px;
+}
+
+.follow-up-task-card:last-child {
+    margin-bottom: 0;
+}
+
+.follow-up-task-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+}
+
+.follow-up-task-customer {
+    color: #202a38;
+
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.follow-up-task-code {
+    flex-shrink: 0;
+
+    color: #9098a5;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.follow-up-task-meta {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 6px 12px;
+
+    margin-top: 8px;
+
+    color: #7b8492;
+
+    font-size: 10px;
+}
+
+.follow-up-task-notes {
+    margin-top: 9px;
+    padding-top: 9px;
+
+    border-top: 1px dashed #e5e7eb;
+
+    color: #697382;
+
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   TASK STATES
+========================================================= */
+
+.follow-up-task-card.is-overdue {
+    border-color: #f0cccc;
+    background: #fffafa;
+}
+
+.follow-up-task-card.is-today {
+    border-color: #eddcb9;
+    background: #fffdf8;
+}
+
+.follow-up-task-card.is-upcoming {
+    border-color: #d8e1f1;
+    background: #fbfcff;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.follow-up-task-actions {
+    display: flex;
+    justify-content: flex-end;
+
+    margin-top: 10px;
+}
+
+.follow-up-open-customer {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 32px;
+    padding: 0 12px;
+
+    background: #f2f5ff;
+
+    border: 1px solid #dce3fa;
+    border-radius: 9px;
+
+    color: #4054b8;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    text-decoration: none;
+}
+
+.follow-up-open-customer:hover {
+    background: #e9eefd;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.follow-up-empty {
+    padding: 20px 12px;
+
+    text-align: center;
+
+    background: #ffffff;
+
+    border: 1px dashed #d9dee5;
+    border-radius: 12px;
+
+    color: #9aa2ad;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
+
+    .follow-up-columns {
+        grid-template-columns: 1fr;
+    }
+
+}
+.follow-up-task-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+
+    gap: 7px;
+
+    margin-top: 10px;
+}
+
+.follow-up-action-btn {
+    min-height: 32px;
+    padding: 0 11px;
+
+    border-radius: 9px;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        opacity 0.15s ease;
+}
+
+.follow-up-done-btn {
+    background: #edf8f0;
+    color: #33784a;
+
+    border: 1px solid #d2e9d9;
+}
+
+.follow-up-done-btn:hover {
+    background: #e2f2e7;
+}
+
+.follow-up-cancel-btn {
+    background: #fff5f5;
+    color: #a94a4a;
+
+    border: 1px solid #efd7d7;
+}
+
+.follow-up-cancel-btn:hover {
+    background: #fceaea;
+}
+
+.follow-up-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* =========================================================
+   FOLLOW-UP SUMMARY
+========================================================= */
+
+.follow-up-summary-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 12px;
+
+    margin-bottom: 18px;
+}
+
+.follow-up-summary-card {
+    padding: 14px 16px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e9ef;
+    border-radius: 14px;
+
+    box-shadow:
+        0 3px 12px rgba(15, 23, 42, 0.04);
+}
+
+.follow-up-summary-label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #8a94a3;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.follow-up-summary-value {
+    display: block;
+
+    color: #1f2937;
+
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.follow-up-summary-card.is-overdue {
+    border-color: #efcaca;
+    background: #fffafa;
+}
+
+.follow-up-summary-card.is-today {
+    border-color: #ecdab5;
+    background: #fffdf7;
+}
+
+.follow-up-summary-card.is-upcoming {
+    border-color: #d7e0f1;
+    background: #fbfcff;
+}
+
+@media (max-width: 900px) {
+
+    .follow-up-summary-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+@media (max-width: 520px) {
+
+    .follow-up-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+/* =========================================================
+   FOLLOW-UP FILTER
+========================================================= */
+
+.follow-up-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-bottom: 16px;
+}
+
+.follow-up-filter-label {
+    color: #667085;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.follow-up-filter-select {
+    min-width: 220px;
+    min-height: 36px;
+
+    padding: 0 10px;
+
+    background: #ffffff;
+
+    border: 1px solid #dfe4ea;
+    border-radius: 9px;
+
+    color: #273142;
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+@media (max-width: 600px) {
+
+    .follow-up-filter-bar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .follow-up-filter-select {
+        width: 100%;
+        min-width: 0;
+    }
+
+}
+/* =========================================================
+   LOGIN PAGE
+========================================================= */
+
+.login-page {
+    min-height: 100vh;
+    margin: 0;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f7f9fc 0%,
+            #eef3f8 100%
+        );
+
+    color: #1f2937;
+}
+
+.login-shell {
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+}
+
+.login-card {
+    width: min(100%, 420px);
+
+    padding: 28px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+
+    box-shadow:
+        0 16px 40px rgba(15, 23, 42, 0.08);
+}
+
+.login-title {
+    margin: 6px 0 8px;
+
+    color: #172033;
+
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.login-subtitle {
+    margin: 0 0 22px;
+
+    color: #7b8492;
+
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.login-form {
+    display: grid;
+    gap: 14px;
+}
+
+.login-field {
+    display: grid;
+    gap: 6px;
+}
+
+.login-field label {
+    color: #586273;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.login-field input {
+    width: 100%;
+    min-height: 42px;
+
+    box-sizing: border-box;
+
+    padding: 0 12px;
+
+    background: #fbfcfe;
+
+    border: 1px solid #dce2e9;
+    border-radius: 10px;
+
+    color: #202936;
+
+    font-size: 12px;
+
+    outline: none;
+
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease,
+        background 0.15s ease;
+}
+
+.login-field input:focus {
+    background: #ffffff;
+
+    border-color: #aebbe8;
+
+    box-shadow:
+        0 0 0 3px rgba(78, 99, 190, 0.09);
+}
+
+.login-submit {
+    min-height: 42px;
+
+    margin-top: 4px;
+
+    background: #4459c7;
+    color: #ffffff;
+
+    border: 1px solid #4459c7;
+    border-radius: 10px;
+
+    font-size: 12px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        transform 0.15s ease;
+}
+
+.login-submit:hover {
+    background: #394db7;
+
+    transform: translateY(-1px);
+}
+
+.login-error {
+    margin-bottom: 14px;
+    padding: 10px 12px;
+
+    background: #fff5f5;
+    color: #a94444;
+
+    border: 1px solid #f0d2d2;
+    border-radius: 10px;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+/* =========================================================
+   STAGE 7.4
+   CUSTOMER FOLLOW-UP CARD
+========================================================= */
+
+.customer-follow-up-card {
+    margin: 16px 0;
+
+    padding: 16px;
+
+    background: #ffffff;
+
+    border: 1px solid #e4e8ee;
+    border-radius: 14px;
+
+    box-shadow:
+        0 4px 14px rgba(15, 23, 42, 0.05);
+}
+
+.customer-follow-up-card.is-overdue {
+    background: #fffafa;
+    border-color: #efcccc;
+}
+
+.customer-follow-up-card.is-today {
+    background: #fffdf7;
+    border-color: #ead7ae;
+}
+
+.customer-follow-up-card.is-upcoming {
+    background: #fbfcff;
+    border-color: #d9e1f0;
+}
+
+.customer-follow-up-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 14px;
+
+    margin-bottom: 14px;
+}
+
+.customer-follow-up-title {
+    margin: 4px 0 0;
+
+    color: #243041;
+
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.customer-follow-up-state {
+    flex-shrink: 0;
+
+    padding: 5px 10px;
+
+    background: #ffffff;
+
+    border: 1px solid #dfe4ea;
+    border-radius: 999px;
+
+    color: #677181;
+
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.customer-follow-up-card.is-overdue
+.customer-follow-up-state {
+    color: #a84444;
+    border-color: #ebcaca;
+}
+
+.customer-follow-up-card.is-today
+.customer-follow-up-state {
+    color: #9a6c1c;
+    border-color: #e5d1a7;
+}
+
+.customer-follow-up-card.is-upcoming
+.customer-follow-up-state {
+    color: #4d63a8;
+    border-color: #d5def3;
+}
+
+
+/* =========================================================
+   DETAILS
+========================================================= */
+
+.customer-follow-up-details {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 10px;
+}
+
+.customer-follow-up-detail {
+    padding: 10px 12px;
+
+    background: rgba(255, 255, 255, 0.72);
+
+    border: 1px solid #e7ebef;
+    border-radius: 10px;
+}
+
+.customer-follow-up-detail span {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #8a94a2;
+
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.customer-follow-up-detail strong {
+    color: #273142;
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   NOTES
+========================================================= */
+
+.customer-follow-up-notes {
+    margin-top: 12px;
+    padding: 10px 12px;
+
+    background: #f8fafc;
+
+    border: 1px dashed #dfe4ea;
+    border-radius: 10px;
+
+    color: #6c7684;
+
+    font-size: 11px;
+    line-height: 1.8;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.customer-follow-up-actions {
+    display: flex;
+    justify-content: flex-end;
+
+    margin-top: 12px;
+}
+
+.customer-follow-up-copilot-btn {
+    min-height: 36px;
+    padding: 0 14px;
+
+    background: #eef3ff;
+    color: #4156b8;
+
+    border: 1px solid #d7def7;
+    border-radius: 9px;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    cursor: pointer;
+}
+
+.customer-follow-up-copilot-btn:hover {
+    background: #e4ebff;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .customer-follow-up-details {
+        grid-template-columns: 1fr;
+    }
+
+    .customer-follow-up-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .customer-follow-up-actions {
+        justify-content: stretch;
+    }
+
+    .customer-follow-up-copilot-btn {
+        width: 100%;
+    }
+
+}

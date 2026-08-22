@@ -2,17 +2,17 @@ from django.urls import path
 
 from .views import salesperson_dashboard
 
-from .views import SalesOutcomeCreateAPIView
-
 from .views import (
+    SalesOutcomeCreateAPIView,
     CustomerSalesOutcomeHistoryAPIView,
+    RecommendationPerformanceAPIView,
+    VisitCompleteAPIView,
+    VisitStartAPIView,
+    FollowUpTaskListAPIView,
+    FollowUpTaskStatusAPIView,
+    follow_up_dashboard,
 )
 
-from .views import (
-    RecommendationPerformanceAPIView,
-)
-from .views import VisitCompleteAPIView
-from .views import VisitStartAPIView
 
 urlpatterns = [
     path(
@@ -50,4 +50,20 @@ urlpatterns = [
         VisitStartAPIView.as_view(),
         name="visit-start",
     ),
+    path(
+        "v1/follow-ups/",
+        FollowUpTaskListAPIView.as_view(),
+        name="follow-up-task-list",
+    ),
+    path(
+        "v1/follow-ups/<int:task_id>/status/",
+        FollowUpTaskStatusAPIView.as_view(),
+        name="follow-up-task-status",
+    ),
+    path(
+        "follow-ups/",
+        follow_up_dashboard,
+        name="follow-up-dashboard",
+    ),
+
 ]

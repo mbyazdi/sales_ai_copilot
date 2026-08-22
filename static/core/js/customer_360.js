@@ -130,6 +130,7 @@
     }
 
 
+
     /* =========================================================
        RECOMMENDATION STATUS
        
@@ -253,7 +254,6 @@
 
             const recommendation =
                 item.recommendation;
-
 
             if (
                 !recommendation ||
@@ -386,15 +386,18 @@
                 "outcomeSalesAmount"
             );
 
+
         const followUpDateGroup =
             document.getElementById(
                 "outcomeFollowUpDateGroup"
             );
 
+
         const followUpDateInput =
             document.getElementById(
                 "outcomeFollowUpDate"
             );
+
         const notesInput =
             document.getElementById(
                 "outcomeNotes"
@@ -496,9 +499,8 @@
 
 
             if (modalOutcome) {
-
                 modalOutcome.textContent =
-                    outcomeLabels[
+                                    outcomeLabels[
                         selectedOutcome
                     ] ||
                     selectedOutcome ||
@@ -996,7 +998,6 @@
                      */
 
                     await loadSalesHistory();
-
 
                     setTimeout(
                         closeModal,
@@ -1498,7 +1499,6 @@
 
 
         if (emptyBox) {
-
             emptyBox.style.display =
                 "none";
         }
@@ -1510,7 +1510,6 @@
                 `/api/visits/v1/customers/${encodeURIComponent(
                     customerCode
                 )}/sales-outcomes/`;
-
 
             console.log(
                 "Sales history API:",
@@ -1722,7 +1721,6 @@
 
                     button.disabled =
                         !enabled;
-
                 }
             );
     }
@@ -1804,6 +1802,7 @@
             currentVisitStatus.textContent =
                 status || "—";
         }
+
         currentVisitStatus.dataset.status =
             status;
 
@@ -1998,7 +1997,6 @@
 
 
         if (startButton) {
-
             startButton.disabled =
                 true;
 
@@ -2119,6 +2117,7 @@
                 "success"
             );
 
+
             window.setTimeout(
                 function () {
 
@@ -2207,6 +2206,7 @@
 
     syncOutcomeButtonsWithVisitStatus();
 
+
     /* =========================================================
     STAGE 10
     SALES COPILOT CHAT
@@ -2217,83 +2217,151 @@
             "salesCopilotMessage"
         );
 
+
     const salesCopilotSubmit =
         document.getElementById(
             "salesCopilotSubmit"
         );
+
 
     const salesCopilotLoading =
         document.getElementById(
             "salesCopilotLoading"
         );
 
+
     const salesCopilotError =
         document.getElementById(
             "salesCopilotError"
         );
+
 
     const salesCopilotResponse =
         document.getElementById(
             "salesCopilotResponse"
         );
 
-        /* =========================================================
-        STAGE 6.11
-        FOLLOW-UP PREPARATION CTA
-        ========================================================= */
 
-        const followUpPrepAction =
-            document.querySelector(
-                ".visit-summary-next-step-action"
-            );
+    /* =========================================================
+       STAGE 6.11
+       FOLLOW-UP PREPARATION CTA
+    ========================================================= */
 
-
-        if (
-            followUpPrepAction &&
-            salesCopilotMessage
-        ) {
-
-            followUpPrepAction.addEventListener(
-                "click",
-                function (event) {
-
-                    event.preventDefault();
-
-                    const workspaceCopilot =
-                        document.getElementById(
-                            "workspace-copilot"
-                        );
-
-                    if (workspaceCopilot) {
-
-                        workspaceCopilot.scrollIntoView({
-                            behavior: "smooth",
-                            block: "start"
-                        });
-                    }
+    const followUpPrepAction =
+        document.querySelector(
+            ".visit-summary-next-step-action"
+        );
 
 
-                    salesCopilotMessage.value =
-                        "برای پیگیری این مشتری، "
-                        "به‌صورت کوتاه بگو چه موضوعی را مطرح کنم "
-                        "و گفتگو را چگونه شروع کنم.";
+    const customerFollowUpCopilotButton =
+        document.querySelector(
+            ".customer-follow-up-copilot-btn"
+        );
 
 
-                    window.setTimeout(
-                        function () {
+    if (
+        followUpPrepAction &&
+        salesCopilotMessage
+    ) {
 
-                            salesCopilotMessage.focus();
+        followUpPrepAction.addEventListener(
+            "click",
+            function (event) {
 
-                            salesCopilotMessage.setSelectionRange(
-                                salesCopilotMessage.value.length,
-                                salesCopilotMessage.value.length
-                            );
-                        },
-                        350
+                event.preventDefault();
+
+                const workspaceCopilot =
+                    document.getElementById(
+                        "workspace-copilot"
                     );
+
+
+                if (workspaceCopilot) {
+
+                    workspaceCopilot.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
                 }
-            );
-        }
+
+
+                salesCopilotMessage.value =
+                    "برای پیگیری این مشتری، "
+                    + "به‌صورت کوتاه بگو چه موضوعی را مطرح کنم "
+                    + "و گفتگو را چگونه شروع کنم.";
+
+
+                window.setTimeout(
+                    function () {
+
+                        salesCopilotMessage.focus();
+
+                        salesCopilotMessage.setSelectionRange(
+                            salesCopilotMessage.value.length,
+                            salesCopilotMessage.value.length
+                        );
+                    },
+                    350
+                );
+            }
+        );
+    }
+
+
+    /* =========================================================
+       STAGE 7.4
+       CUSTOMER FOLLOW-UP → COPILOT
+    ========================================================= */
+
+    if (
+        customerFollowUpCopilotButton &&
+        salesCopilotMessage
+    ) {
+
+        customerFollowUpCopilotButton.addEventListener(
+            "click",
+            function () {
+
+                const workspaceCopilot =
+                    document.getElementById(
+                        "workspace-copilot"
+                    );
+
+
+                if (workspaceCopilot) {
+
+                    workspaceCopilot.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
+                }
+
+
+                salesCopilotMessage.value =
+                    "برای پیگیری این مشتری، "
+                    + "با توجه به وضعیت فعلی و سابقه او، "
+                    + "یک شروع مکالمه کوتاه، "
+                    + "موضوعات اصلی گفتگو و "
+                    + "اقدام بعدی پیشنهادی را ارائه کن.";
+
+
+                window.setTimeout(
+                    function () {
+
+                        salesCopilotMessage.focus();
+
+                        salesCopilotMessage.setSelectionRange(
+                            salesCopilotMessage.value.length,
+                            salesCopilotMessage.value.length
+                        );
+                    },
+                    350
+                );
+            }
+        );
+    }
+
+
     async function askSalesCopilot() {
 
         if (
@@ -2303,8 +2371,10 @@
             return;
         }
 
+
         const message =
             salesCopilotMessage.value.trim();
+
 
         if (!message) {
 
@@ -2320,6 +2390,7 @@
             return;
         }
 
+
         if (!customerCode) {
 
             if (salesCopilotError) {
@@ -2334,30 +2405,41 @@
             return;
         }
 
+
         if (salesCopilotError) {
+
             salesCopilotError.style.display =
                 "none";
+
             salesCopilotError.textContent =
                 "";
         }
 
+
         if (salesCopilotResponse) {
+
             salesCopilotResponse.style.display =
                 "none";
+
             salesCopilotResponse.textContent =
                 "";
         }
 
+
         if (salesCopilotLoading) {
+
             salesCopilotLoading.style.display =
                 "block";
         }
 
+
         salesCopilotSubmit.disabled =
             true;
 
+
         salesCopilotSubmit.textContent =
             "در حال پردازش...";
+
 
         try {
 
@@ -2374,6 +2456,7 @@
                 message:
                     message
             };
+
 
             const response =
                 await fetch(
@@ -2403,8 +2486,10 @@
                     }
                 );
 
+
             const data =
                 await response.json();
+
 
             if (!response.ok) {
 
@@ -2414,6 +2499,7 @@
                     "دریافت پاسخ از Sales Copilot ناموفق بود."
                 );
             }
+
 
             if (salesCopilotResponse) {
 
@@ -2440,9 +2526,9 @@
             }
         }
 
-        finally {
 
-            if (salesCopilotLoading) {
+        finally {
+                        if (salesCopilotLoading) {
                 salesCopilotLoading.style.display =
                     "none";
             }
@@ -2483,6 +2569,8 @@
             }
         );
     }
+
+
     /* =========================================================
     STAGE 6.7
     ACTIVE WORKSPACE NAVIGATION
@@ -2664,11 +2752,11 @@
 
     updateActiveWorkspaceNav();
 
+
     /* =========================================================
        INITIAL LOAD
     ========================================================= */
 
     loadSalesHistory();
-
 
 })();

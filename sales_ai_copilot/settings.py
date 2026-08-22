@@ -161,3 +161,6 @@ OLLAMA_TIMEOUT = int(
         "600",
     )
 )
+
+LOGIN_REDIRECT_URL = "/api/visits/follow-ups/"
+LOGIN_URL = "/accounts/login/"

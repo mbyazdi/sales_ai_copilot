@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import include, path
-
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
 
@@ -47,5 +47,12 @@ urlpatterns = [
     path(
         "api/ai/",
         include("apps.ai.urls"),
+    ),
+    path(
+        "accounts/login/",
+        auth_views.LoginView.as_view(
+            template_name="core/login.html"
+        ),
+        name="login",
     ),
 ]

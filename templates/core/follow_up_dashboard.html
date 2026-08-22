@@ -1,0 +1,421 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        پیگیری‌های من
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'core/css/customer_360.css' %}"
+    >
+
+</head>
+
+<body>
+
+<div class="page">
+
+    <section class="follow-up-dashboard">
+
+        <div class="section-eyebrow">
+            FOLLOW-UP WORKSPACE
+        </div>
+
+        <h1 class="follow-up-dashboard-title">
+            پیگیری‌های من
+        </h1>
+
+        <p class="follow-up-dashboard-subtitle">
+            مشتریانی که نیاز به پیگیری دارند، بر اساس زمان سررسید دسته‌بندی شده‌اند.
+        </p>
+        {% if salesperson %}
+
+            <div class="follow-up-salesperson-context">
+                {{ salesperson.full_name }}
+                ·
+                {{ salesperson.employee_code }}
+            </div>
+
+        {% endif %}
+
+        <div class="follow-up-summary-grid">
+
+            <div class="follow-up-summary-card">
+
+                <span class="follow-up-summary-label">
+                    کل پیگیری‌های باز
+                </span>
+
+                <strong class="follow-up-summary-value">
+                    {{ open_count }}
+                </strong>
+
+            </div>
+
+
+            <div class="follow-up-summary-card is-overdue">
+
+                <span class="follow-up-summary-label">
+                    عقب‌افتاده
+                </span>
+
+                <strong class="follow-up-summary-value">
+                    {{ overdue_count }}
+                </strong>
+
+            </div>
+
+
+            <div class="follow-up-summary-card is-today">
+
+                <span class="follow-up-summary-label">
+                    امروز
+                </span>
+
+                <strong class="follow-up-summary-value">
+                    {{ today_count }}
+                </strong>
+
+            </div>
+
+
+            <div class="follow-up-summary-card is-upcoming">
+
+                <span class="follow-up-summary-label">
+                    آینده
+                </span>
+
+                <strong class="follow-up-summary-value">
+                    {{ upcoming_count }}
+                </strong>
+
+            </div>
+
+        </div>
+        <div class="follow-up-columns">
+
+            <!-- =========================================
+                 OVERDUE
+            ========================================== -->
+
+            <section class="follow-up-column">
+
+                <div class="follow-up-column-head">
+
+                    <h2>
+                        عقب‌افتاده
+                    </h2>
+
+                    <span class="follow-up-count">
+                        {{ overdue_tasks|length }}
+                    </span>
+
+                </div>
+
+
+                {% for task in overdue_tasks %}
+
+                    <article class="follow-up-task-card is-overdue">
+
+                        <div class="follow-up-task-main">
+
+                            <strong class="follow-up-task-customer">
+                                {{ task.customer.name }}
+                            </strong>
+
+                            <span class="follow-up-task-code">
+                                {{ task.customer.customer_code }}
+                            </span>
+
+                        </div>
+
+                        <div class="follow-up-task-meta">
+
+                            <span>
+                                سررسید:
+                                {{ task.due_date }}
+                            </span>
+
+                            <span>
+                                ویزیت #{{ task.visit.id }}
+                            </span>
+
+                        </div>
+
+                        {% if task.notes %}
+
+                            <div class="follow-up-task-notes">
+                                {{ task.notes }}
+                            </div>
+
+                        {% endif %}
+
+                            <div
+                                class="follow-up-task-actions"
+                                data-follow-up-task-id="{{ task.id }}"
+                            >
+
+                                <a
+                                    href="/customers/?customer_code={{ task.customer.customer_code }}&visit_id={{ task.visit.id }}"
+                                    class="follow-up-open-customer"
+                                >
+                                    مشاهده مشتری
+                                </a>
+
+                                <button
+                                    type="button"
+                                    class="follow-up-action-btn follow-up-done-btn"
+                                    data-task-id="{{ task.id }}"
+                                    data-status="DONE"
+                                >
+                                    انجام شد
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="follow-up-action-btn follow-up-cancel-btn"
+                                    data-task-id="{{ task.id }}"
+                                    data-status="CANCELLED"
+                                >
+                                    لغو
+                                </button>
+
+                            </div>
+
+                    </article>
+
+                {% empty %}
+
+                    <div class="follow-up-empty">
+                        مورد عقب‌افتاده‌ای وجود ندارد.
+                    </div>
+
+                {% endfor %}
+
+            </section>
+
+
+            <!-- =========================================
+                 TODAY
+            ========================================== -->
+
+            <section class="follow-up-column">
+
+                <div class="follow-up-column-head">
+
+                    <h2>
+                        امروز
+                    </h2>
+
+                    <span class="follow-up-count">
+                        {{ today_tasks|length }}
+                    </span>
+
+                </div>
+
+
+                {% for task in today_tasks %}
+
+                    <article class="follow-up-task-card is-today">
+
+                        <div class="follow-up-task-main">
+
+                            <strong class="follow-up-task-customer">
+                                {{ task.customer.name }}
+                            </strong>
+
+                            <span class="follow-up-task-code">
+                                {{ task.customer.customer_code }}
+                            </span>
+
+                        </div>
+
+                        <div class="follow-up-task-meta">
+
+                            <span>
+                                سررسید:
+                                {{ task.due_date }}
+                            </span>
+
+                            <span>
+                                ویزیت #{{ task.visit.id }}
+                            </span>
+
+                        </div>
+
+                        {% if task.notes %}
+
+                            <div class="follow-up-task-notes">
+                                {{ task.notes }}
+                            </div>
+
+                        {% endif %}
+
+                        <div
+                            class="follow-up-task-actions"
+                            data-follow-up-task-id="{{ task.id }}"
+                        >
+
+                            <a
+                                href="/customers/?customer_code={{ task.customer.customer_code }}&visit_id={{ task.visit.id }}"
+                                class="follow-up-open-customer"
+                            >
+                                مشاهده مشتری
+                            </a>
+
+                            <button
+                                type="button"
+                                class="follow-up-action-btn follow-up-done-btn"
+                                data-task-id="{{ task.id }}"
+                                data-status="DONE"
+                            >
+                                انجام شد
+                            </button>
+
+                            <button
+                                type="button"
+                                class="follow-up-action-btn follow-up-cancel-btn"
+                                data-task-id="{{ task.id }}"
+                                data-status="CANCELLED"
+                            >
+                                لغو
+                            </button>
+
+                        </div>
+
+                    </article>
+
+                {% empty %}
+
+                    <div class="follow-up-empty">
+                        برای امروز پیگیری‌ای وجود ندارد.
+                    </div>
+
+                {% endfor %}
+
+            </section>
+
+
+            <!-- =========================================
+                 UPCOMING
+            ========================================== -->
+
+            <section class="follow-up-column">
+
+                <div class="follow-up-column-head">
+
+                    <h2>
+                        آینده
+                    </h2>
+
+                    <span class="follow-up-count">
+                        {{ upcoming_tasks|length }}
+                    </span>
+
+                </div>
+
+
+                {% for task in upcoming_tasks %}
+
+                    <article class="follow-up-task-card is-upcoming">
+
+                        <div class="follow-up-task-main">
+
+                            <strong class="follow-up-task-customer">
+                                {{ task.customer.name }}
+                            </strong>
+
+                            <span class="follow-up-task-code">
+                                {{ task.customer.customer_code }}
+                            </span>
+
+                        </div>
+
+                        <div class="follow-up-task-meta">
+
+                            <span>
+                                سررسید:
+                                {{ task.due_date }}
+                            </span>
+
+                            <span>
+                                ویزیت #{{ task.visit.id }}
+                            </span>
+
+                        </div>
+
+                        {% if task.notes %}
+
+                            <div class="follow-up-task-notes">
+                                {{ task.notes }}
+                            </div>
+
+                        {% endif %}
+
+                        <div
+                            class="follow-up-task-actions"
+                            data-follow-up-task-id="{{ task.id }}"
+                        >
+
+                            <a
+                                href="/customers/?customer_code={{ task.customer.customer_code }}&visit_id={{ task.visit.id }}"
+                                class="follow-up-open-customer"
+                            >
+                                مشاهده مشتری
+                            </a>
+
+                            <button
+                                type="button"
+                                class="follow-up-action-btn follow-up-done-btn"
+                                data-task-id="{{ task.id }}"
+                                data-status="DONE"
+                            >
+                                انجام شد
+                            </button>
+
+                            <button
+                                type="button"
+                                class="follow-up-action-btn follow-up-cancel-btn"
+                                data-task-id="{{ task.id }}"
+                                data-status="CANCELLED"
+                            >
+                                لغو
+                            </button>
+
+                        </div>
+
+                    </article>
+
+                {% empty %}
+
+                    <div class="follow-up-empty">
+                        پیگیری آینده‌ای وجود ندارد.
+                    </div>
+
+                {% endfor %}
+
+            </section>
+
+        </div>
+
+    </section>
+
+</div>
+<script
+    src="{% static 'core/js/follow_up_dashboard.js' %}"
+></script>
+</body>
+
+</html>

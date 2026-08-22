@@ -1,0 +1,113 @@
+{% if current_follow_up_task %}
+
+<section
+    class="customer-follow-up-card
+    {% if current_follow_up_time_state == 'OVERDUE' %}
+        is-overdue
+    {% elif current_follow_up_time_state == 'TODAY' %}
+        is-today
+    {% else %}
+        is-upcoming
+    {% endif %}"
+    data-follow-up-task-id="{{ current_follow_up_task.id }}"
+>
+
+    <div class="customer-follow-up-header">
+
+        <div>
+
+            <div class="section-eyebrow">
+                FOLLOW-UP
+            </div>
+
+            <h3 class="customer-follow-up-title">
+                پیگیری فعال مشتری
+            </h3>
+
+        </div>
+
+
+        <span class="customer-follow-up-state">
+
+            {% if current_follow_up_time_state == "OVERDUE" %}
+                عقب‌افتاده
+            {% elif current_follow_up_time_state == "TODAY" %}
+                امروز
+            {% else %}
+                آینده
+            {% endif %}
+
+        </span>
+
+    </div>
+
+
+    <div class="customer-follow-up-details">
+
+        <div class="customer-follow-up-detail">
+
+            <span>
+                تاریخ پیگیری
+            </span>
+
+            <strong>
+                {{ current_follow_up_task.due_date }}
+            </strong>
+
+        </div>
+
+
+        <div class="customer-follow-up-detail">
+
+            <span>
+                ویزیت
+            </span>
+
+            <strong>
+                #{{ current_follow_up_task.visit.id }}
+            </strong>
+
+        </div>
+
+
+        <div class="customer-follow-up-detail">
+
+            <span>
+                بازاریاب
+            </span>
+
+            <strong>
+                {{ current_follow_up_task.salesperson.full_name }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    {% if current_follow_up_task.notes %}
+
+        <div class="customer-follow-up-notes">
+
+            {{ current_follow_up_task.notes }}
+
+        </div>
+
+    {% endif %}
+
+
+    <div class="customer-follow-up-actions">
+
+        <button
+            type="button"
+            class="customer-follow-up-copilot-btn"
+            data-follow-up-task-id="{{ current_follow_up_task.id }}"
+        >
+            آماده‌سازی پیگیری با Copilot
+        </button>
+
+    </div>
+
+</section>
+
+{% endif %}
