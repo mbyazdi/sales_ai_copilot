@@ -508,6 +508,137 @@ class RecommendationDiagnosticsSummaryAPIView(APIView):
             }
         )
 
+class RecommendationDiagnosticsDetailAPIView(APIView):
+
+    permission_classes = [
+        IsAdminUser,
+    ]
+
+    def get(
+        self,
+        request,
+        recommendation_id,
+    ):
+
+        recommendation = (
+            CustomerRecommendation.objects
+            .select_related(
+                "customer",
+                "product",
+            )
+            .filter(
+                id=recommendation_id,
+                is_active=True,
+            )
+            .first()
+        )
+
+        if recommendation is None:
+            return Response(
+                {
+                    "detail":
+                        "Recommendation not found."
+                },
+                status=404,
+            )
+
+        snapshot = (
+            recommendation.explanation_snapshot
+            or {}
+        )
+
+        score_breakdown = (
+            recommendation.score_breakdown
+            or {}
+        )
+
+        active_signal_count = (
+            snapshot.get(
+                "active_signal_count",
+                0,
+            )
+        )
+
+        rule_score = snapshot.get(
+            "rule_score",
+            score_breakdown.get(
+                "rule_score",
+                0,
+            ),
+        )
+
+        feedback_score = snapshot.get(
+            "feedback_score",
+            score_breakdown.get(
+                "feedback_score",
+                0,
+            ),
+        )
+
+        return Response(
+            {
+                "id":
+                    recommendation.id,
+
+                "customer_code":
+                    recommendation.customer.customer_code,
+
+                "rank":
+                    recommendation.rank,
+
+                "product": {
+                    "code":
+                        recommendation.product.product_code,
+
+                    "name":
+                        recommendation.product.name,
+                },
+
+                "recommendation_type":
+                    recommendation.recommendation_type,
+
+                "score":
+                    float(
+                        recommendation.score
+                        or 0
+                    ),
+
+                "confidence_score":
+                    float(
+                        recommendation.confidence_score
+                        or 0
+                    ),
+
+                "evidence_quality":
+                    recommendation.evidence_quality,
+
+                "reason":
+                    recommendation.reason
+                    or "",
+
+                "active_signal_count":
+                    active_signal_count,
+
+                "rule_score":
+                    float(
+                        rule_score
+                        or 0
+                    ),
+
+                "feedback_score":
+                    float(
+                        feedback_score
+                        or 0
+                    ),
+
+                "score_breakdown":
+                    score_breakdown,
+
+                "explanation_snapshot":
+                    snapshot,
+            }
+        )
+
 class RecommendationTuningSuggestionListAPIView(APIView):
     permission_classes = [
         IsAdminUser,

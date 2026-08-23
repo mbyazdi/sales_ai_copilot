@@ -31,45 +31,140 @@
             "refreshRecommendationDiagnostics"
         );
 
-        const summaryTotal =
-            document.getElementById(
-                "diagnosticsSummaryTotal"
-            );
+    const detailBackdrop =
+        document.getElementById(
+            "recommendationDetailBackdrop"
+        );
 
-        const summaryConfidence =
-            document.getElementById(
-                "diagnosticsSummaryConfidence"
-            );
+    const detailDrawer =
+        document.getElementById(
+            "recommendationDetailDrawer"
+        );
 
-        const summaryHigh =
-            document.getElementById(
-                "diagnosticsSummaryHigh"
-            );
+    const detailCloseButton =
+        document.getElementById(
+            "closeRecommendationDetail"
+        );
 
-        const summaryMedium =
-            document.getElementById(
-                "diagnosticsSummaryMedium"
-            );
+    const detailLoading =
+        document.getElementById(
+            "recommendationDetailLoading"
+        );
 
-        const summaryLow =
-            document.getElementById(
-                "diagnosticsSummaryLow"
-            );
+    const detailError =
+        document.getElementById(
+            "recommendationDetailError"
+        );
 
-        const summaryLowConfidence =
-            document.getElementById(
-                "diagnosticsSummaryLowConfidence"
-            );
+    const detailContent =
+        document.getElementById(
+            "recommendationDetailContent"
+        );
 
-        const summaryNegativeFeedback =
-            document.getElementById(
-                "diagnosticsSummaryNegativeFeedback"
-            );
+    const detailTitle =
+        document.getElementById(
+            "recommendationDetailTitle"
+        );
 
-        const summarySingleSignal =
-            document.getElementById(
-                "diagnosticsSummarySingleSignal"
-            );
+    const detailSubtitle =
+        document.getElementById(
+            "recommendationDetailSubtitle"
+        );
+
+    const detailFinalScore =
+        document.getElementById(
+            "detailFinalScore"
+        );
+
+    const detailConfidence =
+        document.getElementById(
+            "detailConfidence"
+        );
+
+    const detailEvidence =
+        document.getElementById(
+            "detailEvidence"
+        );
+
+    const detailActiveSignals =
+        document.getElementById(
+            "detailActiveSignals"
+        );
+
+    const detailScoreBreakdown =
+        document.getElementById(
+            "detailScoreBreakdown"
+        );
+
+    const detailSignals =
+        document.getElementById(
+            "detailSignals"
+        );
+
+    const detailReason =
+        document.getElementById(
+            "detailReason"
+        );
+
+    const detailRecommendationId =
+        document.getElementById(
+            "detailRecommendationId"
+        );
+
+    const detailRank =
+        document.getElementById(
+            "detailRank"
+        );
+
+    const detailCustomerCode =
+        document.getElementById(
+            "detailCustomerCode"
+        );
+
+    const detailProductCode =
+        document.getElementById(
+            "detailProductCode"
+        );
+
+    const summaryTotal =
+        document.getElementById(
+            "diagnosticsSummaryTotal"
+        );
+
+    const summaryConfidence =
+        document.getElementById(
+            "diagnosticsSummaryConfidence"
+        );
+
+    const summaryHigh =
+        document.getElementById(
+            "diagnosticsSummaryHigh"
+        );
+
+    const summaryMedium =
+        document.getElementById(
+            "diagnosticsSummaryMedium"
+        );
+
+    const summaryLow =
+        document.getElementById(
+            "diagnosticsSummaryLow"
+        );
+
+    const summaryLowConfidence =
+        document.getElementById(
+            "diagnosticsSummaryLowConfidence"
+        );
+
+    const summaryNegativeFeedback =
+        document.getElementById(
+            "diagnosticsSummaryNegativeFeedback"
+        );
+
+    const summarySingleSignal =
+        document.getElementById(
+            "diagnosticsSummarySingleSignal"
+        );
 
     const typeLabels = {
         REPEAT_PURCHASE: "خرید مجدد",
@@ -231,6 +326,275 @@
         }
     }
 
+    function setDetailState(
+        state,
+        message = ""
+    ) {
+        if (detailLoading) {
+            detailLoading.hidden =
+                state !== "loading";
+        }
+
+        if (detailError) {
+            detailError.hidden =
+                state !== "error";
+
+            detailError.textContent =
+                message;
+        }
+
+        if (detailContent) {
+            detailContent.hidden =
+                state !== "ready";
+        }
+    }
+
+
+    function openDetailDrawer() {
+        if (detailBackdrop) {
+            detailBackdrop.hidden = false;
+        }
+
+        if (detailDrawer) {
+            detailDrawer.hidden = false;
+            detailDrawer.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+        }
+
+        document.body.classList.add(
+            "recommendation-detail-open"
+        );
+    }
+
+
+    function closeDetailDrawer() {
+        if (detailBackdrop) {
+            detailBackdrop.hidden = true;
+        }
+
+        if (detailDrawer) {
+            detailDrawer.hidden = true;
+            detailDrawer.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+        }
+
+        document.body.classList.remove(
+            "recommendation-detail-open"
+        );
+    }
+
+
+    function renderDetail(data) {
+        const product =
+            data.product || {};
+
+        const breakdown =
+            data.score_breakdown || {};
+
+        const snapshot =
+            data.explanation_snapshot || {};
+
+        const signals =
+            Array.isArray(snapshot.signals)
+                ? snapshot.signals
+                : [];
+
+        if (detailTitle) {
+            detailTitle.textContent =
+                product.name
+                || product.code
+                || "جزئیات پیشنهاد";
+        }
+
+        if (detailSubtitle) {
+            detailSubtitle.textContent =
+                `${data.customer_code || "—"} / ${product.code || "—"}`;
+        }
+
+        if (detailFinalScore) {
+            detailFinalScore.textContent =
+                number(data.score);
+        }
+
+        if (detailConfidence) {
+            detailConfidence.textContent =
+                `${number(
+                    data.confidence_score
+                )}%`;
+        }
+
+        if (detailEvidence) {
+            detailEvidence.textContent =
+                evidenceLabels[
+                    data.evidence_quality
+                ]
+                || data.evidence_quality
+                || "—";
+        }
+
+        if (detailActiveSignals) {
+            detailActiveSignals.textContent =
+                number(
+                    data.active_signal_count
+                );
+        }
+
+        if (detailReason) {
+            detailReason.textContent =
+                data.reason || "—";
+        }
+
+        if (detailRecommendationId) {
+            detailRecommendationId.textContent =
+                number(data.id);
+        }
+
+        if (detailRank) {
+            detailRank.textContent =
+                number(data.rank);
+        }
+
+        if (detailCustomerCode) {
+            detailCustomerCode.textContent =
+                data.customer_code || "—";
+        }
+
+        if (detailProductCode) {
+            detailProductCode.textContent =
+                product.code || "—";
+        }
+
+        if (detailScoreBreakdown) {
+            detailScoreBreakdown.innerHTML = "";
+
+            Object.entries(breakdown).forEach(
+                function ([key, value]) {
+                    const item =
+                        document.createElement(
+                            "div"
+                        );
+
+                    item.className =
+                        "recommendation-detail-list-item";
+
+                    item.innerHTML = `
+                        <span>
+                            ${escapeHtml(key)}
+                        </span>
+                        <strong>
+                            ${signedNumber(value)}
+                        </strong>
+                    `;
+
+                    detailScoreBreakdown.appendChild(
+                        item
+                    );
+                }
+            );
+        }
+
+        if (detailSignals) {
+            detailSignals.innerHTML = "";
+
+            signals.forEach(
+                function (signal) {
+                    const item =
+                        document.createElement(
+                            "div"
+                        );
+
+                    item.className =
+                        "recommendation-detail-list-item";
+
+                    item.innerHTML = `
+                        <span>
+                            ${escapeHtml(
+                                signal.name || "—"
+                            )}
+                        </span>
+                        <strong>
+                            ${signedNumber(
+                                signal.score
+                            )}
+                            ${
+                                signal.active
+                                    ? "✓"
+                                    : ""
+                            }
+                        </strong>
+                    `;
+
+                    detailSignals.appendChild(
+                        item
+                    );
+                }
+            );
+        }
+    }
+
+
+    async function loadRecommendationDetail(
+        recommendationId
+    ) {
+        openDetailDrawer();
+        setDetailState("loading");
+
+        try {
+            const response =
+                await fetch(
+                    `/api/recommendations/v1/diagnostics/${recommendationId}/?_=${Date.now()}`,
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Accept":
+                                "application/json"
+                        },
+
+                        credentials:
+                            "same-origin",
+
+                        cache:
+                            "no-store"
+                    }
+                );
+
+            let data = {};
+
+            try {
+                data =
+                    await response.json();
+            } catch (error) {
+                data = {};
+            }
+
+            if (!response.ok) {
+                throw new Error(
+                    data.detail
+                    ||
+                    data.error
+                    ||
+                    `خطا در دریافت جزئیات (${response.status})`
+                );
+            }
+
+            renderDetail(data);
+            setDetailState("ready");
+
+        } catch (error) {
+            setDetailState(
+                "error",
+                error.message
+                ||
+                "خطا در دریافت جزئیات پیشنهاد."
+            );
+        }
+    }
+
     function renderTable(items) {
         if (!tableBody) {
             return;
@@ -254,6 +618,24 @@
                     document.createElement(
                         "tr"
                     );
+                row.dataset.recommendationId =
+                    item.id;
+
+                row.classList.add(
+                    "diagnostics-row"
+                );
+
+                row.tabIndex = 0;
+
+                row.setAttribute(
+                    "role",
+                    "button"
+                );
+
+                row.setAttribute(
+                    "aria-label",
+                    `نمایش جزئیات پیشنهاد ${item.product_name || item.product_code || ""}`
+                );
 
                 row.innerHTML = `
                     <td>
@@ -350,6 +732,29 @@
         setState("ready");
     }
 
+    function handleDiagnosticsRowActivate(
+        event
+    ) {
+        const row =
+            event.target.closest(
+                ".diagnostics-row"
+            );
+
+        if (!row) {
+            return;
+        }
+
+        const recommendationId =
+            row.dataset.recommendationId;
+
+        if (!recommendationId) {
+            return;
+        }
+
+        loadRecommendationDetail(
+            recommendationId
+        );
+    }
 
     async function loadDiagnostics() {
         setState("loading");
@@ -452,6 +857,69 @@
         }
     }
 
+    if (tableBody) {
+        tableBody.addEventListener(
+            "click",
+            handleDiagnosticsRowActivate
+        );
+
+        tableBody.addEventListener(
+            "keydown",
+            function (event) {
+                if (
+                    event.key !== "Enter"
+                    &&
+                    event.key !== " "
+                ) {
+                    return;
+                }
+
+                const row =
+                    event.target.closest(
+                        ".diagnostics-row"
+                    );
+
+                if (!row) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                handleDiagnosticsRowActivate(
+                    event
+                );
+            }
+        );
+    }
+
+    if (detailCloseButton) {
+        detailCloseButton.addEventListener(
+            "click",
+            closeDetailDrawer
+        );
+    }
+
+    if (detailBackdrop) {
+        detailBackdrop.addEventListener(
+            "click",
+            closeDetailDrawer
+        );
+    }
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+            if (
+                event.key === "Escape"
+                &&
+                detailDrawer
+                &&
+                !detailDrawer.hidden
+            ) {
+                closeDetailDrawer();
+            }
+        }
+    );
 
     if (refreshButton) {
         refreshButton.addEventListener(

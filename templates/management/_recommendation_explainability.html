@@ -103,6 +103,149 @@
             </strong>
         </div>
     </div>
+    <div
+        id="recommendationDetailBackdrop"
+        class="recommendation-detail-backdrop"
+        hidden
+    ></div>
+
+    <aside
+        id="recommendationDetailDrawer"
+        class="recommendation-detail-drawer"
+        aria-hidden="true"
+        aria-labelledby="recommendationDetailTitle"
+        hidden
+    >
+        <div class="recommendation-detail-header">
+            <div>
+                <div class="recommendation-detail-eyebrow">
+                    جزئیات Explainability
+                </div>
+
+                <h2
+                    id="recommendationDetailTitle"
+                    class="recommendation-detail-title"
+                >
+                    جزئیات پیشنهاد
+                </h2>
+
+                <div
+                    id="recommendationDetailSubtitle"
+                    class="recommendation-detail-subtitle"
+                >
+                    —
+                </div>
+            </div>
+
+            <button
+                type="button"
+                id="closeRecommendationDetail"
+                class="recommendation-detail-close"
+                aria-label="بستن جزئیات"
+            >
+                ×
+            </button>
+        </div>
+
+        <div
+            id="recommendationDetailLoading"
+            class="recommendation-detail-state"
+        >
+            در حال دریافت جزئیات...
+        </div>
+
+        <div
+            id="recommendationDetailError"
+            class="recommendation-detail-state recommendation-detail-state--error"
+            hidden
+        >
+        </div>
+
+        <div
+            id="recommendationDetailContent"
+            class="recommendation-detail-content"
+            hidden
+        >
+            <div class="recommendation-detail-summary">
+                <div class="recommendation-detail-metric">
+                    <span>امتیاز نهایی</span>
+                    <strong id="detailFinalScore">—</strong>
+                </div>
+
+                <div class="recommendation-detail-metric">
+                    <span>Confidence</span>
+                    <strong id="detailConfidence">—</strong>
+                </div>
+
+                <div class="recommendation-detail-metric">
+                    <span>کیفیت شواهد</span>
+                    <strong id="detailEvidence">—</strong>
+                </div>
+
+                <div class="recommendation-detail-metric">
+                    <span>سیگنال فعال</span>
+                    <strong id="detailActiveSignals">—</strong>
+                </div>
+            </div>
+
+            <section class="recommendation-detail-section">
+                <h3>ترکیب امتیاز</h3>
+
+                <div
+                    id="detailScoreBreakdown"
+                    class="recommendation-detail-list"
+                >
+                </div>
+            </section>
+
+            <section class="recommendation-detail-section">
+                <h3>سیگنال‌ها</h3>
+
+                <div
+                    id="detailSignals"
+                    class="recommendation-detail-list"
+                >
+                </div>
+            </section>
+
+            <section class="recommendation-detail-section">
+                <h3>دلیل پیشنهاد</h3>
+
+                <p
+                    id="detailReason"
+                    class="recommendation-detail-reason"
+                >
+                    —
+                </p>
+            </section>
+
+            <section class="recommendation-detail-section">
+                <h3>اطلاعات رکورد</h3>
+
+                <div class="recommendation-detail-meta">
+                    <div>
+                        <span>شناسه</span>
+                        <strong id="detailRecommendationId">—</strong>
+                    </div>
+
+                    <div>
+                        <span>رتبه</span>
+                        <strong id="detailRank">—</strong>
+                    </div>
+
+                    <div>
+                        <span>مشتری</span>
+                        <strong id="detailCustomerCode">—</strong>
+                    </div>
+
+                    <div>
+                        <span>کد محصول</span>
+                        <strong id="detailProductCode">—</strong>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </aside>
     <div class="section-header">
 
         <div>

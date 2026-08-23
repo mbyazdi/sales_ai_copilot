@@ -843,6 +843,248 @@ tbody tr:hover {
 #diagnosticsTableWrap .diagnostics-subtext {
     white-space: nowrap;
 }
+.diagnostics-row {
+    cursor: pointer;
+    transition:
+        background-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.diagnostics-row:hover {
+    background-color: #f8fafc;
+}
+
+.diagnostics-row:focus {
+    outline: 2px solid #94a3b8;
+    outline-offset: -2px;
+}
+/* =========================================
+   Recommendation Detail Drawer
+   ========================================= */
+
+.recommendation-detail-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: rgba(15, 23, 42, 0.34);
+    backdrop-filter: blur(2px);
+}
+
+.recommendation-detail-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 100;
+    width: min(520px, 92vw);
+    height: 100vh;
+    overflow-y: auto;
+    background: #ffffff;
+    border-left: 1px solid #e5e7eb;
+    box-shadow:
+        -18px 0 48px
+        rgba(15, 23, 42, 0.14);
+    padding: 24px;
+}
+
+.recommendation-detail-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #edf1f6;
+}
+
+.recommendation-detail-eyebrow {
+    margin-bottom: 6px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.recommendation-detail-title {
+    margin: 0;
+    color: #172033;
+    font-size: 22px;
+    line-height: 1.4;
+}
+
+.recommendation-detail-subtitle {
+    margin-top: 6px;
+    color: #667085;
+    font-size: 12px;
+}
+
+.recommendation-detail-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #475467;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.recommendation-detail-close:hover {
+    background: #f8fafc;
+}
+
+.recommendation-detail-state {
+    margin-top: 20px;
+    padding: 14px 16px;
+    border: 1px solid #e8edf5;
+    border-radius: 12px;
+    background: #f8fafc;
+    color: #475467;
+    font-size: 13px;
+}
+
+.recommendation-detail-state--error {
+    border-color: #f3d3d3;
+    background: #fff7f7;
+    color: #b42318;
+}
+
+.recommendation-detail-content {
+    padding-top: 20px;
+}
+
+.recommendation-detail-summary {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+    gap: 12px;
+}
+
+.recommendation-detail-metric {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 16px;
+    border: 1px solid #e8edf5;
+    border-radius: 12px;
+    background: #fbfcfe;
+}
+
+.recommendation-detail-metric span {
+    color: #667085;
+    font-size: 11px;
+}
+
+.recommendation-detail-metric strong {
+    color: #172033;
+    font-size: 20px;
+}
+
+.recommendation-detail-section {
+    margin-top: 24px;
+}
+
+.recommendation-detail-section h3 {
+    margin: 0 0 12px;
+    color: #172033;
+    font-size: 14px;
+}
+
+.recommendation-detail-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.recommendation-detail-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 12px;
+    border: 1px solid #edf1f6;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.recommendation-detail-list-item span {
+    min-width: 0;
+    color: #667085;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+.recommendation-detail-list-item strong {
+    color: #172033;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.recommendation-detail-reason {
+    margin: 0;
+    padding: 14px 16px;
+    border: 1px solid #e8edf5;
+    border-radius: 12px;
+    background: #fbfcfe;
+    color: #344054;
+    font-size: 13px;
+    line-height: 1.9;
+}
+
+.recommendation-detail-meta {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+    gap: 10px;
+}
+
+.recommendation-detail-meta > div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 12px;
+    border: 1px solid #edf1f6;
+    border-radius: 10px;
+}
+
+.recommendation-detail-meta span {
+    color: #667085;
+    font-size: 11px;
+}
+
+.recommendation-detail-meta strong {
+    color: #172033;
+    font-size: 13px;
+}
+
+body.recommendation-detail-open {
+    overflow: hidden;
+}
+
+@media (max-width: 640px) {
+    .recommendation-detail-drawer {
+        width: 100vw;
+        padding: 18px;
+    }
+
+    .recommendation-detail-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .recommendation-detail-meta {
+        grid-template-columns: 1fr;
+    }
+}
 /* =========================================
    Explainability Summary KPI Cards
    ========================================= */
