@@ -338,6 +338,11 @@ def update_tuning_suggestion_status(
                 "RecommendationConfig metric not found."
             )
 
+        previous_value = getattr(
+            config,
+            suggestion.metric,
+        )
+
         setattr(
             config,
             suggestion.metric,
@@ -357,6 +362,10 @@ def update_tuning_suggestion_status(
             .APPLIED
         )
 
+        suggestion.applied_previous_value = (
+            previous_value
+        )
+
         suggestion.applied_at = (
             timezone.now()
         )
@@ -366,6 +375,7 @@ def update_tuning_suggestion_status(
                 "status",
                 "applied_at",
                 "updated_at",
+                "applied_previous_value",
             ]
         )
 
@@ -381,6 +391,94 @@ def update_tuning_suggestion_status(
         update_fields=[
             "status",
             "reviewed_at",
+            "updated_at",
+        ]
+    )
+
+    return suggestion
+
+def rollback_tuning_suggestion(
+    suggestion,
+):
+    """
+    Roll back an applied tuning suggestion.
+
+    The active RecommendationConfig value is restored
+    to the value captured at apply time.
+    """
+
+    from django.utils import timezone
+
+    from .models import (
+        RecommendationConfig,
+        RecommendationTuningSuggestion,
+    )
+
+    if (
+        suggestion.status
+        != RecommendationTuningSuggestion.Status.APPLIED
+    ):
+        raise ValueError(
+            "Only applied tuning suggestions can be rolled back."
+        )
+
+    if suggestion.applied_previous_value is None:
+        raise ValueError(
+            "Previous applied value is not available for rollback."
+        )
+
+    config = (
+        RecommendationConfig.objects
+        .filter(
+            is_active=True,
+        )
+        .order_by(
+            "-updated_at",
+            "-id",
+        )
+        .first()
+    )
+
+    if not config:
+        raise ValueError(
+            "Active RecommendationConfig not found."
+        )
+
+    if not hasattr(
+        config,
+        suggestion.metric,
+    ):
+        raise ValueError(
+            "RecommendationConfig metric not found."
+        )
+
+    setattr(
+        config,
+        suggestion.metric,
+        suggestion.applied_previous_value,
+    )
+
+    config.save(
+        update_fields=[
+            suggestion.metric,
+            "updated_at",
+        ]
+    )
+
+    suggestion.status = (
+        RecommendationTuningSuggestion
+        .Status
+        .ROLLED_BACK
+    )
+
+    suggestion.rolled_back_at = (
+        timezone.now()
+    )
+
+    suggestion.save(
+        update_fields=[
+            "status",
+            "rolled_back_at",
             "updated_at",
         ]
     )

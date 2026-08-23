@@ -45,7 +45,8 @@
         PENDING: "در انتظار بررسی",
         APPROVED: "تأیید شده",
         REJECTED: "رد شده",
-        APPLIED: "اعمال شده"
+        APPLIED: "اعمال شده",
+        ROLLED_BACK: "بازگردانی شده"
     };
 
 
@@ -284,6 +285,57 @@
         return data;
     }
 
+    async function rollbackSuggestion(
+        suggestionId
+    ) {
+
+        const response =
+            await fetch(
+                `/api/recommendations/v1/tuning-suggestions/${encodeURIComponent(
+                    suggestionId
+                )}/rollback/`,
+                {
+                    method:
+                        "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+
+                        "Accept":
+                            "application/json",
+
+                        "X-CSRFToken":
+                            getCsrfToken()
+                    },
+
+                    credentials:
+                        "same-origin",
+
+                    body:
+                        JSON.stringify({})
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.detail
+                ||
+                data.error
+                ||
+                "بازگردانی پیشنهاد تنظیم ناموفق بود."
+            );
+        }
+
+
+        return data;
+    }
 
     function buildActions(
         item
@@ -318,7 +370,19 @@
 
 
         if (item.status === "APPROVED") {
-
+            if (item.status === "APPLIED") {
+                return `
+                    <div class="tuning-actions">
+                        <button
+                            type="button"
+                            data-tuning-action="rollback"
+                            data-suggestion-id="${item.id}"
+                        >
+                            بازگردانی
+                        </button>
+                    </div>
+                `;
+            }
             return `
                 <div class="tuning-actions">
 
@@ -335,6 +399,23 @@
             `;
         }
 
+        if (item.status === "APPLIED") {
+
+            return `
+                <div class="tuning-actions">
+
+                    <button
+                        type="button"
+                        class="tuning-action-btn tuning-rollback-btn"
+                        data-tuning-action="rollback"
+                        data-suggestion-id="${item.id}"
+                    >
+                        بازگردانی
+                    </button>
+
+                </div>
+            `;
+        }
 
         return `
             <span class="tuning-action-disabled">
@@ -589,6 +670,20 @@
                                     );
 
                                     await applySuggestion(
+                                        suggestionId
+                                    );
+                                } else if (
+                                    action
+                                    === "rollback"
+                                ) {
+
+                                    setButtonBusy(
+                                        button,
+                                        true,
+                                        "در حال بازگردانی..."
+                                    );
+
+                                    await rollbackSuggestion(
                                         suggestionId
                                     );
                                 }

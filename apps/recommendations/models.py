@@ -420,6 +420,7 @@ class RecommendationTuningSuggestion(models.Model):
         APPROVED = "APPROVED", "Approved"
         REJECTED = "REJECTED", "Rejected"
         APPLIED = "APPLIED", "Applied"
+        ROLLED_BACK = "ROLLED_BACK", "Rolled Back"
 
     recommendation_type = models.CharField(
         max_length=30,
@@ -467,6 +468,18 @@ class RecommendationTuningSuggestion(models.Model):
     )
 
     applied_at = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+
+    applied_previous_value = models.DecimalField(
+        max_digits=8,
+        decimal_places=4,
+        null=True,
+        blank=True,
+    )
+
+    rolled_back_at = models.DateTimeField(
         null=True,
         blank=True,
     )

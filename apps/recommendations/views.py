@@ -16,6 +16,10 @@ from rest_framework.permissions import IsAdminUser
 from .services import (
     update_tuning_suggestion_status,
 )
+from .services import (
+    update_tuning_suggestion_status,
+    rollback_tuning_suggestion,
+)
 
 class CustomerRecommendationAPIView(APIView):
 
@@ -451,6 +455,65 @@ class RecommendationTuningSuggestionApplyAPIView(APIView):
 
                     "applied_at": (
                         suggestion.applied_at
+                    ),
+                },
+            },
+            status=status.HTTP_200_OK,
+        )
+
+class RecommendationTuningSuggestionRollbackAPIView(APIView):
+
+    permission_classes = [
+        IsAdminUser,
+    ]
+
+    def post(self, request, suggestion_id):
+
+        suggestion = get_object_or_404(
+            RecommendationTuningSuggestion,
+            id=suggestion_id,
+        )
+
+        try:
+
+            suggestion = rollback_tuning_suggestion(
+                suggestion=suggestion
+            )
+
+        except ValueError as error:
+
+            return Response(
+                {
+                    "detail": str(error),
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response(
+            {
+                "success": True,
+
+                "suggestion": {
+                    "id": suggestion.id,
+
+                    "recommendation_type": (
+                        suggestion.recommendation_type
+                    ),
+
+                    "metric": (
+                        suggestion.metric
+                    ),
+
+                    "restored_value": (
+                        suggestion.applied_previous_value
+                    ),
+
+                    "status": (
+                        suggestion.status
+                    ),
+
+                    "rolled_back_at": (
+                        suggestion.rolled_back_at
                     ),
                 },
             },

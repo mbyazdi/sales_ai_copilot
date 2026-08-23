@@ -6,6 +6,7 @@ from .views import (
     RecommendationTuningSuggestionListAPIView,
     RecommendationTuningSuggestionStatusAPIView,
     RecommendationTuningSuggestionApplyAPIView,
+    RecommendationTuningSuggestionRollbackAPIView,
 )
 
 
@@ -36,6 +37,11 @@ urlpatterns = [
         "v1/tuning-suggestions/<int:suggestion_id>/apply/",
         RecommendationTuningSuggestionApplyAPIView.as_view(),
         name="recommendation-tuning-suggestion-apply",
+    ),
+    path(
+        "v1/tuning-suggestions/<int:suggestion_id>/rollback/",
+        RecommendationTuningSuggestionRollbackAPIView.as_view(),
+        name="recommendation-tuning-suggestion-rollback",
     ),
 
 ]
