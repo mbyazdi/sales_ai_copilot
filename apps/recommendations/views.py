@@ -294,6 +294,10 @@ class RecommendationTuningSuggestionListAPIView(APIView):
                     item.suggested_value
                 ),
 
+                "applied_previous_value": (
+                    item.applied_previous_value
+                ),
+
                 "status": item.status,
 
                 "reason": item.reason,
@@ -312,6 +316,10 @@ class RecommendationTuningSuggestionListAPIView(APIView):
 
                 "applied_at": (
                     item.applied_at
+                ),
+
+                "rolled_back_at": (
+                    item.rolled_back_at
                 ),
 
             })

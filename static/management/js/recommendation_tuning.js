@@ -98,6 +98,25 @@
         );
     }
 
+    function dateTime(value) {
+        if (!value) {
+            return "—";
+        }
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return "—";
+        }
+
+        return new Intl.DateTimeFormat(
+            "fa-IR",
+            {
+                dateStyle: "short",
+                timeStyle: "short"
+            }
+        ).format(date);
+    }
 
     function getCsrfToken() {
 
@@ -533,7 +552,35 @@
                             "—"
                         )}
                     </td>
+                    <td>
+                        ${number(
+                            item.applied_previous_value
+                        )}
+                    </td>
 
+                    <td>
+                        ${escapeHtml(
+                            dateTime(
+                                item.reviewed_at
+                            )
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            dateTime(
+                                item.applied_at
+                            )
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            dateTime(
+                                item.rolled_back_at
+                            )
+                        )}
+                    </td>
                     <td>
                         ${buildActions(
                             item
