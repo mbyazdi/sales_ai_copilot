@@ -695,3 +695,111 @@ tbody tr:hover {
     }
 
 }
+
+/* =========================================================
+   STAGE 8.11
+   TUNING FILTERS
+========================================================= */
+
+.tuning-filters {
+    display: grid;
+    grid-template-columns:
+        minmax(160px, 1fr)
+        minmax(180px, 1fr)
+        minmax(220px, 2fr)
+        auto;
+
+    gap: 12px;
+
+    align-items: end;
+
+    margin: 18px 0;
+}
+
+.tuning-filter-field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+.tuning-filter-field label {
+    font-size: 11px;
+    font-weight: 800;
+
+    color: #64748b;
+}
+
+.tuning-filter-field select,
+.tuning-filter-field input {
+    width: 100%;
+
+    min-height: 40px;
+
+    padding: 8px 10px;
+
+    border: 1px solid #dbe2ea;
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    color: #334155;
+
+    font-size: 12px;
+
+    outline: none;
+}
+
+.tuning-filter-field select:focus,
+.tuning-filter-field input:focus {
+    border-color: #94a3b8;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(148, 163, 184, 0.12);
+}
+
+.tuning-clear-filters {
+    min-height: 40px;
+
+    padding: 8px 14px;
+
+    border: 1px solid #dbe2ea;
+    border-radius: 9px;
+
+    background: #f8fafc;
+
+    color: #475569;
+
+    font-size: 12px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+}
+
+.tuning-clear-filters:hover {
+    background: #f1f5f9;
+}
+
+@media (max-width: 900px) {
+
+    .tuning-filters {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .tuning-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .tuning-clear-filters {
+        width: 100%;
+    }
+
+}

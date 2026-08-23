@@ -343,6 +343,51 @@ def update_tuning_suggestion_status(
             suggestion.metric,
         )
 
+        from decimal import Decimal
+
+        minimum_allowed_value = Decimal("0")
+        maximum_allowed_value = Decimal("100")
+        maximum_allowed_delta = Decimal("10")
+
+        suggested_value = (
+            suggestion.suggested_value
+        )
+
+        if suggested_value is None:
+            raise ValueError(
+                "Suggested tuning value is required."
+            )
+
+        if (
+            suggested_value
+            < minimum_allowed_value
+            or suggested_value
+            > maximum_allowed_value
+        ):
+            raise ValueError(
+                "Suggested tuning value is outside "
+                "the allowed range."
+            )
+
+        delta = abs(
+            suggested_value
+            - previous_value
+        )
+
+        if delta > maximum_allowed_delta:
+            raise ValueError(
+                "Suggested tuning change exceeds "
+                "the maximum allowed delta."
+            )
+
+        if (
+            suggestion.current_value is not None
+            and previous_value != suggestion.current_value
+        ):
+            raise ValueError(
+                "Tuning suggestion is stale because "
+                "the active configuration value has changed."
+            )
         setattr(
             config,
             suggestion.metric,

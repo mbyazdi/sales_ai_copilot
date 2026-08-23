@@ -32,6 +32,108 @@
 
     </div>
 
+    <div class="tuning-filters">
+
+        <div class="tuning-filter-field">
+
+            <label for="tuningStatusFilter">
+                وضعیت
+            </label>
+
+            <select id="tuningStatusFilter">
+
+                <option value="">
+                    همه وضعیت‌ها
+                </option>
+
+                <option value="PENDING">
+                    در انتظار بررسی
+                </option>
+
+                <option value="APPROVED">
+                    تأیید شده
+                </option>
+
+                <option value="REJECTED">
+                    رد شده
+                </option>
+
+                <option value="APPLIED">
+                    اعمال شده
+                </option>
+
+                <option value="ROLLED_BACK">
+                    بازگردانی شده
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="tuning-filter-field">
+
+            <label for="tuningTypeFilter">
+                نوع پیشنهاد
+            </label>
+
+            <select id="tuningTypeFilter">
+
+                <option value="">
+                    همه انواع
+                </option>
+
+                <option value="REPEAT_PURCHASE">
+                    خرید مجدد
+                </option>
+
+                <option value="CROSS_SELL">
+                    فروش مکمل
+                </option>
+
+                <option value="CATEGORY">
+                    پیشنهاد دسته
+                </option>
+
+                <option value="SIMILAR_PRODUCT">
+                    محصول مشابه
+                </option>
+
+                <option value="UP_SELL">
+                    فروش ارتقایی
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="tuning-filter-field tuning-filter-search">
+
+            <label for="tuningMetricSearch">
+                پارامتر
+            </label>
+
+            <input
+                type="search"
+                id="tuningMetricSearch"
+                placeholder="مثلاً similar_product_score"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <button
+            type="button"
+            class="tuning-clear-filters"
+            id="clearTuningFilters"
+        >
+            پاک‌کردن فیلترها
+        </button>
+
+    </div>
+
     <div
         class="table-loading"
         id="tuningLoading"

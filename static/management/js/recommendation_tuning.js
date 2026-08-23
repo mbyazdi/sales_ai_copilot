@@ -31,6 +31,25 @@
             "refreshRecommendationTuning"
         );
 
+    const statusFilter =
+        document.getElementById(
+            "tuningStatusFilter"
+        );
+
+    const typeFilter =
+        document.getElementById(
+            "tuningTypeFilter"
+        );
+
+    const metricSearch =
+        document.getElementById(
+            "tuningMetricSearch"
+        );
+
+    const clearFiltersButton =
+        document.getElementById(
+            "clearTuningFilters"
+        );
 
     const typeLabels = {
         REPEAT_PURCHASE: "خرید مجدد",
@@ -443,6 +462,65 @@
         `;
     }
 
+    function filterItems(
+        items
+    ) {
+
+        const selectedStatus =
+            statusFilter
+                ? statusFilter.value
+                : "";
+
+        const selectedType =
+            typeFilter
+                ? typeFilter.value
+                : "";
+
+        const metricQuery =
+            metricSearch
+                ? metricSearch.value
+                    .trim()
+                    .toLowerCase()
+                : "";
+
+        return items.filter(
+            function (item) {
+
+                if (
+                    selectedStatus
+                    &&
+                    item.status !== selectedStatus
+                ) {
+                    return false;
+                }
+
+                if (
+                    selectedType
+                    &&
+                    item.recommendation_type
+                    !== selectedType
+                ) {
+                    return false;
+                }
+
+                if (
+                    metricQuery
+                    &&
+                    !String(
+                        item.metric || ""
+                    )
+                        .toLowerCase()
+                        .includes(
+                            metricQuery
+                        )
+                ) {
+                    return false;
+                }
+
+                return true;
+            }
+        );
+    }
 
     function renderTable(
         items
@@ -452,16 +530,17 @@
             return;
         }
 
-
+        const filteredItems =
+            filterItems(
+                Array.isArray(items)
+                    ? items
+                    : []
+            );
         tableBody.innerHTML =
             "";
 
 
-        if (
-            !Array.isArray(items)
-            ||
-            !items.length
-        ) {
+        if (!filteredItems.length) {
 
             setState(
                 "empty"
@@ -471,7 +550,7 @@
         }
 
 
-        items.forEach(
+        filteredItems.forEach(
             function (item) {
 
                 const snapshot =
@@ -820,6 +899,58 @@
         }
     }
 
+    if (statusFilter) {
+
+        statusFilter.addEventListener(
+            "change",
+            loadTuningSuggestions
+        );
+    }
+
+
+    if (typeFilter) {
+
+        typeFilter.addEventListener(
+            "change",
+            loadTuningSuggestions
+        );
+    }
+
+
+    if (metricSearch) {
+
+        metricSearch.addEventListener(
+            "input",
+            function () {
+
+                loadTuningSuggestions();
+            }
+        );
+    }
+
+
+    if (clearFiltersButton) {
+
+        clearFiltersButton.addEventListener(
+            "click",
+            function () {
+
+                if (statusFilter) {
+                    statusFilter.value = "";
+                }
+
+                if (typeFilter) {
+                    typeFilter.value = "";
+                }
+
+                if (metricSearch) {
+                    metricSearch.value = "";
+                }
+
+                loadTuningSuggestions();
+            }
+        );
+    }
 
     if (refreshButton) {
 

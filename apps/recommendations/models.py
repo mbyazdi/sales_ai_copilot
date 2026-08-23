@@ -405,6 +405,7 @@ class RecommendationConfig(models.Model):
 
     def __str__(self):
         return self.name
+
 class RecommendationTuningSuggestion(models.Model):
     """
     Stores a proposed tuning change for the
