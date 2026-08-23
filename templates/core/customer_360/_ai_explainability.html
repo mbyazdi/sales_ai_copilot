@@ -1,110 +1,536 @@
 <section class="explainability-section">
-        {% with primary=recommendations.0 %}
+
+    {% with primary=recommendations.0 %}
+
         <div class="explainability-grid">
-<div class="why-ai-card">
-<div class="ai-card-head">
-<div>
-<div class="section-eyebrow">AI EXPLAINABILITY</div>
-<h2 class="ai-card-title">🧠 چرا AI این پیشنهاد را انتخاب کرده؟</h2>
-<div class="ai-card-subtitle">دلایل قابل فهم برای فروشنده؛ بدون پنهان کردن منطق تصمیم</div>
-</div>
-<div class="confidence-badge">Confidence <span class="confidence-value">{{ primary.score|floatformat:0 }}%</span></div>
-</div>
-{% if primary.score_breakdown %}
 
-    <div class="ai-score-breakdown">
+            <div class="why-ai-card">
 
-        <div class="ai-score-breakdown-item">
+                <!-- =========================================
+                     HEADER
+                ========================================== -->
 
-            <span class="ai-score-breakdown-label">
-                امتیاز قواعد
-            </span>
+                <div class="ai-card-head">
 
-            <strong class="ai-score-breakdown-value">
-                {{ primary.score_breakdown.rule_score|floatformat:0 }}
-            </strong>
+                    <div>
 
-        </div>
+                        <div class="section-eyebrow">
+                            AI EXPLAINABILITY
+                        </div>
+
+                        <h2 class="ai-card-title">
+                            🧠 چرا AI این پیشنهاد را انتخاب کرده؟
+                        </h2>
+
+                        <div class="ai-card-subtitle">
+                            دلایل قابل فهم برای فروشنده؛
+                            بدون پنهان کردن منطق تصمیم
+                        </div>
+
+                    </div>
 
 
-        <div class="ai-score-breakdown-item">
+                    <div class="ai-explainability-meta">
 
-            <span class="ai-score-breakdown-label">
-                اثر بازخورد تاریخی
-            </span>
+                        <div class="confidence-badge">
 
-            <strong
-                class="
-                    ai-score-breakdown-value
-                    {% if primary.score_breakdown.feedback_score > 0 %}
-                        is-positive
-                    {% elif primary.score_breakdown.feedback_score < 0 %}
-                        is-negative
-                    {% endif %}
-                "
-            >
-                {% if primary.score_breakdown.feedback_score > 0 %}
-                    +
+                            Confidence
+
+                            <span class="confidence-value">
+                                {{ primary.confidence_score|floatformat:0 }}%
+                            </span>
+
+                        </div>
+
+
+                        <div class="evidence-badge">
+
+                            Evidence
+
+                            <span class="evidence-value">
+
+                                {% if primary.evidence_quality == "HIGH" %}
+
+                                    قوی
+
+                                {% elif primary.evidence_quality == "MEDIUM" %}
+
+                                    متوسط
+
+                                {% else %}
+
+                                    محدود
+
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================================
+                     SCORE BREAKDOWN
+                ========================================== -->
+
+                {% if primary.score_breakdown %}
+
+                    <div class="ai-score-breakdown">
+
+
+                        <div class="ai-score-breakdown-item">
+
+                            <span class="ai-score-breakdown-label">
+                                امتیاز قواعد
+                            </span>
+
+                            <strong class="ai-score-breakdown-value">
+                                {{ primary.score_breakdown.rule_score|floatformat:0 }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="ai-score-breakdown-item">
+
+                            <span class="ai-score-breakdown-label">
+                                اثر بازخورد تاریخی
+                            </span>
+
+                            <strong
+                                class="
+                                    ai-score-breakdown-value
+                                    {% if primary.score_breakdown.feedback_score > 0 %}
+                                        is-positive
+                                    {% elif primary.score_breakdown.feedback_score < 0 %}
+                                        is-negative
+                                    {% endif %}
+                                "
+                            >
+
+                                {% if primary.score_breakdown.feedback_score > 0 %}
+                                    +
+                                {% endif %}
+
+                                {{ primary.score_breakdown.feedback_score|floatformat:0 }}
+
+                            </strong>
+
+                        </div>
+
+
+                        <div class="ai-score-breakdown-item is-final">
+
+                            <span class="ai-score-breakdown-label">
+                                امتیاز نهایی
+                            </span>
+
+                            <strong class="ai-score-breakdown-value">
+                                {{ primary.score_breakdown.final_score|floatformat:0 }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =========================================
+                         ACTIVE SCORE SIGNALS
+                    ========================================== -->
+
+                    <div class="ai-signal-breakdown">
+
+
+                        {% if primary.score_breakdown.group_score > 0 %}
+
+                            <div class="ai-signal-item">
+
+                                <span>
+                                    هم‌خوانی دسته
+                                </span>
+
+                                <strong>
+                                    {{ primary.score_breakdown.group_score|floatformat:0 }}
+                                </strong>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        {% if primary.score_breakdown.purchase_score > 0 %}
+
+                            <div class="ai-signal-item">
+
+                                <span>
+                                    خرید مجدد
+                                </span>
+
+                                <strong>
+                                    {{ primary.score_breakdown.purchase_score|floatformat:0 }}
+                                </strong>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        {% if primary.score_breakdown.association_score > 0 %}
+
+                            <div class="ai-signal-item">
+
+                                <span>
+                                    ارتباط محصول
+                                </span>
+
+                                <strong>
+                                    {{ primary.score_breakdown.association_score|floatformat:0 }}
+                                </strong>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        {% if primary.score_breakdown.upsell_score > 0 %}
+
+                            <div class="ai-signal-item">
+
+                                <span>
+                                    Up-Sell
+                                </span>
+
+                                <strong>
+                                    {{ primary.score_breakdown.upsell_score|floatformat:0 }}
+                                </strong>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        {% if primary.score_breakdown.grade_score > 0 %}
+
+                            <div class="ai-signal-item">
+
+                                <span>
+                                    گرید مشتری
+                                </span>
+
+                                <strong>
+                                    {{ primary.score_breakdown.grade_score|floatformat:0 }}
+                                </strong>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        {% if primary.score_breakdown.promotion_score > 0 %}
+
+                            <div class="ai-signal-item">
+
+                                <span>
+                                    پروموشن
+                                </span>
+
+                                <strong>
+                                    {{ primary.score_breakdown.promotion_score|floatformat:0 }}
+                                </strong>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        {% if primary.score_breakdown.similar_score > 0 %}
+
+                            <div class="ai-signal-item">
+
+                                <span>
+                                    محصول مشابه
+                                </span>
+
+                                <strong>
+                                    {{ primary.score_breakdown.similar_score|floatformat:0 }}
+                                </strong>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        {% if primary.score_breakdown.feedback_score != 0 %}
+
+                            <div class="ai-signal-item">
+
+                                <span>
+                                    بازخورد تاریخی
+                                </span>
+
+                                <strong
+                                    class="
+                                        {% if primary.score_breakdown.feedback_score > 0 %}
+                                            is-positive
+                                        {% elif primary.score_breakdown.feedback_score < 0 %}
+                                            is-negative
+                                        {% endif %}
+                                    "
+                                >
+
+                                    {% if primary.score_breakdown.feedback_score > 0 %}
+                                        +
+                                    {% endif %}
+
+                                    {{ primary.score_breakdown.feedback_score|floatformat:0 }}
+
+                                </strong>
+
+                            </div>
+
+                        {% endif %}
+
+
+                    </div>
+
                 {% endif %}
-                {{ primary.score_breakdown.feedback_score|floatformat:0 }}
-            </strong>
-
-        </div>
 
 
-        <div class="ai-score-breakdown-item is-final">
+                <!-- =========================================
+                     DYNAMIC EXPLANATION REASONS
+                ========================================== -->
 
-            <span class="ai-score-breakdown-label">
-                امتیاز نهایی
-            </span>
+                <div class="reason-list">
 
-            <strong class="ai-score-breakdown-value">
-                {{ primary.score_breakdown.final_score|floatformat:0 }}
-            </strong>
+                    {% for signal in primary.explanation_snapshot.signals %}
 
-        </div>
+                        {% if signal.active %}
 
-    </div>
+                            <div class="reason-item">
 
-{% endif %}
+                                <div class="reason-icon">
+                                    ✓
+                                </div>
 
 
-<div class="reason-list">
-<div class="reason-list">
-<div class="reason-item">
-<div class="reason-icon">✓</div>
-<div class="reason-text"><strong>الگوی خرید مشتری</strong><span>رفتار خرید قبلی با این نوع پیشنهاد همخوانی دارد.</span></div>
-<div class="reason-weight">High</div>
-</div>
-<div class="reason-item">
-<div class="reason-icon">✓</div>
-<div class="reason-text"><strong>زمان‌بندی خرید</strong><span>{{ customer_360.days_since_last_purchase }} روز از آخرین خرید گذشته است.</span></div>
-<div class="reason-weight">High</div>
-</div>
-<div class="reason-item">
-<div class="reason-icon">✓</div>
-<div class="reason-text"><strong>هم‌خوانی با دسته خرید</strong><span>دسته اصلی خرید مشتری: {{ customer_360.top_category }}</span></div>
-<div class="reason-weight">Medium</div>
-</div>
-<div class="reason-item">
-<div class="reason-icon">✓</div>
-<div class="reason-text"><strong>ارزش مشتری</strong><span>مشتری از نظر ارزش خرید در گروه {{ customer.grade.name|default:"قابل توجه" }} قرار دارد.</span></div>
-<div class="reason-weight">Medium</div>
-</div>
-</div>
+                                <div class="reason-text">
+
+
+                                    {% if signal.name == "group_affinity" %}
+
+                                        <strong>
+                                            هم‌خوانی دسته محصول
+                                        </strong>
+
+                                        <span>
+                                            این محصول با الگوی خرید
+                                            دسته‌ای مشتری همخوانی دارد.
+                                        </span>
+
+
+                                    {% elif signal.name == "repurchase" %}
+
+                                        <strong>
+                                            خرید مجدد
+                                        </strong>
+
+                                        <span>
+                                            الگوی خرید مشتری نشان می‌دهد
+                                            زمان خرید مجدد این محصول
+                                            مناسب است.
+                                        </span>
+
+
+                                    {% elif signal.name == "association" %}
+
+                                        <strong>
+                                            ارتباط با محصولات قبلی
+                                        </strong>
+
+                                        <span>
+                                            این محصول با خریدهای قبلی
+                                            مشتری ارتباط معناداری دارد.
+                                        </span>
+
+
+                                    {% elif signal.name == "upsell" %}
+
+                                        <strong>
+                                            فرصت Up-Sell
+                                        </strong>
+
+                                        <span>
+                                            این محصول نسبت به سطح خرید
+                                            قبلی مشتری گزینه ارتقایی
+                                            محسوب می‌شود.
+                                        </span>
+
+
+                                    {% elif signal.name == "customer_grade" %}
+
+                                        <strong>
+                                            تناسب با گرید مشتری
+                                        </strong>
+
+                                        <span>
+                                            سطح ارزش و گرید مشتری
+                                            با این پیشنهاد سازگار است.
+                                        </span>
+
+
+                                    {% elif signal.name == "promotion" %}
+
+                                        <strong>
+                                            پروموشن فعال
+                                        </strong>
+
+                                        <span>
+                                            برای این محصول پیشنهاد
+                                            یا پروموشن فعال وجود دارد.
+                                        </span>
+
+
+                                    {% elif signal.name == "similar_product" %}
+
+                                        <strong>
+                                            شباهت محصول
+                                        </strong>
+
+                                        <span>
+                                            این محصول به محصولاتی که
+                                            مشتری قبلاً خریداری کرده
+                                            شباهت دارد.
+                                        </span>
+
+
+                                    {% elif signal.name == "historical_feedback" %}
+
+                                        <strong>
+                                            بازخورد تاریخی
+                                        </strong>
+
+                                        <span>
+
+                                            {% if signal.score > 0 %}
+
+                                                نتایج قبلی تعامل مشتری
+                                                با این محصول سیگنال مثبتی
+                                                برای پیشنهاد مجدد ایجاد
+                                                کرده است.
+
+                                            {% elif signal.score < 0 %}
+
+                                                نتایج قبلی تعامل مشتری
+                                                با این محصول امتیاز
+                                                پیشنهاد را کاهش داده است.
+
+                                            {% else %}
+
+                                                سابقه تعامل مشتری با
+                                                این محصول در ارزیابی
+                                                پیشنهاد لحاظ شده است.
+
+                                            {% endif %}
+
+                                        </span>
+
+                                    {% endif %}
+
+
+                                </div>
+
+
+                                <div
+                                    class="
+                                        reason-weight
+                                        {% if signal.score > 0 %}
+                                            is-positive
+                                        {% elif signal.score < 0 %}
+                                            is-negative
+                                        {% endif %}
+                                    "
+                                >
+
+                                    {% if signal.score > 0 %}
+                                        +
+                                    {% endif %}
+
+                                    {{ signal.score|floatformat:0 }}
+
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+
+                    {% empty %}
+
+                        <div class="reason-item">
+
+                            <div class="reason-text">
+
+                                <span>
+                                    شواهد کافی برای نمایش
+                                    جزئیات بیشتر در دسترس نیست.
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- =========================================
+                     ALTERNATIVE RECOMMENDATION
+                ========================================== -->
 
                 {% if recommendations|length > 1 %}
-                {% with second=recommendations.1 %}
-                <div class="alternative-insight">
-<div class="alternative-insight-title">🔁 اگر پیشنهاد اصلی مناسب نبود؟</div>
-<div class="alternative-insight-text">گزینه جایگزین AI: <strong>{{ second.product.name }}</strong> با امتیاز <strong>{{ second.score|floatformat:0 }}</strong>. فروشنده می‌تواند بدون خروج از جلسه به گزینه دوم سوییچ کند.</div>
-</div>
-                {% endwith %}
+
+                    {% with second=recommendations.1 %}
+
+                        <div class="alternative-insight">
+
+                            <div class="alternative-insight-title">
+                                🔁 اگر پیشنهاد اصلی مناسب نبود؟
+                            </div>
+
+                            <div class="alternative-insight-text">
+
+                                گزینه جایگزین AI:
+
+                                <strong>
+                                    {{ second.product.name }}
+                                </strong>
+
+                                با امتیاز
+
+                                <strong>
+                                    {{ second.score|floatformat:0 }}
+                                </strong>.
+
+                                فروشنده می‌تواند بدون خروج از جلسه
+                                به گزینه دوم سوییچ کند.
+
+                            </div>
+
+                        </div>
+
+                    {% endwith %}
+
                 {% endif %}
+
+
             </div>
 
         </div>
 
-        {% endwith %}
+    {% endwith %}
 
 </section>

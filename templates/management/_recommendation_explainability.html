@@ -1,0 +1,88 @@
+<section
+    class="recommendation-diagnostics-card"
+    id="recommendationDiagnosticsSection"
+>
+
+    <div class="section-header">
+
+        <div>
+
+            <div class="section-eyebrow">
+                RECOMMENDATION DIAGNOSTICS
+            </div>
+
+            <h2>
+                تشخیص‌پذیری و منطق پیشنهادها
+            </h2>
+
+            <p>
+                بررسی جزئیات امتیازدهی، سطح اطمینان
+                و کیفیت شواهد Recommendation Engine.
+            </p>
+
+        </div>
+
+        <button
+            type="button"
+            class="performance-refresh"
+            id="refreshRecommendationDiagnostics"
+        >
+            ↻ بروزرسانی
+        </button>
+
+    </div>
+
+
+    <div
+        class="table-loading"
+        id="diagnosticsLoading"
+    >
+        در حال دریافت جزئیات Explainability...
+    </div>
+
+
+    <div
+        class="table-error"
+        id="diagnosticsError"
+    ></div>
+
+
+    <div
+        class="performance-empty"
+        id="diagnosticsEmpty"
+    >
+        هنوز داده‌ای برای تشخیص پیشنهادها موجود نیست.
+    </div>
+
+
+    <div
+        class="table-wrapper"
+        id="diagnosticsTableWrap"
+        style="display:none"
+    >
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>رتبه</th>
+                    <th>محصول</th>
+                    <th>نوع پیشنهاد</th>
+                    <th>امتیاز نهایی</th>
+                    <th>Confidence</th>
+                    <th>کیفیت شواهد</th>
+                    <th>سیگنال‌های فعال</th>
+                    <th>امتیاز قواعد</th>
+                    <th>اثر بازخورد</th>
+                </tr>
+
+            </thead>
+
+            <tbody id="diagnosticsTableBody"></tbody>
+
+        </table>
+
+    </div>
+
+</section>

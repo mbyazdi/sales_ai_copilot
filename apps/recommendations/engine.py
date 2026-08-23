@@ -734,6 +734,110 @@ class RecommendationEngine:
             )
         )
 
+        explanation_snapshot = {
+            "signals": [
+                {
+                    "name": "group_affinity",
+                    "score": float(group_score),
+                    "active": group_score > 0,
+                },
+                {
+                    "name": "repurchase",
+                    "score": float(purchase_score),
+                    "active": purchase_score > 0,
+                },
+                {
+                    "name": "association",
+                    "score": float(association_score),
+                    "active": association_score > 0,
+                },
+                {
+                    "name": "upsell",
+                    "score": float(upsell_score),
+                    "active": upsell_score > 0,
+                },
+                {
+                    "name": "customer_grade",
+                    "score": float(grade_score),
+                    "active": grade_score > 0,
+                },
+                {
+                    "name": "promotion",
+                    "score": float(promotion_score),
+                    "active": promotion_score > 0,
+                },
+                {
+                    "name": "similar_product",
+                    "score": float(similar_score),
+                    "active": similar_score > 0,
+                },
+                {
+                    "name": "historical_feedback",
+                    "score": float(feedback_score),
+                    "active": feedback_score != 0,
+                },
+            ],
+
+            "rule_score": float(rule_score),
+            "feedback_score": float(feedback_score),
+            "final_score": float(score),
+        }
+
+        active_signals = [
+            signal
+            for signal in explanation_snapshot["signals"]
+            if signal["active"]
+        ]
+
+        active_signal_count = len(
+            active_signals
+        )
+
+        positive_signal_score = sum(
+            max(
+                Decimal("0"),
+                Decimal(
+                    str(signal["score"])
+                ),
+            )
+            for signal in active_signals
+        )
+
+        confidence_score = min(
+            Decimal("100"),
+            (
+                Decimal(active_signal_count)
+                * Decimal("10")
+            )
+            + min(
+                positive_signal_score,
+                Decimal("50"),
+            ),
+        )
+
+        if active_signal_count >= 4:
+            evidence_quality = "HIGH"
+
+        elif active_signal_count >= 2:
+            evidence_quality = "MEDIUM"
+
+        else:
+            evidence_quality = "LOW"
+
+        explanation_snapshot[
+            "active_signal_count"
+        ] = active_signal_count
+
+        explanation_snapshot[
+            "confidence_score"
+        ] = float(
+            confidence_score
+        )
+
+        explanation_snapshot[
+            "evidence_quality"
+        ] = evidence_quality
+
         return {
             "product": product,
 
@@ -747,10 +851,20 @@ class RecommendationEngine:
                 recommendation_type
             ),
             "score_breakdown": {
+                "group_score": group_score,
+                "purchase_score": purchase_score,
+                "association_score": association_score,
+                "upsell_score": upsell_score,
+                "grade_score": grade_score,
+                "promotion_score": promotion_score,
+                "similar_score": similar_score,
                 "rule_score": rule_score,
                 "feedback_score": feedback_score,
                 "final_score": score,
             },
+            "confidence_score": confidence_score,
+            "evidence_quality": evidence_quality,
+            "explanation_snapshot": explanation_snapshot,
         }
 
     # =====================================================
@@ -1289,16 +1403,27 @@ class RecommendationEngine:
                     ],
 
                     score_breakdown={
-                        "rule_score": float(
-                            item["score_breakdown"]["rule_score"]
-                        ),
-                        "feedback_score": float(
-                            item["score_breakdown"]["feedback_score"]
-                        ),
-                        "final_score": float(
-                            item["score_breakdown"]["final_score"]
-                        ),
+                        key: float(value)
+                        for key, value in item.get(
+                            "score_breakdown",
+                            {},
+                        ).items()
                     },
+
+                    confidence_score=item.get(
+                        "confidence_score",
+                        0,
+                    ),
+
+                    evidence_quality=item.get(
+                        "evidence_quality",
+                        "LOW",
+                    ),
+
+                    explanation_snapshot=item.get(
+                        "explanation_snapshot",
+                        {},
+                    ),
 
                     rank=rank,
 

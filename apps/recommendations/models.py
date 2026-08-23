@@ -41,6 +41,22 @@ class CustomerRecommendation(models.Model):
         blank=True,
     )
 
+    confidence_score = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        default=0,
+    )
+
+    evidence_quality = models.CharField(
+        max_length=20,
+        default="LOW",
+    )
+
+    explanation_snapshot = models.JSONField(
+        default=dict,
+        blank=True,
+    )
+
     reason = models.TextField(
         blank=True,
     )
@@ -86,6 +102,7 @@ class CustomerRecommendation(models.Model):
             f"{self.product.product_code} - "
             f"{self.score}"
         )
+
 class ProductAssociation(models.Model):
     """
     Stores product-to-product purchase associations.

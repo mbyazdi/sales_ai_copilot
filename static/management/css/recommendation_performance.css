@@ -803,3 +803,43 @@ tbody tr:hover {
     }
 
 }
+
+/* =========================================
+   Recommendation Explainability Diagnostics
+   ========================================= */
+
+.recommendation-diagnostics-card {
+    margin-top: 24px;
+}
+
+#diagnosticsTableWrap {
+    max-height: 620px;
+    overflow-x: auto;
+    overflow-y: auto;
+    border-radius: 12px;
+}
+
+#diagnosticsTableWrap table {
+    min-width: 1180px;
+    width: 100%;
+}
+
+#diagnosticsTableWrap thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #ffffff;
+}
+
+#diagnosticsTableWrap tbody tr {
+    height: auto;
+}
+
+#diagnosticsTableWrap th,
+#diagnosticsTableWrap td {
+    white-space: nowrap;
+}
+
+#diagnosticsTableWrap .diagnostics-subtext {
+    white-space: nowrap;
+}

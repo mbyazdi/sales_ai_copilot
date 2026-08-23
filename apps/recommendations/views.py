@@ -58,6 +58,21 @@ class CustomerRecommendationAPIView(APIView):
                 "product_name": product.name,
                 "category": product.category.name,
                 "score": recommendation.score,
+                "score_breakdown": (
+                    recommendation.score_breakdown
+                ),
+
+                "confidence_score": (
+                    recommendation.confidence_score
+                ),
+
+                "evidence_quality": (
+                    recommendation.evidence_quality
+                ),
+
+                "explanation_snapshot": (
+                    recommendation.explanation_snapshot
+                ),
                 "recommendation_type": recommendation.recommendation_type,
                 "reason": recommendation.reason,
             })
@@ -254,6 +269,107 @@ class CustomerRecommendationPerformanceAPIView(APIView):
                 "performance": (
                     performance
                 ),
+            },
+            status=status.HTTP_200_OK,
+        )
+class RecommendationDiagnosticsAPIView(APIView):
+
+    permission_classes = [
+        IsAdminUser,
+    ]
+
+    def get(self, request):
+
+        recommendations = (
+            CustomerRecommendation.objects
+            .filter(
+                is_active=True,
+            )
+            .select_related(
+                "customer",
+                "product",
+            )
+            .order_by(
+                "customer_id",
+                "rank",
+            )
+        )
+
+        data = []
+
+        for recommendation in recommendations:
+
+            snapshot = (
+                recommendation.explanation_snapshot
+                or {}
+            )
+
+            breakdown = (
+                recommendation.score_breakdown
+                or {}
+            )
+
+            data.append({
+                "id": recommendation.id,
+
+                "customer_code": (
+                    recommendation.customer.customer_code
+                ),
+
+                "rank": recommendation.rank,
+
+                "product_code": (
+                    recommendation.product.product_code
+                ),
+
+                "product_name": (
+                    recommendation.product.name
+                ),
+
+                "recommendation_type": (
+                    recommendation.recommendation_type
+                ),
+
+                "score": recommendation.score,
+
+                "confidence_score": (
+                    recommendation.confidence_score
+                ),
+
+                "evidence_quality": (
+                    recommendation.evidence_quality
+                ),
+
+                "active_signal_count": (
+                    snapshot.get(
+                        "active_signal_count",
+                        0,
+                    )
+                ),
+
+                "rule_score": (
+                    breakdown.get(
+                        "rule_score",
+                        0,
+                    )
+                ),
+
+                "feedback_score": (
+                    breakdown.get(
+                        "feedback_score",
+                        0,
+                    )
+                ),
+
+                "score_breakdown": breakdown,
+
+                "explanation_snapshot": snapshot,
+            })
+
+        return Response(
+            {
+                "count": len(data),
+                "results": data,
             },
             status=status.HTTP_200_OK,
         )
