@@ -405,3 +405,89 @@ class RecommendationConfig(models.Model):
 
     def __str__(self):
         return self.name
+class RecommendationTuningSuggestion(models.Model):
+    """
+    Stores a proposed tuning change for the
+    recommendation engine.
+
+    Suggestions are generated from observed
+    recommendation performance, but are not applied
+    automatically.
+    """
+
+    class Status(models.TextChoices):
+        PENDING = "PENDING", "Pending"
+        APPROVED = "APPROVED", "Approved"
+        REJECTED = "REJECTED", "Rejected"
+        APPLIED = "APPLIED", "Applied"
+
+    recommendation_type = models.CharField(
+        max_length=30,
+        choices=CustomerRecommendation.RecommendationType.choices,
+        blank=True,
+    )
+
+    metric = models.CharField(
+        max_length=100,
+    )
+
+    current_value = models.DecimalField(
+        max_digits=8,
+        decimal_places=4,
+        null=True,
+        blank=True,
+    )
+
+    suggested_value = models.DecimalField(
+        max_digits=8,
+        decimal_places=4,
+        null=True,
+        blank=True,
+    )
+
+    reason = models.TextField(
+        blank=True,
+    )
+
+    performance_snapshot = models.JSONField(
+        default=dict,
+        blank=True,
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING,
+        db_index=True,
+    )
+
+    reviewed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+
+    applied_at = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
+
+    class Meta:
+        ordering = [
+            "-created_at",
+            "-id",
+        ]
+
+    def __str__(self):
+        return (
+            f"{self.recommendation_type or 'GENERAL'} "
+            f"- {self.metric} "
+            f"- {self.status}"
+        )

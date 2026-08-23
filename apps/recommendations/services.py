@@ -3,7 +3,7 @@ from apps.customers.services import (
 )
 
 from .engine import RecommendationEngine
-
+from django.utils import timezone
 
 def generate_customer_recommendations(
     customer_code
@@ -31,126 +31,358 @@ def generate_customer_recommendations(
         "recommendations": recommendations,
     }
 
-def get_recommendation_performance(customer=None):
+def generate_tuning_suggestions(
+    performance=None,
+):
     """
-    Calculate recommendation performance based on
-    SalesOutcome records.
+    Generate conservative recommendation tuning suggestions
+    from resolved recommendation performance.
 
-    Metrics:
-        - presented
-        - purchased
-        - interested
-        - rejected
-        - follow_up
-        - not_presented
-        - revenue
-        - average_revenue
-        - conversion_rate
-        - interest_rate
+    Suggestions are never applied automatically.
     """
 
-    from apps.visits.models import SalesOutcome
+    from decimal import Decimal
 
-    queryset = (
-        SalesOutcome.objects
-        .filter(
-            visit__customer=customer,
-            recommendation__isnull=False,
-        )
-        .select_related(
-            "recommendation",
-        )
+    from apps.visits.services import (
+        get_recommendation_performance,
     )
 
-    performance = {}
+    from .models import (
+        RecommendationConfig,
+        RecommendationTuningSuggestion,
+    )
 
-    for outcome in queryset:
+    if performance is None:
+
+        performance = (
+            get_recommendation_performance(
+                customer=None
+            )
+        )
+
+    config = (
+        RecommendationConfig.objects
+        .filter(
+            is_active=True,
+        )
+        .order_by(
+            "-updated_at",
+            "-id",
+        )
+        .first()
+    )
+
+    if not config:
+        return []
+
+    created = []
+
+    for item in performance:
+
+        if (
+            item["data_quality"]
+            != "SUFFICIENT_DATA"
+        ):
+            continue
 
         recommendation_type = (
-            outcome.recommendation.recommendation_type
+            item["recommendation_type"]
         )
 
-        if recommendation_type not in performance:
-            performance[recommendation_type] = {
-                "recommendation_type": recommendation_type,
-                "presented": 0,
-                "purchased": 0,
-                "interested": 0,
-                "rejected": 0,
-                "follow_up": 0,
-                "not_presented": 0,
-                "revenue": 0.0,
-            }
-
-        item = performance[recommendation_type]
-
-        item["presented"] += 1
-
-        outcome_name = outcome.outcome
-
-        if outcome_name == "PURCHASED":
-            item["purchased"] += 1
-
-        elif outcome_name == "INTERESTED":
-            item["interested"] += 1
-
-        elif outcome_name == "REJECTED":
-            item["rejected"] += 1
-
-        elif outcome_name == "FOLLOW_UP":
-            item["follow_up"] += 1
-
-        elif outcome_name == "NOT_PRESENTED":
-            item["not_presented"] += 1
-
-        if outcome.sales_amount:
-            item["revenue"] += float(
-                outcome.sales_amount
-            )
-
-    result = []
-
-    for item in performance.values():
-
-        presented = item["presented"]
-
-        purchased = item["purchased"]
-
-        interested = item["interested"]
-
-        revenue = item["revenue"]
-
-        item["average_revenue"] = (
-            round(
-                revenue / purchased,
-                2,
-            )
-            if purchased
-            else 0.0
+        learning_signal = (
+            item["learning_signal"]
         )
 
-        item["conversion_rate"] = (
-            round(
-                purchased / presented * 100,
-                2,
+        metric = None
+        current_value = None
+        suggested_value = None
+        reason = ""
+
+        if recommendation_type == "CROSS_SELL":
+
+            metric = "association_max_score"
+
+            current_value = (
+                config.association_max_score
             )
-            if presented
-            else 0.0
+
+        elif recommendation_type == "CATEGORY":
+
+            metric = "category_rank_1_score"
+
+            current_value = (
+                config.category_rank_1_score
+            )
+
+        elif recommendation_type == "UP_SELL":
+
+            metric = "upsell_25_percent_score"
+
+            current_value = (
+                config.upsell_25_percent_score
+            )
+
+        elif recommendation_type == "SIMILAR_PRODUCT":
+
+            metric = "similar_product_score"
+
+            current_value = (
+                config.similar_product_score
+            )
+
+        elif recommendation_type == "REPEAT_PURCHASE":
+
+            metric = "repurchase_no_cycle_score"
+
+            current_value = (
+                config.repurchase_no_cycle_score
+            )
+
+        if (
+            not metric
+            or current_value is None
+        ):
+            continue
+
+        if learning_signal == "POSITIVE":
+
+            suggested_value = (
+                current_value
+                + Decimal("2")
+            )
+
+            reason = (
+                "Performance data shows a positive "
+                "learning signal for this recommendation type."
+            )
+
+        elif learning_signal == "WEAK":
+
+            suggested_value = max(
+                Decimal("0"),
+                current_value
+                - Decimal("2"),
+            )
+
+            reason = (
+                "Performance data shows a weak "
+                "learning signal for this recommendation type."
+            )
+
+        else:
+            continue
+
+        existing = (
+            RecommendationTuningSuggestion.objects
+            .filter(
+                recommendation_type=(
+                    recommendation_type
+                ),
+                metric=metric,
+                status=(
+                    RecommendationTuningSuggestion
+                    .Status
+                    .PENDING
+                ),
+            )
+            .exists()
         )
 
-        item["interest_rate"] = (
-            round(
-                interested / presented * 100,
-                2,
+        if existing:
+            continue
+
+        suggestion = (
+            RecommendationTuningSuggestion.objects
+            .create(
+                recommendation_type=(
+                    recommendation_type
+                ),
+
+                metric=metric,
+
+                current_value=(
+                    current_value
+                ),
+
+                suggested_value=(
+                    suggested_value
+                ),
+
+                reason=reason,
+
+                performance_snapshot={
+                    "presented": (
+                        item["presented"]
+                    ),
+                    "purchased": (
+                        item["purchased"]
+                    ),
+                    "interested": (
+                        item["interested"]
+                    ),
+                    "follow_up": (
+                        item["follow_up"]
+                    ),
+                    "rejected": (
+                        item["rejected"]
+                    ),
+                    "conversion_rate": (
+                        item["conversion_rate"]
+                    ),
+                    "interest_rate": (
+                        item["interest_rate"]
+                    ),
+                    "engagement_rate": (
+                        item["engagement_rate"]
+                    ),
+                    "learning_signal": (
+                        item["learning_signal"]
+                    ),
+                    "performance_level": (
+                        item["performance_level"]
+                    ),
+                    "data_quality": (
+                        item["data_quality"]
+                    ),
+                },
             )
-            if presented
-            else 0.0
         )
 
-        result.append(item)
+        created.append(
+            suggestion
+        )
 
-    result.sort(
-        key=lambda x: x["recommendation_type"]
+    return created
+
+from django.utils import timezone
+
+
+def update_tuning_suggestion_status(
+    suggestion,
+    new_status,
+):
+    """
+    Review or apply a tuning suggestion.
+
+    APPROVED:
+        marks the suggestion as approved.
+
+    REJECTED:
+        marks the suggestion as rejected.
+
+    APPLIED:
+        writes suggested_value to the active
+        RecommendationConfig and marks the suggestion
+        as applied.
+    """
+
+    from .models import (
+        RecommendationConfig,
+        RecommendationTuningSuggestion,
     )
 
-    return result
+    allowed_statuses = {
+        RecommendationTuningSuggestion.Status.APPROVED,
+        RecommendationTuningSuggestion.Status.REJECTED,
+        RecommendationTuningSuggestion.Status.APPLIED,
+    }
+
+    if new_status not in allowed_statuses:
+        raise ValueError(
+            "Invalid tuning suggestion status."
+        )
+
+    if (
+        suggestion.status
+        == RecommendationTuningSuggestion.Status.APPLIED
+    ):
+        raise ValueError(
+            "Applied tuning suggestion cannot be changed."
+        )
+
+    if (
+        new_status
+        == RecommendationTuningSuggestion.Status.APPLIED
+    ):
+
+        if (
+            suggestion.status
+            != RecommendationTuningSuggestion.Status.APPROVED
+        ):
+            raise ValueError(
+                "Tuning suggestion must be approved before apply."
+            )
+
+        config = (
+            RecommendationConfig.objects
+            .filter(
+                is_active=True,
+            )
+            .order_by(
+                "-updated_at",
+                "-id",
+            )
+            .first()
+        )
+
+        if not config:
+            raise ValueError(
+                "Active RecommendationConfig not found."
+            )
+
+        if not hasattr(
+            config,
+            suggestion.metric,
+        ):
+            raise ValueError(
+                "RecommendationConfig metric not found."
+            )
+
+        setattr(
+            config,
+            suggestion.metric,
+            suggestion.suggested_value,
+        )
+
+        config.save(
+            update_fields=[
+                suggestion.metric,
+                "updated_at",
+            ]
+        )
+
+        suggestion.status = (
+            RecommendationTuningSuggestion
+            .Status
+            .APPLIED
+        )
+
+        suggestion.applied_at = (
+            timezone.now()
+        )
+
+        suggestion.save(
+            update_fields=[
+                "status",
+                "applied_at",
+                "updated_at",
+            ]
+        )
+
+        return suggestion
+
+    suggestion.status = new_status
+
+    suggestion.reviewed_at = (
+        timezone.now()
+    )
+
+    suggestion.save(
+        update_fields=[
+            "status",
+            "reviewed_at",
+            "updated_at",
+        ]
+    )
+
+    return suggestion

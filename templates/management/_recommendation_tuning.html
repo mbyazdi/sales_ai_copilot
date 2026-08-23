@@ -1,0 +1,81 @@
+<section
+    class="recommendation-tuning-card"
+    id="recommendationTuningSection"
+>
+
+    <div class="section-header">
+
+        <div>
+
+            <div class="section-eyebrow">
+                RECOMMENDATION TUNING
+            </div>
+
+            <h2>
+                پیشنهادهای تنظیم موتور
+            </h2>
+
+            <p>
+                پیشنهادهای تغییر وزن موتور بر اساس عملکرد واقعی
+                Recommendation Engine در این بخش نمایش داده می‌شوند.
+            </p>
+
+        </div>
+
+        <button
+            class="performance-refresh"
+            id="refreshRecommendationTuning"
+            type="button"
+        >
+            ↻ بروزرسانی
+        </button>
+
+    </div>
+
+    <div
+        class="table-loading"
+        id="tuningLoading"
+    >
+        در حال دریافت پیشنهادهای تنظیم...
+    </div>
+
+    <div
+        class="table-error"
+        id="tuningError"
+    ></div>
+
+    <div
+        class="performance-empty"
+        id="tuningEmpty"
+    >
+        هنوز پیشنهاد تنظیمی ثبت نشده است.
+    </div>
+
+    <div
+        class="table-wrapper"
+        id="tuningTableWrap"
+        style="display:none"
+    >
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>نوع پیشنهاد</th>
+                    <th>پارامتر</th>
+                    <th>مقدار فعلی</th>
+                    <th>مقدار پیشنهادی</th>
+                    <th>وضعیت</th>
+                    <th>سیگنال</th>
+                    <th>کیفیت داده</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+
+            <tbody id="tuningTableBody"></tbody>
+
+        </table>
+
+    </div>
+
+</section>
