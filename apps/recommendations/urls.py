@@ -8,6 +8,7 @@ from .views import (
     RecommendationTuningSuggestionApplyAPIView,
     RecommendationTuningSuggestionRollbackAPIView,
     RecommendationDiagnosticsAPIView,
+    RecommendationDiagnosticsSummaryAPIView,
 )
 
 
@@ -48,6 +49,11 @@ urlpatterns = [
         "v1/diagnostics/",
         RecommendationDiagnosticsAPIView.as_view(),
         name="recommendation-diagnostics",
+    ),
+    path(
+        "v1/diagnostics/summary/",
+        RecommendationDiagnosticsSummaryAPIView.as_view(),
+        name="recommendation-diagnostics-summary",
     ),
 
 ]

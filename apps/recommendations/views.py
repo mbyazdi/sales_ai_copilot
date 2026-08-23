@@ -374,6 +374,140 @@ class RecommendationDiagnosticsAPIView(APIView):
             status=status.HTTP_200_OK,
         )
 
+class RecommendationDiagnosticsSummaryAPIView(APIView):
+
+    permission_classes = [
+        IsAdminUser,
+    ]
+
+    LOW_CONFIDENCE_THRESHOLD = 50
+
+    def get(self, request):
+
+        recommendations = CustomerRecommendation.objects.filter(
+            is_active=True,
+        )
+
+        total_recommendations = recommendations.count()
+
+        if total_recommendations == 0:
+            return Response(
+                {
+                    "total_recommendations": 0,
+                    "average_confidence": 0.0,
+                    "evidence": {
+                        "high": 0,
+                        "medium": 0,
+                        "low": 0,
+                    },
+                    "quality_flags": {
+                        "low_confidence": 0,
+                        "negative_feedback": 0,
+                        "single_signal": 0,
+                    },
+                }
+            )
+
+        confidence_values = [
+            float(item.confidence_score or 0)
+            for item in recommendations
+        ]
+
+        average_confidence = (
+            sum(confidence_values)
+            / total_recommendations
+        )
+
+        high_evidence_count = recommendations.filter(
+            evidence_quality="HIGH",
+        ).count()
+
+        medium_evidence_count = recommendations.filter(
+            evidence_quality="MEDIUM",
+        ).count()
+
+        low_evidence_count = recommendations.filter(
+            evidence_quality="LOW",
+        ).count()
+
+        low_confidence_count = recommendations.filter(
+            confidence_score__lt=self.LOW_CONFIDENCE_THRESHOLD,
+        ).count()
+
+        negative_feedback_count = 0
+        single_signal_count = 0
+
+        for recommendation in recommendations:
+
+            snapshot = (
+                recommendation.explanation_snapshot
+                or {}
+            )
+
+            feedback_score = snapshot.get(
+                "feedback_score",
+                0,
+            )
+
+            active_signal_count = snapshot.get(
+                "active_signal_count",
+                0,
+            )
+
+            try:
+                feedback_score = float(
+                    feedback_score or 0
+                )
+            except (
+                TypeError,
+                ValueError,
+            ):
+                feedback_score = 0.0
+
+            try:
+                active_signal_count = int(
+                    active_signal_count or 0
+                )
+            except (
+                TypeError,
+                ValueError,
+            ):
+                active_signal_count = 0
+
+            if feedback_score < 0:
+                negative_feedback_count += 1
+
+            if active_signal_count <= 1:
+                single_signal_count += 1
+
+        return Response(
+            {
+                "total_recommendations": (
+                    total_recommendations
+                ),
+                "average_confidence": round(
+                    average_confidence,
+                    2,
+                ),
+                "evidence": {
+                    "high": high_evidence_count,
+                    "medium": medium_evidence_count,
+                    "low": low_evidence_count,
+                },
+                "quality_flags": {
+                    "low_confidence": (
+                        low_confidence_count
+                    ),
+                    "negative_feedback": (
+                        negative_feedback_count
+                    ),
+                    "single_signal": (
+                        single_signal_count
+                    ),
+                },
+            }
+        )
+
 class RecommendationTuningSuggestionListAPIView(APIView):
     permission_classes = [
         IsAdminUser,

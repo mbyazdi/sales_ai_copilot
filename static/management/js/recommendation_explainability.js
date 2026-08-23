@@ -31,6 +31,45 @@
             "refreshRecommendationDiagnostics"
         );
 
+        const summaryTotal =
+            document.getElementById(
+                "diagnosticsSummaryTotal"
+            );
+
+        const summaryConfidence =
+            document.getElementById(
+                "diagnosticsSummaryConfidence"
+            );
+
+        const summaryHigh =
+            document.getElementById(
+                "diagnosticsSummaryHigh"
+            );
+
+        const summaryMedium =
+            document.getElementById(
+                "diagnosticsSummaryMedium"
+            );
+
+        const summaryLow =
+            document.getElementById(
+                "diagnosticsSummaryLow"
+            );
+
+        const summaryLowConfidence =
+            document.getElementById(
+                "diagnosticsSummaryLowConfidence"
+            );
+
+        const summaryNegativeFeedback =
+            document.getElementById(
+                "diagnosticsSummaryNegativeFeedback"
+            );
+
+        const summarySingleSignal =
+            document.getElementById(
+                "diagnosticsSummarySingleSignal"
+            );
 
     const typeLabels = {
         REPEAT_PURCHASE: "خرید مجدد",
@@ -128,6 +167,69 @@
         }
     }
 
+    function renderSummary(data) {
+        const evidence =
+            data.evidence || {};
+
+        const qualityFlags =
+            data.quality_flags || {};
+
+        if (summaryTotal) {
+            summaryTotal.textContent =
+                number(
+                    data.total_recommendations
+                );
+        }
+
+        if (summaryConfidence) {
+            summaryConfidence.textContent =
+                `${number(
+                    data.average_confidence
+                )}%`;
+        }
+
+        if (summaryHigh) {
+            summaryHigh.textContent =
+                number(
+                    evidence.high
+                );
+        }
+
+        if (summaryMedium) {
+            summaryMedium.textContent =
+                number(
+                    evidence.medium
+                );
+        }
+
+        if (summaryLow) {
+            summaryLow.textContent =
+                number(
+                    evidence.low
+                );
+        }
+
+        if (summaryLowConfidence) {
+            summaryLowConfidence.textContent =
+                number(
+                    qualityFlags.low_confidence
+                );
+        }
+
+        if (summaryNegativeFeedback) {
+            summaryNegativeFeedback.textContent =
+                number(
+                    qualityFlags.negative_feedback
+                );
+        }
+
+        if (summarySingleSignal) {
+            summarySingleSignal.textContent =
+                number(
+                    qualityFlags.single_signal
+                );
+        }
+    }
 
     function renderTable(items) {
         if (!tableBody) {
@@ -253,8 +355,11 @@
         setState("loading");
 
         try {
-            const response =
-                await fetch(
+            const [
+                diagnosticsResponse,
+                summaryResponse
+            ] = await Promise.all([
+                fetch(
                     `/api/recommendations/v1/diagnostics/?_=${Date.now()}`,
                     {
                         method: "GET",
@@ -270,29 +375,70 @@
                         cache:
                             "no-store"
                     }
-                );
+                ),
 
-            let data = {};
+                fetch(
+                    `/api/recommendations/v1/diagnostics/summary/?_=${Date.now()}`,
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Accept":
+                                "application/json"
+                        },
+
+                        credentials:
+                            "same-origin",
+
+                        cache:
+                            "no-store"
+                    }
+                )
+            ]);
+
+            let diagnosticsData = {};
+            let summaryData = {};
 
             try {
-                data =
-                    await response.json();
+                diagnosticsData =
+                    await diagnosticsResponse.json();
             } catch (error) {
-                data = {};
+                diagnosticsData = {};
             }
 
-            if (!response.ok) {
+            try {
+                summaryData =
+                    await summaryResponse.json();
+            } catch (error) {
+                summaryData = {};
+            }
+
+            if (!diagnosticsResponse.ok) {
                 throw new Error(
-                    data.detail
+                    diagnosticsData.detail
                     ||
-                    data.error
+                    diagnosticsData.error
                     ||
-                    `خطا در دریافت Diagnostics (${response.status})`
+                    `خطا در دریافت Diagnostics (${diagnosticsResponse.status})`
                 );
             }
 
+            if (!summaryResponse.ok) {
+                throw new Error(
+                    summaryData.detail
+                    ||
+                    summaryData.error
+                    ||
+                    `خطا در دریافت Summary (${summaryResponse.status})`
+                );
+            }
+
+            renderSummary(
+                summaryData
+            );
+
             renderTable(
-                data.results
+                diagnosticsData.results
                 || []
             );
 
