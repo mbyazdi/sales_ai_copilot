@@ -985,6 +985,100 @@
             font-size: 10px;
             color: #778196;
         }
+        .commercial-context {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed #dfe4ed;
+        }
+
+        .commercial-context-title {
+            margin-bottom: 9px;
+            font-size: 11px;
+            font-weight: 900;
+            color: #5f6f92;
+        }
+
+        .commercial-context-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(
+                    2,
+                    minmax(0, 1fr)
+                );
+            gap: 8px;
+        }
+
+        .commercial-context-item {
+            padding: 10px;
+            border-radius: 10px;
+            background: #f7f8fc;
+        }
+
+        .commercial-context-label {
+            margin-bottom: 6px;
+            font-size: 10px;
+            color: #7b8496;
+        }
+
+        .commercial-context-value {
+            font-size: 12px;
+            font-weight: 800;
+            color: #2c3447;
+        }
+
+        .commercial-badge {
+            display: inline-flex;
+            margin-right: 6px;
+            padding: 4px 7px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 900;
+        }
+
+        .commercial-badge-success {
+            color: #137a50;
+            background: #e9f8f1;
+        }
+
+        .commercial-badge-warning {
+            color: #8a5a00;
+            background: #fff6df;
+        }
+
+        .commercial-badge-danger {
+            color: #9b1c1c;
+            background: #fff0f0;
+        }
+
+        .commercial-muted {
+            font-size: 11px;
+            font-weight: 600;
+            color: #858da0;
+        }
+
+        .commercial-promo {
+            display: grid;
+            gap: 4px;
+        }
+
+        .commercial-promo strong {
+            font-size: 12px;
+        }
+
+        .commercial-promo span {
+            font-size: 10px;
+            font-weight: 600;
+            color: #68738a;
+        }
+
+        @media (
+            max-width: 720px
+        ) {
+
+            .commercial-context-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 
 
@@ -1527,6 +1621,131 @@
                                                             </div>
 
                                                         {% endfor %}
+
+                                                    </div>
+
+                                                </div>
+
+                                            {% endif %}
+                                            {% if brief.commercial_context %}
+
+                                                <div class="commercial-context">
+
+                                                    <div class="commercial-context-title">
+                                                        وضعیت تجاری این پیشنهاد
+                                                    </div>
+
+                                                    <div class="commercial-context-grid">
+
+                                                        <div class="commercial-context-item">
+
+                                                            <div class="commercial-context-label">
+                                                                موجودی قابل فروش
+                                                            </div>
+
+                                                            <div class="commercial-context-value">
+
+                                                                {% if brief.commercial_context.inventory.has_record %}
+
+                                                                    {{ brief.commercial_context.inventory.sellable_quantity }}
+
+                                                                    {% if brief.commercial_context.inventory.is_low_stock %}
+
+                                                                        <span class="commercial-badge commercial-badge-warning">
+                                                                            موجودی کم
+                                                                        </span>
+
+                                                                    {% elif brief.commercial_context.inventory.is_in_stock %}
+
+                                                                        <span class="commercial-badge commercial-badge-success">
+                                                                            موجود
+                                                                        </span>
+
+                                                                    {% else %}
+
+                                                                        <span class="commercial-badge commercial-badge-danger">
+                                                                            ناموجود
+                                                                        </span>
+
+                                                                    {% endif %}
+
+                                                                {% else %}
+
+                                                                    <span class="commercial-muted">
+                                                                        اطلاعات موجودی در دسترس نیست
+                                                                    </span>
+
+                                                                {% endif %}
+
+                                                            </div>
+
+                                                        </div>
+
+
+                                                        <div class="commercial-context-item">
+
+                                                            <div class="commercial-context-label">
+                                                                پروموشن
+                                                            </div>
+
+                                                            <div class="commercial-context-value">
+
+                                                                {% if brief.commercial_context.has_eligible_promotion %}
+
+                                                                    {% for promo in brief.commercial_context.promotions %}
+
+                                                                        <div class="commercial-promo">
+
+                                                                            <strong>
+                                                                                {{ promo.name }}
+                                                                            </strong>
+
+                                                                            <span>
+                                                                                {{ promo.promotion_type }}
+                                                                            </span>
+
+                                                                            {% if promo.discount_percent %}
+
+                                                                                <span>
+                                                                                    {{ promo.discount_percent|floatformat:0 }}%
+                                                                                    تخفیف
+                                                                                </span>
+
+                                                                            {% endif %}
+
+                                                                            {% if promo.discount_amount %}
+
+                                                                                <span>
+                                                                                    تخفیف:
+                                                                                    {{ promo.discount_amount|floatformat:0 }}
+                                                                                </span>
+
+                                                                            {% endif %}
+
+                                                                            {% if promo.minimum_quantity %}
+
+                                                                                <span>
+                                                                                    حداقل خرید:
+                                                                                    {{ promo.minimum_quantity }}
+                                                                                </span>
+
+                                                                            {% endif %}
+
+                                                                        </div>
+
+                                                                    {% endfor %}
+
+                                                                {% else %}
+
+                                                                    <span class="commercial-muted">
+                                                                        پروموشن واجد شرایط ندارد
+                                                                    </span>
+
+                                                                {% endif %}
+
+                                                            </div>
+
+                                                        </div>
 
                                                     </div>
 

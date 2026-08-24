@@ -16,6 +16,9 @@ from .models import (
     SalesOutcome,
 )
 
+from apps.core.commercial_context import (
+    build_product_commercial_contexts,
+)
 
 OUTCOME_PRIORITY = {
     "PURCHASED": 5,
@@ -90,6 +93,38 @@ def build_pre_visit_briefs(
             ] = recommendation
 
     # =====================================================
+    # COMMERCIAL CONTEXT
+    # =====================================================
+
+    commercial_pairs = []
+
+    for visit in visits:
+
+        primary = (
+            primary_recommendations.get(
+                visit.customer_id
+            )
+        )
+
+        if not primary:
+            continue
+
+        commercial_pairs.append(
+            (
+                primary.product,
+                visit.customer,
+            )
+        )
+
+    commercial_contexts = (
+        build_product_commercial_contexts(
+            product_customer_pairs=(
+                commercial_pairs
+            )
+        )
+    )
+
+    # =====================================================
     # OPEN FOLLOW-UPS
     # =====================================================
 
@@ -138,6 +173,19 @@ def build_pre_visit_briefs(
         primary = primary_recommendations.get(
             customer.id
         )
+
+        commercial_context = None
+
+        if primary:
+
+            commercial_context = (
+                commercial_contexts.get(
+                    (
+                        primary.product_id,
+                        customer.id,
+                    )
+                )
+            )
 
         target_relevance = []
 
@@ -347,7 +395,9 @@ def build_pre_visit_briefs(
             "target_relevance": (
                 target_relevance
             ),
-
+            "commercial_context": (
+                commercial_context
+            ),
             "customer": {
                 "customer_code":
                     customer.customer_code,
