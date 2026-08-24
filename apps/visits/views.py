@@ -20,6 +20,10 @@ from rest_framework.permissions import IsAuthenticated
 from .services import (
     build_pre_visit_briefs,
 )
+from apps.targets.services import (
+    get_salesperson_target_progress,
+    build_target_summary,
+)
 
 def recommendation_performance_dashboard(request):
     return render(
@@ -43,7 +47,6 @@ def salesperson_dashboard(request):
         and not salesperson.is_active
     ):
         salesperson = None
-
     if salesperson is None:
 
         return render(
@@ -51,8 +54,11 @@ def salesperson_dashboard(request):
             "visits/dashboard.html",
             {
                 "salesperson": None,
+
                 "today": today,
+
                 "visits": [],
+
                 "summary": {
                     "total": 0,
                     "planned": 0,
@@ -60,6 +66,22 @@ def salesperson_dashboard(request):
                     "completed": 0,
                     "cancelled": 0,
                 },
+
+                "priority_summary": {
+                    "high": 0,
+                    "medium": 0,
+                    "normal": 0,
+                },
+
+                "target_progress": [],
+
+                "target_summary": {
+                    "total_targets": 0,
+                    "average_achievement_percent": 0,
+                    "completed_targets": 0,
+                    "at_risk_targets": 0,
+                },
+
                 "error": (
                     "فروشنده مورد نظر پیدا نشد."
                 ),
@@ -101,10 +123,24 @@ def salesperson_dashboard(request):
         visits
     )
 
+    target_progress = (
+        get_salesperson_target_progress(
+            salesperson=salesperson,
+            as_of_date=today,
+        )
+    )
+
+    target_summary = (
+        build_target_summary(
+            target_progress
+        )
+    )
+
     pre_visit_briefs = (
         build_pre_visit_briefs(
             visits=visit_list,
             salesperson=salesperson,
+            target_progress=target_progress,
         )
     )
 
@@ -160,6 +196,7 @@ def salesperson_dashboard(request):
             )
         ),
     }
+
     return render(
         request,
         "visits/dashboard.html",
@@ -171,6 +208,14 @@ def salesperson_dashboard(request):
 
             "priority_summary": (
                 priority_summary
+            ),
+
+            "target_progress": (
+                target_progress
+            ),
+
+            "target_summary": (
+                target_summary
             ),
 
             "error": None,

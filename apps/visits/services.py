@@ -28,6 +28,7 @@ OUTCOME_PRIORITY = {
 def build_pre_visit_briefs(
     visits,
     salesperson,
+    target_progress=None,
 ):
     """
     Build normalized pre-visit briefs for a batch
@@ -44,6 +45,10 @@ def build_pre_visit_briefs(
 
     if not visits:
         return {}
+
+    target_progress = list(
+        target_progress or []
+    )
 
     customer_ids = {
         visit.customer_id
@@ -64,6 +69,7 @@ def build_pre_visit_briefs(
         )
         .select_related(
             "product",
+            "product__category",
         )
         .order_by(
             "customer_id",
@@ -132,6 +138,109 @@ def build_pre_visit_briefs(
         primary = primary_recommendations.get(
             customer.id
         )
+
+        target_relevance = []
+
+        if primary:
+
+            primary_product = (
+                primary.product
+            )
+
+            for target in target_progress:
+
+                scope = target.get(
+                    "scope",
+                    {},
+                )
+
+                scope_type = scope.get(
+                    "type"
+                )
+
+                scope_code = scope.get(
+                    "code"
+                )
+
+                is_relevant = False
+
+                if (
+                    scope_type
+                    == "PRODUCT"
+                    and scope_code
+                    == primary_product.product_code
+                ):
+                    is_relevant = True
+
+                elif (
+                    scope_type
+                    == "CATEGORY"
+                    and primary_product.category
+                    and scope_code
+                    == primary_product.category.code
+                ):
+                    is_relevant = True
+
+                elif (
+                    scope_type
+                    == "PRODUCT_GROUP"
+                    and scope_code
+                    == primary_product.product_group
+                ):
+                    is_relevant = True
+
+                if is_relevant:
+
+                    target_relevance.append({
+                        "target_id": (
+                            target["id"]
+                        ),
+
+                        "scope_type": (
+                            scope_type
+                        ),
+
+                        "scope_code": (
+                            scope_code
+                        ),
+
+                        "scope_name": (
+                            scope.get(
+                                "name",
+                                "",
+                            )
+                        ),
+
+                        "target_unit": (
+                            target[
+                                "target_unit"
+                            ]
+                        ),
+
+                        "target_value": (
+                            target[
+                                "target_value"
+                            ]
+                        ),
+
+                        "actual_value": (
+                            target[
+                                "actual_value"
+                            ]
+                        ),
+
+                        "remaining_value": (
+                            target[
+                                "remaining_value"
+                            ]
+                        ),
+
+                        "achievement_percent": (
+                            target[
+                                "achievement_percent"
+                            ]
+                        ),
+                    })
 
         customer_followups = (
             followups_by_customer.get(
@@ -234,6 +343,11 @@ def build_pre_visit_briefs(
 
             "priority_reasons":
                 priority_reasons,
+
+            "target_relevance": (
+                target_relevance
+            ),
+
             "customer": {
                 "customer_code":
                     customer.customer_code,

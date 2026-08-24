@@ -49,6 +49,10 @@ urlpatterns = [
         include("apps.ai.urls"),
     ),
     path(
+        "api/targets/",
+        include("apps.targets.urls"),
+    ),
+    path(
         "accounts/login/",
         auth_views.LoginView.as_view(
             template_name="core/login.html"

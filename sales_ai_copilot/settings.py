@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "apps.promotions.apps.PromotionsConfig",
     "apps.inventory.apps.InventoryConfig",
     "apps.visits.apps.VisitsConfig",
+    "apps.targets.apps.TargetsConfig",
     "apps.management.apps.ManagementConfig",
 ]
 
