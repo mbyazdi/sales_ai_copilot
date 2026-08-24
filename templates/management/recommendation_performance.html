@@ -1,29 +1,28 @@
+{% extends "base.html" %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
 
-<head>
+{% block title %}
+    Recommendation Performance
+{% endblock %}
 
-    <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
-        Recommendation Performance
-    </title>
+{% block extra_css %}
 
     <link
         rel="stylesheet"
         href="{% static 'management/css/recommendation_performance.css' %}"
     >
 
-</head>
+{% endblock %}
 
-<body>
+
+{% block breadcrumb %}
+    Manager / Recommendation Performance
+{% endblock %}
+
+
+{% block content %}
 
 <div class="management-page">
 
@@ -277,16 +276,22 @@
         </div>
 
     </section>
-    {% include "management/_recommendation_explainability.html" %}
-    {% include "management/_recommendation_tuning.html" %}
-</div>
+        {% include "management/_recommendation_explainability.html" %}
+        {% include "management/_recommendation_tuning.html" %}
+    </div>
+
+    {% endblock %}
 
 
-<script>
+    {% block extra_js %}
 
-window.salesRecommendationPerformance = {
-    apiUrl: "/api/visits/v1/recommendations/performance/"
-};
+    <script>
+
+    window.salesRecommendationPerformance = {
+        apiUrl: "/api/visits/v1/recommendations/performance/"
+    };
+
+    </script>
 
 </script>
 
@@ -294,12 +299,13 @@ window.salesRecommendationPerformance = {
 <script
     src="{% static 'management/js/recommendation_performance.js' %}"
 ></script>
+
 <script
     src="{% static 'management/js/recommendation_explainability.js' %}"
 ></script>
+
 <script
     src="{% static 'management/js/recommendation_tuning.js' %}"
 ></script>
-</body>
 
-</html>
+{% endblock %}

@@ -24,18 +24,22 @@ def recommendation_performance_dashboard(request):
         "management/recommendation_performance.html",
     )
 
+@login_required
 def salesperson_dashboard(request):
 
     today = timezone.localdate()
 
-    salesperson = (
-        Salesperson.objects
-        .filter(
-            employee_code="SP001",
-            is_active=True,
-        )
-        .first()
+    salesperson = getattr(
+        request.user,
+        "salesperson_profile",
+        None,
     )
+
+    if (
+        salesperson
+        and not salesperson.is_active
+    ):
+        salesperson = None
 
     if salesperson is None:
 

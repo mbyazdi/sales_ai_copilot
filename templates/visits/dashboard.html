@@ -1,20 +1,15 @@
+{% extends "base.html" %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
 
-<head>
+{% block title %}
+    Daily Visit Workspace
+{% endblock %}
 
-    <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+{% block extra_css %}
 
-    <title>
-        برنامه ویزیت روزانه
-    </title>
+<style>
 
     <style>
 
@@ -622,9 +617,16 @@
 
     </style>
 
-</head>
 
-<body>
+{% endblock %}
+
+
+{% block breadcrumb %}
+    Sales Rep / Daily Workspace
+{% endblock %}
+
+
+{% block content %}
 
 <div class="page">
 
@@ -905,6 +907,4 @@
 
 </div>
 
-</body>
-
-</html>
+{% endblock %}

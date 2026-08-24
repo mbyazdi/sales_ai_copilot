@@ -1,7 +1,7 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
 
@@ -52,7 +52,6 @@
 
         </div>
 
-
         <div class="sidebar-section">
 
             <div class="sidebar-label">
@@ -61,53 +60,71 @@
 
             <nav class="sidebar-nav">
 
-                <a
-                    href="#"
-                    class="nav-item active"
-                >
-                    <span class="nav-icon">⌂</span>
-                    <span>Dashboard</span>
-                </a>
+                {% if request.user.is_staff or request.user.is_superuser %}
 
-                <a
-                    href="#"
-                    class="nav-item"
-                >
-                    <span class="nav-icon">◉</span>
-                    <span>Customers</span>
-                </a>
+                    <a
+                        href="{% url 'recommendation-performance-dashboard' %}"
+                        class="nav-item
+                            {% if request.resolver_match.url_name == 'recommendation-performance-dashboard' %}
+                                active
+                            {% endif %}
+                        "
+                    >
+                        <span class="nav-icon">⌂</span>
+                        <span>Manager Dashboard</span>
+                    </a>
 
-                <a
-                    href="#"
-                    class="nav-item"
-                >
-                    <span class="nav-icon">◷</span>
-                    <span>Visits</span>
-                </a>
+                    <a
+                        href="{% url 'recommendation-performance-dashboard' %}"
+                        class="nav-item"
+                    >
+                        <span class="nav-icon">◇</span>
+                        <span>Recommendation Performance</span>
+                    </a>
 
-                <a
-                    href="#"
-                    class="nav-item"
-                >
-                    <span class="nav-icon">✦</span>
-                    <span>AI Insights</span>
-                </a>
+                {% elif request.user.salesperson_profile %}
 
-                <a
-                    href="#"
-                    class="nav-item"
-                >
-                    <span class="nav-icon">◇</span>
-                    <span>Recommendations</span>
-                </a>
+                    <a
+                        href="{% url 'salesperson-dashboard' %}"
+                        class="nav-item
+                            {% if request.resolver_match.url_name == 'salesperson-dashboard' %}
+                                active
+                            {% endif %}
+                        "
+                    >
+                        <span class="nav-icon">⌂</span>
+                        <span>Daily Workspace</span>
+                    </a>
 
-                <a
-                    href="#"
-                    class="nav-item"
-                >
-                    <span class="nav-icon">%</span>
-                    <span>Promotions</span>
-                </a>
+                    <a
+                        href="{% url 'salesperson-dashboard' %}"
+                        class="nav-item"
+                    >
+                        <span class="nav-icon">▷</span>
+                        <span>Today's Visits</span>
+                    </a>
+
+                    <a
+                        href="/customers/"
+                        class="nav-item"
+                    >
+                        <span class="nav-icon">◉</span>
+                        <span>Customers</span>
+                    </a>
+
+                    <a
+                        href="{% url 'follow-up-dashboard' %}"
+                        class="nav-item
+                            {% if request.resolver_match.url_name == 'follow-up-dashboard' %}
+                                active
+                            {% endif %}
+                        "
+                    >
+                        <span class="nav-icon">✓</span>
+                        <span>Follow-ups</span>
+                    </a>
+
+                {% endif %}
 
             </nav>
 
@@ -117,23 +134,22 @@
         <div class="sidebar-section">
 
             <div class="sidebar-label">
-                SYSTEM
+                ACCOUNT
             </div>
 
             <nav class="sidebar-nav">
 
                 <a
-                    href="#"
+                    href="{% url 'role-home' %}"
                     class="nav-item"
                 >
-                    <span class="nav-icon">⚙</span>
-                    <span>Settings</span>
+                    <span class="nav-icon">↗</span>
+                    <span>My Workspace</span>
                 </a>
 
             </nav>
 
         </div>
-
 
         <div class="sidebar-bottom">
 
@@ -209,11 +225,21 @@
                     <div class="user-info">
 
                         <div class="user-name">
-                            Sales Manager
+                            {% if request.user.salesperson_profile %}
+                                {{ request.user.salesperson_profile.full_name }}
+                            {% else %}
+                                {{ request.user.get_full_name|default:request.user.username }}
+                            {% endif %}
                         </div>
 
                         <div class="user-role">
-                            Sales Representative
+                            {% if request.user.is_staff or request.user.is_superuser %}
+                                Sales Manager
+                            {% elif request.user.salesperson_profile %}
+                                Sales Representative
+                            {% else %}
+                                User
+                            {% endif %}
                         </div>
 
                     </div>

@@ -55,4 +55,10 @@ urlpatterns = [
         ),
         name="login",
     ),
+    path(
+        "",
+        include(
+            "apps.core.urls"
+        ),
+    ),
 ]
