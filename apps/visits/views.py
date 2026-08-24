@@ -331,7 +331,36 @@ class CustomerVisitsAPIView(APIView):
 
 class SalesOutcomeCreateAPIView(APIView):
 
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
     def post(self, request):
+
+        # =========================================
+        # AUTHENTICATED SALESPERSON
+        # =========================================
+
+        salesperson = getattr(
+            request.user,
+            "salesperson_profile",
+            None,
+        )
+
+        if (
+            salesperson is None
+            or not salesperson.is_active
+        ):
+
+            return Response(
+                {
+                    "detail": (
+                        "Active salesperson profile "
+                        "was not found."
+                    )
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         visit_id = request.data.get("visit_id")
         recommendation_id = request.data.get(
@@ -455,7 +484,8 @@ class SalesOutcomeCreateAPIView(APIView):
                     "salesperson",
                 )
                 .get(
-                    id=visit_id
+                    id=visit_id,
+                    salesperson=salesperson,
                 )
             )
 
@@ -1204,7 +1234,32 @@ class VisitCommercialDecisionAPIView(
 
 class VisitCompleteAPIView(APIView):
 
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
     def post(self, request, visit_id):
+
+        salesperson = getattr(
+            request.user,
+            "salesperson_profile",
+            None,
+        )
+
+        if (
+            salesperson is None
+            or not salesperson.is_active
+        ):
+
+            return Response(
+                {
+                    "detail": (
+                        "Active salesperson profile "
+                        "was not found."
+                    )
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         visit = get_object_or_404(
             Visit.objects.select_related(
@@ -1212,19 +1267,23 @@ class VisitCompleteAPIView(APIView):
                 "salesperson",
             ),
             id=visit_id,
+            salesperson=salesperson,
         )
 
         if (
             visit.status
-            == Visit.VisitStatus.CANCELLED
+            != Visit.VisitStatus.IN_PROGRESS
         ):
 
             return Response(
                 {
                     "detail": (
-                        "Cancelled visit cannot "
-                        "be completed."
-                    )
+                        "Visit can only be completed "
+                        "while it is in progress."
+                    ),
+                    "visit_status": (
+                        visit.status
+                    ),
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
@@ -1260,7 +1319,32 @@ class VisitCompleteAPIView(APIView):
 
 class VisitStartAPIView(APIView):
 
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
     def post(self, request, visit_id):
+
+        salesperson = getattr(
+            request.user,
+            "salesperson_profile",
+            None,
+        )
+
+        if (
+            salesperson is None
+            or not salesperson.is_active
+        ):
+
+            return Response(
+                {
+                    "detail": (
+                        "Active salesperson profile "
+                        "was not found."
+                    )
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         visit = get_object_or_404(
             Visit.objects.select_related(
@@ -1268,6 +1352,7 @@ class VisitStartAPIView(APIView):
                 "salesperson",
             ),
             id=visit_id,
+            salesperson=salesperson,
         )
 
         if (

@@ -18,6 +18,100 @@
                     یک پیشنهاد مشخص، همراه با دلیل و شواهد رفتاری
                 </div>
 
+                {% if sales_session.commercial_priority %}
+
+                    <div class="commercial-decision-focus">
+
+                        <div class="commercial-decision-focus-head">
+
+                            <div>
+
+                                <div class="commercial-decision-focus-label">
+                                    COMMERCIAL DECISION
+                                </div>
+
+                                <div class="commercial-decision-focus-title">
+                                    اولویت تجاری این فرصت
+                                </div>
+
+                            </div>
+
+
+                            <div class="commercial-decision-focus-metrics">
+
+                                <div
+                                    class="
+                                        commercial-priority-badge
+                                        commercial-priority-{{ sales_session.commercial_priority|lower }}
+                                    "
+                                >
+                                    {{ sales_session.commercial_priority }}
+                                </div>
+
+
+                                {% if sales_session.commercial_score != None %}
+
+                                    <div class="commercial-score-pill">
+
+                                        <span class="commercial-score-value">
+                                            {{ sales_session.commercial_score }}
+                                        </span>
+
+                                        <span class="commercial-score-label">
+                                            COMMERCIAL SCORE
+                                        </span>
+
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                        {% if sales_session.commercial_blocked %}
+
+                            <div class="commercial-blocked-alert">
+                                این فرصت در حال حاضر دارای مانع تجاری است.
+                                قبل از اقدام برای نهایی‌کردن فروش،
+                                مانع ثبت‌شده را بررسی کنید.
+                            </div>
+
+                        {% endif %}
+
+
+                        {% if sales_session.why_now %}
+
+                            <div class="commercial-why-now">
+
+                                <div class="commercial-why-now-label">
+                                    WHY NOW
+                                </div>
+
+                                <div class="commercial-why-now-list">
+
+                                    {% for reason in sales_session.why_now %}
+
+                                        <div class="commercial-why-now-item">
+                                            <span class="commercial-why-now-dot"></span>
+
+                                            <span>
+                                                {{ reason }}
+                                            </span>
+                                        </div>
+
+                                    {% endfor %}
+
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                {% endif %}
 
                 <div class="action-main">
 
@@ -52,7 +146,7 @@
                                 </span>
 
                                 <span class="score-ring-label">
-                                    AI SCORE
+                                    RECOMMENDATION
                                 </span>
 
                             </div>

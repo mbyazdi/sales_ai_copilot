@@ -77,6 +77,92 @@
             </div>
 
 
+            <div class="visit-execution-guidance">
+
+                <div
+                    class="
+                        visit-execution-state
+                        visit-execution-state-planned
+                    "
+                >
+                    <div class="visit-execution-label">
+                        PRE-VISIT PREPARATION
+                    </div>
+
+                    <div class="visit-execution-title">
+                        آماده برای شروع جلسه
+                    </div>
+
+                    <div class="visit-execution-text">
+                        قبل از شروع، اقدام پیشنهادی،
+                        نکته گفتگو و اطلاعات مشتری را مرور کنید.
+                    </div>
+                </div>
+
+
+                <div
+                    class="
+                        visit-execution-state
+                        visit-execution-state-in-progress
+                    "
+                >
+                    <div class="visit-execution-label">
+                        LIVE VISIT
+                    </div>
+
+                    <div class="visit-execution-title">
+                        جلسه در حال اجراست
+                    </div>
+
+                    <div class="visit-execution-text">
+                        پیشنهادها را مطرح کنید و نتیجه هر تعامل
+                        را در همین Workspace ثبت کنید.
+                    </div>
+                </div>
+
+
+                <div
+                    class="
+                        visit-execution-state
+                        visit-execution-state-completed
+                    "
+                >
+                    <div class="visit-execution-label">
+                        VISIT REVIEW
+                    </div>
+
+                    <div class="visit-execution-title">
+                        جلسه تکمیل شده است
+                    </div>
+
+                    <div class="visit-execution-text">
+                        Workspace اکنون در حالت مرور است و
+                        نتیجه‌ها و پیگیری‌های ثبت‌شده قابل مشاهده‌اند.
+                    </div>
+                </div>
+
+
+                <div
+                    class="
+                        visit-execution-state
+                        visit-execution-state-cancelled
+                    "
+                >
+                    <div class="visit-execution-label">
+                        VISIT CLOSED
+                    </div>
+
+                    <div class="visit-execution-title">
+                        جلسه لغو شده است
+                    </div>
+
+                    <div class="visit-execution-text">
+                        عملیات اجرایی این Visit غیرفعال است.
+                    </div>
+                </div>
+
+            </div>
+
             <div class="visit-workflow-actions">
 
                 {% if current_visit.status == "PLANNED" %}
@@ -105,6 +191,12 @@
 
                     <div class="visit-completed-message">
                         ✓ این ویزیت تکمیل شده است
+                    </div>
+
+                {% elif current_visit.status == "CANCELLED" %}
+
+                    <div class="visit-cancelled-message">
+                        این ویزیت لغو شده است
                     </div>
 
                 {% endif %}
