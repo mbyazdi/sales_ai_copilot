@@ -12,6 +12,7 @@ from apps.recommendations.models import (
 )
 
 from .models import (
+    Visit,
     FollowUpTask,
     SalesOutcome,
 )
@@ -21,6 +22,9 @@ from apps.core.commercial_context import (
 )
 from apps.core.commercial_decision import (
     build_base_sales_session,
+)
+from apps.targets.services import (
+    get_salesperson_target_progress,
 )
 
 OUTCOME_PRIORITY = {
@@ -544,6 +548,210 @@ def build_pre_visit_briefs(
         }
 
     return briefs
+
+def build_pre_visit_intelligence_window(
+    salesperson,
+    start_date,
+    end_date,
+    statuses=None,
+):
+    """
+    Build canonical pre-visit intelligence for a
+    salesperson over a date window.
+
+    No intelligence is persisted here.
+    This is the orchestration layer used by
+    runtime and future nightly-ready workflows.
+    """
+
+    if start_date > end_date:
+        raise ValueError(
+            "start_date cannot be after end_date."
+        )
+
+    if statuses is None:
+        statuses = [
+            Visit.VisitStatus.PLANNED,
+            Visit.VisitStatus.IN_PROGRESS,
+        ]
+
+    visits = list(
+        Visit.objects
+        .filter(
+            salesperson=salesperson,
+            visit_date__gte=start_date,
+            visit_date__lte=end_date,
+            status__in=statuses,
+        )
+        .select_related(
+            "customer",
+            "customer__grade",
+            "customer__customer_360",
+        )
+        .order_by(
+            "visit_date",
+            "id",
+        )
+    )
+
+    if not visits:
+        return {
+            "salesperson": {
+                "employee_code":
+                    salesperson.employee_code,
+                "full_name":
+                    salesperson.full_name,
+            },
+            "start_date": start_date,
+            "end_date": end_date,
+            "visit_count": 0,
+            "items": [],
+        }
+
+    # ==========================================
+    # GROUP VISITS BY DATE
+    # ==========================================
+
+    visits_by_date = {}
+
+    for visit in visits:
+
+        visits_by_date.setdefault(
+            visit.visit_date,
+            [],
+        ).append(
+            visit
+        )
+
+    items = []
+
+    # Target progress is date-sensitive.
+    # Build briefs separately for each visit date.
+    for visit_date, date_visits in (
+        visits_by_date.items()
+    ):
+
+        target_progress = (
+            get_salesperson_target_progress(
+                salesperson=salesperson,
+                as_of_date=visit_date,
+            )
+        )
+
+        briefs = build_pre_visit_briefs(
+            visits=date_visits,
+            salesperson=salesperson,
+            target_progress=target_progress,
+        )
+
+        for visit in date_visits:
+
+            brief = briefs.get(
+                visit.id,
+                {},
+            )
+
+            items.append({
+                "visit": {
+                    "id": visit.id,
+                    "visit_date":
+                        visit.visit_date,
+                    "status":
+                        visit.status,
+                },
+
+                "customer": (
+                    brief.get(
+                        "customer"
+                    )
+                ),
+
+                "primary_recommendation": (
+                    brief.get(
+                        "primary_recommendation"
+                    )
+                ),
+
+                "visit_priority": {
+                    "score": (
+                        brief.get(
+                            "priority_score"
+                        )
+                    ),
+                    "level": (
+                        brief.get(
+                            "priority_level"
+                        )
+                    ),
+                    "reasons": (
+                        brief.get(
+                            "priority_reasons",
+                            [],
+                        )
+                    ),
+                },
+
+                "target_relevance": (
+                    brief.get(
+                        "target_relevance",
+                        [],
+                    )
+                ),
+
+                "commercial_context": (
+                    brief.get(
+                        "commercial_context"
+                    )
+                ),
+
+                "commercial_decision": (
+                    brief.get(
+                        "commercial_decision"
+                    )
+                ),
+
+                "follow_up": {
+                    "open_count": (
+                        brief.get(
+                            "open_follow_up_count",
+                            0,
+                        )
+                    ),
+                    "next_due_date": (
+                        brief.get(
+                            "next_follow_up_date"
+                        )
+                    ),
+                },
+            })
+
+    items.sort(
+        key=lambda item: (
+            item["visit"]["visit_date"],
+            -(
+                item[
+                    "visit_priority"
+                ][
+                    "score"
+                ]
+                or 0
+            ),
+            item["visit"]["id"],
+        )
+    )
+
+    return {
+        "salesperson": {
+            "employee_code":
+                salesperson.employee_code,
+            "full_name":
+                salesperson.full_name,
+        },
+        "start_date": start_date,
+        "end_date": end_date,
+        "visit_count": len(items),
+        "items": items,
+    }
 
 def resolve_recommendation_outcome(
     visit_id,
