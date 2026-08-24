@@ -24,6 +24,17 @@ from apps.targets.services import (
     get_salesperson_target_progress,
     build_target_summary,
 )
+from rest_framework.permissions import (
+    IsAuthenticated,
+)
+
+from apps.targets.services import (
+    get_salesperson_target_progress,
+)
+
+from .services import (
+    build_pre_visit_briefs,
+)
 
 def recommendation_performance_dashboard(request):
     return render(
@@ -221,6 +232,7 @@ def salesperson_dashboard(request):
             "error": None,
         },
     )
+
 class CustomerVisitsAPIView(APIView):
 
     def get(self, request, customer_code):
@@ -1009,6 +1021,187 @@ class RecommendationPerformanceAPIView(APIView):
             }
         )
 
+class VisitCommercialDecisionAPIView(
+    APIView
+):
+    """
+    Return the canonical commercial decision
+    for one visit.
+
+    The decision is built from the same backend
+    services used by the Sales Rep Daily Workspace.
+    """
+
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    def get(
+        self,
+        request,
+        visit_id,
+    ):
+
+        visit = get_object_or_404(
+            Visit.objects.select_related(
+                "salesperson",
+                "customer",
+                "customer__grade",
+                "customer__customer_360",
+            ),
+            id=visit_id,
+        )
+
+        # =========================================
+        # SALES REP ACCESS
+        # =========================================
+
+        salesperson = getattr(
+            request.user,
+            "salesperson_profile",
+            None,
+        )
+
+        if (
+            salesperson is None
+            or not salesperson.is_active
+        ):
+
+            return Response(
+                {
+                    "detail": (
+                        "Active salesperson profile "
+                        "was not found."
+                    ),
+                },
+                status=(
+                    status.HTTP_403_FORBIDDEN
+                ),
+            )
+
+        if (
+            visit.salesperson_id
+            != salesperson.id
+        ):
+
+            return Response(
+                {
+                    "detail": (
+                        "This visit does not belong "
+                        "to the authenticated salesperson."
+                    ),
+                },
+                status=(
+                    status.HTTP_403_FORBIDDEN
+                ),
+            )
+
+        # =========================================
+        # TARGET CONTEXT
+        # =========================================
+
+        target_progress = (
+            get_salesperson_target_progress(
+                salesperson=salesperson,
+                as_of_date=visit.visit_date,
+            )
+        )
+
+        # =========================================
+        # CANONICAL BRIEF / DECISION
+        # =========================================
+
+        briefs = build_pre_visit_briefs(
+            visits=[
+                visit,
+            ],
+            salesperson=salesperson,
+            target_progress=target_progress,
+        )
+
+        brief = briefs.get(
+            visit.id,
+            {},
+        )
+
+        primary = brief.get(
+            "primary_recommendation"
+        )
+
+        decision = brief.get(
+            "commercial_decision"
+        )
+
+        return Response(
+            {
+                "visit": {
+                    "id": visit.id,
+                    "visit_date": (
+                        visit.visit_date
+                    ),
+                    "status": (
+                        visit.status
+                    ),
+                },
+
+                "salesperson": {
+                    "employee_code": (
+                        salesperson.employee_code
+                    ),
+                    "full_name": (
+                        salesperson.full_name
+                    ),
+                },
+
+                "customer": (
+                    brief.get(
+                        "customer"
+                    )
+                ),
+
+                "primary_recommendation": (
+                    primary
+                ),
+
+                "visit_priority": {
+                    "score": (
+                        brief.get(
+                            "priority_score"
+                        )
+                    ),
+                    "level": (
+                        brief.get(
+                            "priority_level"
+                        )
+                    ),
+                    "reasons": (
+                        brief.get(
+                            "priority_reasons",
+                            [],
+                        )
+                    ),
+                },
+
+                "target_relevance": (
+                    brief.get(
+                        "target_relevance",
+                        [],
+                    )
+                ),
+
+                "commercial_context": (
+                    brief.get(
+                        "commercial_context"
+                    )
+                ),
+
+                "commercial_decision": (
+                    decision
+                ),
+            },
+            status=status.HTTP_200_OK,
+        )
+
 class VisitCompleteAPIView(APIView):
 
     def post(self, request, visit_id):
@@ -1135,6 +1328,7 @@ class VisitStartAPIView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
 class FollowUpTaskListAPIView(APIView):
 
     permission_classes = [

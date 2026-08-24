@@ -19,6 +19,9 @@ from .models import (
 from apps.core.commercial_context import (
     build_product_commercial_contexts,
 )
+from apps.core.commercial_decision import (
+    build_base_sales_session,
+)
 
 OUTCOME_PRIORITY = {
     "PURCHASED": 5,
@@ -297,6 +300,20 @@ def build_pre_visit_briefs(
             )
         )
 
+        commercial_decision = (
+            build_base_sales_session(
+                customer=customer,
+                customer_360=customer_360,
+                primary_recommendation=primary,
+                target_relevance=(
+                    target_relevance
+                ),
+                commercial_context=(
+                    commercial_context
+                ),
+            )
+        )
+
         next_followup = (
             customer_followups[0]
             if customer_followups
@@ -398,6 +415,49 @@ def build_pre_visit_briefs(
             "commercial_context": (
                 commercial_context
             ),
+            "commercial_decision": {
+                "commercial_score": (
+                    commercial_decision[
+                        "commercial_score"
+                    ]
+                ),
+
+                "commercial_priority": (
+                    commercial_decision[
+                        "commercial_priority"
+                    ]
+                ),
+
+                "decision_reasons": (
+                    commercial_decision[
+                        "decision_reasons"
+                    ]
+                ),
+
+                "why_now": (
+                    commercial_decision[
+                        "why_now"
+                    ]
+                ),
+
+                "commercial_blocked": (
+                    commercial_decision[
+                        "commercial_blocked"
+                    ]
+                ),
+
+                "next_best_action": (
+                    commercial_decision[
+                        "next_best_action"
+                    ]
+                ),
+
+                "talking_point": (
+                    commercial_decision[
+                        "talking_point"
+                    ]
+                ),
+            },
             "customer": {
                 "customer_code":
                     customer.customer_code,

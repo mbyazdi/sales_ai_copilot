@@ -17,7 +17,15 @@ from apps.visits.models import (
 from apps.sales.services import get_customer_sales_history
 
 from apps.visits.services import (
+    build_pre_visit_briefs,
     resolve_recommendation_outcome,
+)
+
+from apps.targets.services import (
+    get_salesperson_target_progress,
+)
+from apps.core.commercial_decision import (
+    build_base_sales_session,
 )
 
 def customer_search(request):
@@ -42,6 +50,8 @@ def customer_search(request):
         "recommendations": [],
 
         "sales_session": None,
+
+        "commercial_decision": None,
 
         "assignment": None,
 
@@ -163,240 +173,101 @@ def customer_search(request):
 
             if customer_360:
 
-                # Customer status
-                if customer_360.segment == "HIGH_VALUE":
-                    customer_status = (
-                        "مشتری با ارزش بالا و دارای "
-                        "پتانسیل مناسب برای فروش مجدد"
-                    )
-                else:
-                    customer_status = (
-                        "مشتری فعال با فرصت‌های فروش قابل بررسی"
-                    )
+                current_visit = context.get(
+                    "current_visit"
+                )
 
-                # Sales opportunity
-                if (
-                    customer_360.days_since_last_purchase
-                    and customer_360.days_since_last_purchase >= 20
-                ):
-                    sales_opportunity = (
-                        f"مشتری {customer_360.days_since_last_purchase} "
-                        "روز است که خریدی نداشته است. "
-                        "این موضوع می‌تواند یک فرصت مناسب "
-                        "برای پیگیری فروش باشد."
-                    )
-                else:
-                    sales_opportunity = (
-                        "مشتری اخیراً خرید داشته است. "
-                        "تمرکز روی فروش مکمل و محصولات مرتبط "
-                        "پیشنهاد می‌شود."
+                target_relevance = []
+                commercial_context = None
+
+                # -------------------------------------
+                # VISIT-SCOPED COMMERCIAL DECISION
+                # -------------------------------------
+
+                if current_visit:
+
+                    target_progress = (
+                        get_salesperson_target_progress(
+                            salesperson=(
+                                current_visit.salesperson
+                            ),
+                            as_of_date=(
+                                current_visit.visit_date
+                            ),
+                        )
                     )
 
-                # Primary product
-                if primary_recommendation:
-
-                    primary_product = (
-                        primary_recommendation.product.name
+                    visit_briefs = (
+                        build_pre_visit_briefs(
+                            visits=[
+                                current_visit,
+                            ],
+                            salesperson=(
+                                current_visit.salesperson
+                            ),
+                            target_progress=(
+                                target_progress
+                            ),
+                        )
                     )
 
-                    primary_product_code = (
-                        primary_recommendation.product.product_code
+                    current_brief = (
+                        visit_briefs.get(
+                            current_visit.id,
+                            {},
+                        )
                     )
 
-                    primary_reason = (
-                        primary_recommendation.reason
+                    target_relevance = (
+                        current_brief.get(
+                            "target_relevance",
+                            [],
+                        )
                     )
 
-                    recommendation_type = (
-                        primary_recommendation.recommendation_type
+                    commercial_context = (
+                        current_brief.get(
+                            "commercial_context"
+                        )
                     )
 
-                else:
-
-                    primary_product = None
-                    primary_product_code = None
-                    primary_reason = None
-                    recommendation_type = None
-
-                # Salesperson talking point
-                if primary_recommendation:
-
-                    if (
-                        recommendation_type
-                        == "REPEAT_PURCHASE"
-                    ):
-
-                        talking_point = (
-                            f"با توجه به سابقه خرید مشتری، "
-                            f"در مورد تمدید یا خرید مجدد "
-                            f"{primary_product} "
-                            "با مشتری صحبت کنید."
+                    context[
+                        "commercial_decision"
+                    ] = (
+                        current_brief.get(
+                            "commercial_decision"
                         )
-
-                    elif (
-                        recommendation_type
-                        == "CROSS_SELL"
-                    ):
-
-                        talking_point = (
-                            f"با توجه به خریدهای قبلی مشتری، "
-                            f"محصول مکمل {primary_product} "
-                            "را به عنوان پیشنهاد جانبی مطرح کنید."
-                        )
-
-                    elif (
-                        recommendation_type
-                        == "CATEGORY"
-                    ):
-
-                        talking_point = (
-                            f"با توجه به علاقه مشتری به این دسته، "
-                            f"محصول {primary_product} "
-                            "را به عنوان گزینه جدید معرفی کنید."
-                        )
-
-                    elif (
-                        recommendation_type
-                        == "SIMILAR_PRODUCT"
-                    ):
-
-                        talking_point = (
-                            f"محصول {primary_product} "
-                            "را به عنوان جایگزین یا گزینه مشابه "
-                            "معرفی کنید."
-                        )
-
-                    else:
-
-                        talking_point = (
-                            f"محصول {primary_product} "
-                            "را به عنوان یکی از گزینه‌های اصلی "
-                            "پیشنهاد دهید."
-                        )
-
-                else:
-
-                    talking_point = (
-                        "در حال حاضر پیشنهاد مشخصی برای "
-                        "این مشتری ثبت نشده است."
                     )
 
-                # -----------------------------------------
-                # NEXT BEST ACTION
-                # -----------------------------------------
+                # -------------------------------------
+                # CANONICAL SALES SESSION
+                # -------------------------------------
 
-                if primary_recommendation:
-
-                    if (
-                        recommendation_type
-                        == "REPEAT_PURCHASE"
-                    ):
-
-                        next_best_action = (
-                            f"پیشنهاد خرید مجدد "
-                            f"{primary_product} "
-                            "را در ابتدای گفتگو مطرح کنید."
-                        )
-
-                    elif (
-                        recommendation_type
-                        == "CROSS_SELL"
-                    ):
-
-                        next_best_action = (
-                            f"بعد از مرور خرید قبلی، "
-                            f"{primary_product} "
-                            "را به عنوان محصول مکمل پیشنهاد دهید."
-                        )
-
-                    elif (
-                        recommendation_type
-                        == "UP_SELL"
-                    ):
-
-                        next_best_action = (
-                            f"مشتری را به گزینه بالاتر "
-                            f"{primary_product} "
-                            "هدایت کنید."
-                        )
-
-                    elif (
-                        recommendation_type
-                        == "CATEGORY"
-                    ):
-
-                        next_best_action = (
-                            f"محصول "
-                            f"{primary_product} "
-                            "را از دسته مورد علاقه مشتری معرفی کنید."
-                        )
-
-                    elif (
-                        recommendation_type
-                        == "SIMILAR_PRODUCT"
-                    ):
-
-                        next_best_action = (
-                            f"محصول "
-                            f"{primary_product} "
-                            "را به عنوان گزینه جایگزین معرفی کنید."
-                        )
-
-                    else:
-
-                        next_best_action = (
-                            f"محصول "
-                            f"{primary_product} "
-                            "را به عنوان پیشنهاد اصلی مطرح کنید."
-                        )
-
-                else:
-
-                    next_best_action = (
-                        "در حال حاضر اقدام پیشنهادی مشخصی "
-                        "برای این مشتری وجود ندارد."
+                context["sales_session"] = (
+                    build_base_sales_session(
+                        customer=customer,
+                        customer_360=customer_360,
+                        primary_recommendation=(
+                            primary_recommendation
+                        ),
+                        target_relevance=(
+                            target_relevance
+                        ),
+                        commercial_context=(
+                            commercial_context
+                        ),
                     )
+                )
 
-                context["sales_session"] = {
-
-                    "customer_status": customer_status,
-
-                    "sales_opportunity": (
-                        sales_opportunity
-                    ),
-
-                    "primary_product": (
-                        primary_product
-                    ),
-
-                    "primary_product_code": (
-                        primary_product_code
-                    ),
-
-                    "primary_reason": (
-                        primary_reason
-                    ),
-
-                    "next_best_action": (
-                        next_best_action
-                    ),
-                    
-                    "talking_point": (
-                        talking_point
-                    ),
-
-                    "recommendation_type": (
-                        recommendation_type
-                    ),
-                }
+                # -------------------------------------
+                # AI CONTEXT
+                # -------------------------------------
 
                 context["sales_ai_context"] = (
                     build_sales_ai_context(
                         customer=customer,
                         customer_360=customer_360,
-                        current_visit=context.get(
-                            "current_visit"
-                        ),
+                        current_visit=current_visit,
                         sales_session=context.get(
                             "sales_session"
                         ),

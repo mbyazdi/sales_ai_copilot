@@ -11,6 +11,7 @@ from .views import (
     FollowUpTaskListAPIView,
     FollowUpTaskStatusAPIView,
     follow_up_dashboard,
+    VisitCommercialDecisionAPIView,
 )
 
 
@@ -39,6 +40,11 @@ urlpatterns = [
         "v1/recommendations/performance/",
         RecommendationPerformanceAPIView.as_view(),
         name="recommendation-performance-all",
+    ),
+    path(
+        "v1/visits/<int:visit_id>/commercial-decision/",
+        VisitCommercialDecisionAPIView.as_view(),
+        name="visit-commercial-decision",
     ),
     path(
         "v1/visits/<int:visit_id>/complete/",

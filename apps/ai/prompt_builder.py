@@ -63,6 +63,34 @@ def build_sales_copilot_prompt(
     )
 
     lines.append(
+        "- Commercial Priority, Commercial Score, "
+        "Decision Reasons, Why Now, Target Context, "
+        "Inventory Context, and Promotion Context are "
+        "authoritative backend facts."
+    )
+
+    lines.append(
+        "- Do NOT recalculate, override, reinterpret, "
+        "or invent Commercial Priority or Commercial Score."
+    )
+
+    lines.append(
+        "- Do NOT infer a promotion benefit beyond the "
+        "explicit promotion fields provided in context."
+    )
+
+    lines.append(
+        "- Do NOT infer inventory availability beyond the "
+        "explicit inventory fields provided in context."
+    )
+
+    lines.append(
+        "- If Commercial Blocked is true, do not encourage "
+        "the salesperson to close the sale without resolving "
+        "the blocking condition."
+    )
+
+    lines.append(
         "- Product recommendations have already been "
         "decided by a Rule-Based Recommendation Engine."
     )
@@ -206,6 +234,164 @@ def build_sales_copilot_prompt(
         f"- Approved Talking Point: "
         f"{sales_session.get('talking_point')}"
     )
+
+    lines.append(
+        f"- Commercial Priority: "
+        f"{sales_session.get('commercial_priority')}"
+    )
+
+    lines.append(
+        f"- Commercial Score: "
+        f"{sales_session.get('commercial_score')}"
+    )
+
+    lines.append(
+        f"- Commercial Blocked: "
+        f"{sales_session.get('commercial_blocked')}"
+    )
+
+    decision_reasons = (
+        sales_session.get(
+            "decision_reasons"
+        )
+        or []
+    )
+
+    if decision_reasons:
+
+        lines.append(
+            "- Decision Reasons:"
+        )
+
+        for reason in decision_reasons:
+
+            lines.append(
+                f"  - {reason}"
+            )
+
+    why_now = (
+        sales_session.get(
+            "why_now"
+        )
+        or []
+    )
+
+    if why_now:
+
+        lines.append(
+            "- Why Now:"
+        )
+
+        for item in why_now:
+
+            lines.append(
+                f"  - {item}"
+            )
+
+    target_context = (
+        sales_session.get(
+            "target_context"
+        )
+        or []
+    )
+
+    inventory_context = (
+        sales_session.get(
+            "inventory_context"
+        )
+        or {}
+    )
+
+    promotion_context = (
+        sales_session.get(
+            "promotion_context"
+        )
+        or []
+    )
+
+    lines.append(
+        ""
+    )
+
+    lines.append(
+        "COMMERCIAL CONTEXT:"
+    )
+
+    if target_context:
+
+        lines.append(
+            "- Target Context:"
+        )
+
+        for target in target_context:
+
+            scope = (
+                target.get(
+                    "scope"
+                )
+                or {}
+            )
+
+            lines.append(
+                "  - "
+                f"{scope.get('type')} "
+                f"{scope.get('code')} "
+                f"| Achievement: "
+                f"{_serialize_value(target.get('achievement_percent'))}% "
+                f"| Remaining: "
+                f"{_serialize_value(target.get('remaining_value'))}"
+            )
+
+    else:
+
+        lines.append(
+            "- Target Context: none"
+        )
+
+    if inventory_context:
+
+        lines.append(
+            f"- Inventory Sellable Quantity: "
+            f"{_serialize_value(inventory_context.get('sellable_quantity'))}"
+        )
+
+        lines.append(
+            f"- Inventory Low Stock: "
+            f"{inventory_context.get('is_low_stock')}"
+        )
+
+        lines.append(
+            f"- Inventory In Stock: "
+            f"{inventory_context.get('is_in_stock')}"
+        )
+
+    else:
+
+        lines.append(
+            "- Inventory Context: not available"
+        )
+
+    if promotion_context:
+
+        lines.append(
+            "- Eligible Promotions:"
+        )
+
+        for promotion in promotion_context:
+
+            lines.append(
+                "  - "
+                f"{promotion.get('code')} "
+                f"| {promotion.get('name')} "
+                f"| Type: "
+                f"{promotion.get('promotion_type')}"
+            )
+
+    else:
+
+        lines.append(
+            "- Eligible Promotions: none"
+        )
 
     lines.append(
         ""

@@ -1079,6 +1079,97 @@
                 grid-template-columns: 1fr;
             }
         }
+        .commercial-decision {
+            margin-top: 12px;
+            padding: 14px;
+            border: 1px solid #e4e8f0;
+            border-radius: 12px;
+            background: #fbfcff;
+        }
+
+        .commercial-decision-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .commercial-decision-eyebrow {
+            margin-bottom: 4px;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.6px;
+            color: #7280a6;
+        }
+
+        .commercial-decision-title {
+            font-size: 13px;
+            font-weight: 900;
+            color: #2d3548;
+        }
+
+        .commercial-decision-badge {
+            padding: 6px 9px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .commercial-decision-high {
+            color: #137a50;
+            background: #e9f8f1;
+        }
+
+        .commercial-decision-medium {
+            color: #8a5a00;
+            background: #fff6df;
+        }
+
+        .commercial-decision-normal {
+            color: #596579;
+            background: #eef1f5;
+        }
+
+        .commercial-decision-blocked {
+            color: #9b1c1c;
+            background: #fff0f0;
+        }
+
+        .commercial-why-now {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #dfe4ed;
+        }
+
+        .commercial-why-now-label {
+            margin-bottom: 6px;
+            font-size: 10px;
+            font-weight: 900;
+            color: #6a7691;
+        }
+
+        .commercial-why-now ul {
+            margin: 0;
+            padding-right: 18px;
+        }
+
+        .commercial-why-now li {
+            margin-bottom: 4px;
+            font-size: 11px;
+            line-height: 1.7;
+            color: #566177;
+        }
+
+        .commercial-blocked-message {
+            margin-top: 10px;
+            padding: 9px 10px;
+            border-radius: 9px;
+            font-size: 11px;
+            font-weight: 800;
+            color: #9b1c1c;
+            background: #fff0f0;
+        }
     </style>
 
 
@@ -1751,6 +1842,85 @@
 
                                                 </div>
 
+                                            {% endif %}
+                                            {% if brief.commercial_decision %}
+
+                                                <div class="commercial-decision">
+
+                                                    <div class="commercial-decision-header">
+
+                                                        <div>
+
+                                                            <div class="commercial-decision-eyebrow">
+                                                                COMMERCIAL DECISION
+                                                            </div>
+
+                                                            <div class="commercial-decision-title">
+                                                                اولویت تجاری این فرصت
+                                                            </div>
+
+                                                        </div>
+
+                                                        <div
+                                                            class="
+                                                                commercial-decision-badge
+
+                                                                {% if brief.commercial_decision.commercial_priority == 'HIGH' %}
+                                                                    commercial-decision-high
+
+                                                                {% elif brief.commercial_decision.commercial_priority == 'MEDIUM' %}
+                                                                    commercial-decision-medium
+
+                                                                {% elif brief.commercial_decision.commercial_priority == 'BLOCKED' %}
+                                                                    commercial-decision-blocked
+
+                                                                {% else %}
+                                                                    commercial-decision-normal
+                                                                {% endif %}
+                                                            "
+                                                        >
+                                                            {{ brief.commercial_decision.commercial_priority }}
+                                                            ·
+                                                            {{ brief.commercial_decision.commercial_score }}
+                                                        </div>
+
+                                                    </div>
+
+
+                                                    {% if brief.commercial_decision.why_now %}
+
+                                                        <div class="commercial-why-now">
+
+                                                            <div class="commercial-why-now-label">
+                                                                چرا الان؟
+                                                            </div>
+
+                                                            <ul>
+
+                                                                {% for reason in brief.commercial_decision.why_now %}
+
+                                                                    <li>
+                                                                        {{ reason }}
+                                                                    </li>
+
+                                                                {% endfor %}
+
+                                                            </ul>
+
+                                                        </div>
+
+                                                    {% endif %}
+
+
+                                                    {% if brief.commercial_decision.commercial_blocked %}
+
+                                                        <div class="commercial-blocked-message">
+                                                            این فرصت در حال حاضر به دلیل محدودیت تجاری قابل اقدام نیست.
+                                                        </div>
+
+                                                    {% endif %}
+
+                                                </div>
                                             {% endif %}
                                         </div>
 
