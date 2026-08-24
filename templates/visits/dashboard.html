@@ -9,8 +9,6 @@
 
 {% block extra_css %}
 
-<style>
-
     <style>
 
         * {
@@ -614,7 +612,161 @@
             }
 
         }
+        .pre-visit-brief {
+            margin-top: 14px;
+            padding: 14px 16px;
+            border: 1px solid #e4e8f1;
+            border-radius: 12px;
+            background: #f8f9fc;
+        }
 
+        .pre-visit-title {
+            margin-bottom: 10px;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.8px;
+            color: #6577a8;
+        }
+
+        .pre-visit-line {
+            margin-top: 6px;
+            font-size: 12px;
+            color: #68738a;
+        }
+
+        .pre-visit-recommendation {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e5e9f1;
+        }
+
+        .pre-visit-product {
+            margin-bottom: 7px;
+            font-size: 14px;
+            font-weight: 900;
+            color: #172033;
+        }
+
+        .pre-visit-recommendation-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 12px;
+            font-size: 11px;
+            color: #657083;
+        }
+
+        .pre-visit-follow-up {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #8a5a00;
+        }
+
+        .pre-visit-empty {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #7b8496;
+        }
+        .visit-priority-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px 12px;
+            margin-bottom: 10px;
+        }
+
+        .visit-priority-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .priority-high {
+            color: #9b1c1c;
+            background: #fff0f0;
+        }
+
+        .priority-medium {
+            color: #8a5a00;
+            background: #fff6df;
+        }
+
+        .priority-normal {
+            color: #536079;
+            background: #eef1f6;
+        }
+
+        .visit-priority-score {
+            font-size: 11px;
+            color: #7a8496;
+        }
+
+        .priority-overview {
+            margin-bottom: 28px;
+            padding: 22px;
+            border: 1px solid #e2e7f0;
+            border-radius: 18px;
+            background: #ffffff;
+        }
+
+        .priority-overview-header {
+            margin-bottom: 16px;
+        }
+
+        .priority-overview-eyebrow {
+            margin-bottom: 6px;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.8px;
+            color: #6577a8;
+        }
+
+        .priority-overview-header h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .priority-overview-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(
+                    3,
+                    minmax(
+                        0,
+                        1fr
+                    )
+                );
+            gap: 12px;
+        }
+
+        .priority-overview-card {
+            padding: 16px;
+            border: 1px solid #e5e9f1;
+            border-radius: 14px;
+            background: #f8f9fc;
+        }
+
+        .priority-overview-label {
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #6f798c;
+        }
+
+        .priority-overview-value {
+            font-size: 26px;
+            font-weight: 900;
+        }
+
+        @media (
+            max-width: 720px
+        ) {
+            .priority-overview-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 
 
@@ -759,6 +911,63 @@
 
         </section>
 
+        <section class="priority-overview">
+
+            <div class="priority-overview-header">
+
+                <div>
+                    <div class="priority-overview-eyebrow">
+                        TODAY'S PRIORITIES
+                    </div>
+
+                    <h2>
+                        اولویت ویزیت‌های امروز
+                    </h2>
+                </div>
+
+            </div>
+
+            <div class="priority-overview-grid">
+
+                <article class="priority-overview-card">
+
+                    <div class="priority-overview-label">
+                        اولویت بالا
+                    </div>
+
+                    <div class="priority-overview-value">
+                        {{ priority_summary.high }}
+                    </div>
+
+                </article>
+
+                <article class="priority-overview-card">
+
+                    <div class="priority-overview-label">
+                        اولویت متوسط
+                    </div>
+
+                    <div class="priority-overview-value">
+                        {{ priority_summary.medium }}
+                    </div>
+
+                </article>
+
+                <article class="priority-overview-card">
+
+                    <div class="priority-overview-label">
+                        اولویت عادی
+                    </div>
+
+                    <div class="priority-overview-value">
+                        {{ priority_summary.normal }}
+                    </div>
+
+                </article>
+
+            </div>
+
+        </section>
 
         <section class="visit-section">
 
@@ -830,6 +1039,121 @@
 
                         </div>
 
+                        {% with brief=visit.pre_visit_brief %}
+
+                            {% if brief %}
+
+                            <div class="visit-priority-row">
+
+                                <span
+                                    class="
+                                        visit-priority-badge
+
+                                        {% if brief.priority_level == 'HIGH' %}
+                                            priority-high
+                                        {% elif brief.priority_level == 'MEDIUM' %}
+                                            priority-medium
+                                        {% else %}
+                                            priority-normal
+                                        {% endif %}
+                                    "
+                                >
+                                    {% if brief.priority_level == "HIGH" %}
+                                        اولویت بالا
+                                    {% elif brief.priority_level == "MEDIUM" %}
+                                        اولویت متوسط
+                                    {% else %}
+                                        اولویت عادی
+                                    {% endif %}
+                                </span>
+
+                                <span class="visit-priority-score">
+                                    Priority Score:
+                                    {{ brief.priority_score }}
+                                </span>
+
+                            </div>
+                                <div class="pre-visit-brief">
+
+                                    <div class="pre-visit-title">
+                                        PRE-VISIT BRIEF
+                                    </div>
+
+                                    {% if brief.customer.days_since_last_purchase is not None %}
+
+                                        <div class="pre-visit-line">
+                                            آخرین خرید:
+                                            <strong>
+                                                {{ brief.customer.days_since_last_purchase }}
+                                                روز قبل
+                                            </strong>
+                                        </div>
+
+                                    {% endif %}
+
+                                    {% if brief.customer.top_category %}
+
+                                        <div class="pre-visit-line">
+                                            دسته برتر:
+                                            <strong>
+                                                {{ brief.customer.top_category }}
+                                            </strong>
+                                        </div>
+
+                                    {% endif %}
+
+                                    {% if brief.primary_recommendation %}
+
+                                        <div class="pre-visit-recommendation">
+
+                                            <div class="pre-visit-product">
+                                                {{ brief.primary_recommendation.product_name }}
+                                            </div>
+
+                                            <div class="pre-visit-recommendation-meta">
+
+                                                <span>
+                                                    Score:
+                                                    {{ brief.primary_recommendation.score|floatformat:0 }}
+                                                </span>
+
+                                                <span>
+                                                    Confidence:
+                                                    {{ brief.primary_recommendation.confidence_score|floatformat:0 }}%
+                                                </span>
+
+                                                <span>
+                                                    {{ brief.primary_recommendation.recommendation_type }}
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+                                    {% else %}
+
+                                        <div class="pre-visit-empty">
+                                            پیشنهاد فعالی برای این مشتری وجود ندارد.
+                                        </div>
+
+                                    {% endif %}
+
+                                    {% if brief.open_follow_up_count %}
+
+                                        <div class="pre-visit-follow-up">
+                                            پیگیری باز:
+                                            <strong>
+                                                {{ brief.open_follow_up_count }}
+                                            </strong>
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                            {% endif %}
+
+                        {% endwith %}
 
                         <div class="visit-actions">
 

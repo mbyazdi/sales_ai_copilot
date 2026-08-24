@@ -17,6 +17,9 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from rest_framework.permissions import IsAuthenticated
+from .services import (
+    build_pre_visit_briefs,
+)
 
 def recommendation_performance_dashboard(request):
     return render(
@@ -94,14 +97,82 @@ def salesperson_dashboard(request):
         ).count(),
     }
 
+    visit_list = list(
+        visits
+    )
+
+    pre_visit_briefs = (
+        build_pre_visit_briefs(
+            visits=visit_list,
+            salesperson=salesperson,
+        )
+    )
+
+    for visit in visit_list:
+        visit.pre_visit_brief = (
+            pre_visit_briefs.get(
+                visit.id,
+                {},
+            )
+        )
+
+    visit_list.sort(
+        key=lambda visit: (
+            -visit.pre_visit_brief.get(
+                "priority_score",
+                0,
+            ),
+            visit.id,
+        )
+    )
+
+    priority_summary = {
+        "high": sum(
+            1
+            for visit in visit_list
+            if (
+                visit.pre_visit_brief.get(
+                    "priority_level"
+                )
+                == "HIGH"
+            )
+        ),
+
+        "medium": sum(
+            1
+            for visit in visit_list
+            if (
+                visit.pre_visit_brief.get(
+                    "priority_level"
+                )
+                == "MEDIUM"
+            )
+        ),
+
+        "normal": sum(
+            1
+            for visit in visit_list
+            if (
+                visit.pre_visit_brief.get(
+                    "priority_level"
+                )
+                == "NORMAL"
+            )
+        ),
+    }
     return render(
         request,
         "visits/dashboard.html",
         {
             "salesperson": salesperson,
             "today": today,
-            "visits": visits,
+            "visits": visit_list,
             "summary": summary,
+
+            "priority_summary": (
+                priority_summary
+            ),
+
             "error": None,
         },
     )
