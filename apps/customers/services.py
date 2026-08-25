@@ -416,6 +416,7 @@ def build_sales_ai_context(
     current_visit=None,
     sales_session=None,
     recommendations=None,
+    outcome_history=None,
 ):
     """
     Build a normalized sales context for AI Copilot.
@@ -430,6 +431,10 @@ def build_sales_ai_context(
 
     recommendations = (
         recommendations or []
+    )
+
+    outcome_history = (
+        outcome_history or {}
     )
 
     # =====================================================
@@ -587,5 +592,9 @@ def build_sales_ai_context(
 
         "recommendations": (
             recommendation_data
+        ),
+
+        "outcome_history": (
+            outcome_history
         ),
     }

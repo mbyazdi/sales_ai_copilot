@@ -22,6 +22,7 @@ from apps.targets.services import (
 )
 
 from apps.visits.services import (
+    build_customer_outcome_history,
     build_pre_visit_briefs,
 )
 
@@ -255,6 +256,13 @@ class SalesCopilotAPIView(APIView):
             )
         )
 
+        outcome_history = (
+            build_customer_outcome_history(
+                customer=customer,
+                limit=10,
+            )
+        )
+
         # =========================================
         # AI CONTEXT
         # =========================================
@@ -266,6 +274,9 @@ class SalesCopilotAPIView(APIView):
                 current_visit=current_visit,
                 sales_session=sales_session,
                 recommendations=recommendations,
+                outcome_history=(
+                    outcome_history
+                ),
             )
         )
 

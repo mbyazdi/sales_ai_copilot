@@ -48,6 +48,13 @@ def build_sales_copilot_prompt(
         or []
     )
 
+    outcome_history = (
+        sales_ai_context.get(
+            "outcome_history"
+        )
+        or {}
+    )
+
     lines = []
 
     lines.append(
@@ -405,6 +412,178 @@ def build_sales_copilot_prompt(
     )
 
     # =====================================================
+    # HISTORICAL OUTCOME FACTS
+    # =====================================================
+
+    lines.append(
+        "HISTORICAL OUTCOME FACTS:"
+    )
+
+    if outcome_history:
+
+        history_customer = (
+            outcome_history.get(
+                "customer"
+            )
+            or {}
+        )
+
+        history_totals = (
+            outcome_history.get(
+                "totals"
+            )
+            or {}
+        )
+
+        history_items = (
+            outcome_history.get(
+                "history"
+            )
+            or []
+        )
+
+        lines.append(
+            f"- Customer Code: "
+            f"{history_customer.get('customer_code')}"
+        )
+
+        lines.append(
+            f"- Historical Final Visits: "
+            f"{_serialize_value(outcome_history.get('history_count'))}"
+        )
+
+        lines.append(
+            f"- Resolved Recommendations: "
+            f"{_serialize_value(history_totals.get('resolved_recommendations'))}"
+        )
+
+        lines.append(
+            f"- Purchased Outcomes: "
+            f"{_serialize_value(history_totals.get('purchased'))}"
+        )
+
+        lines.append(
+            f"- Interested Outcomes: "
+            f"{_serialize_value(history_totals.get('interested'))}"
+        )
+
+        lines.append(
+            f"- Follow-Up Outcomes: "
+            f"{_serialize_value(history_totals.get('follow_up'))}"
+        )
+
+        lines.append(
+            f"- Rejected Outcomes: "
+            f"{_serialize_value(history_totals.get('rejected'))}"
+        )
+
+        lines.append(
+            f"- Not Presented Outcomes: "
+            f"{_serialize_value(history_totals.get('not_presented'))}"
+        )
+
+        lines.append(
+            f"- Historical Sold Quantity: "
+            f"{_serialize_value(history_totals.get('total_quantity'))}"
+        )
+
+        lines.append(
+            f"- Historical Revenue: "
+            f"{_serialize_value(history_totals.get('total_revenue'))}"
+        )
+
+        if history_items:
+
+            lines.append(
+                "- Historical Visit Facts:"
+            )
+
+            for history_item in history_items:
+
+                visit_data = (
+                    history_item.get(
+                        "visit"
+                    )
+                    or {}
+                )
+
+                summary_data = (
+                    history_item.get(
+                        "summary"
+                    )
+                    or {}
+                )
+
+                lines.append(
+                    "  - "
+                    f"Visit {visit_data.get('id')} "
+                    f"| Date: {visit_data.get('visit_date')} "
+                    f"| Status: {visit_data.get('status')} "
+                    f"| Purchased: "
+                    f"{_serialize_value(summary_data.get('purchased'))} "
+                    f"| Interested: "
+                    f"{_serialize_value(summary_data.get('interested'))} "
+                    f"| Follow-Up: "
+                    f"{_serialize_value(summary_data.get('follow_up'))} "
+                    f"| Rejected: "
+                    f"{_serialize_value(summary_data.get('rejected'))} "
+                    f"| Revenue: "
+                    f"{_serialize_value(summary_data.get('total_revenue'))}"
+                )
+
+    else:
+
+        lines.append(
+            "- No historical outcome facts available."
+        )
+
+    lines.append(
+        ""
+    )
+
+    lines.append(
+        "HISTORICAL OUTCOME GUARDRAILS:"
+    )
+
+    lines.append(
+        "- Historical outcome data describes recorded past events only."
+    )
+
+    lines.append(
+        "- Do NOT use historical outcome counts to predict future purchase behavior."
+    )
+
+    lines.append(
+        "- Do NOT convert historical outcomes into probability, propensity, likelihood, intent, or confidence."
+    )
+
+    lines.append(
+        "- Do NOT claim that past purchases imply the customer will purchase again."
+    )
+
+    lines.append(
+        "- Do NOT infer customer preference from historical outcome counts alone."
+    )
+
+    lines.append(
+        "- Do NOT treat historical revenue as evidence of future revenue."
+    )
+
+    lines.append(
+        "- You MAY summarize historical outcome facts when they are relevant to the salesperson's question."
+    )
+
+    lines.append(
+        "- When referring to historical outcomes, use factual wording such as "
+        "'در سوابق ثبت‌شده...' or "
+        "'در ویزیت‌های قبلی ثبت‌شده...'."
+    )
+
+    lines.append(
+        ""
+    )
+
+    # =====================================================
     # AUTHORITATIVE RECOMMENDATION
     # =====================================================
 
@@ -492,6 +671,22 @@ def build_sales_copilot_prompt(
     lines.append(
         "- Use only facts explicitly present "
         "in this context."
+    )
+
+    lines.append(
+        "- Historical Outcome Facts are authoritative records of past events only."
+    )
+
+    lines.append(
+        "- Never transform Historical Outcome Facts into a prediction about the current visit."
+    )
+
+    lines.append(
+        "- Never state or imply purchase probability, purchase likelihood, customer intent, or propensity unless such a value is explicitly provided by an approved predictive model."
+    )
+
+    lines.append(
+        "- No approved predictive model output is available in the current context unless explicitly stated."
     )
 
     lines.append(

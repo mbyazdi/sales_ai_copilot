@@ -57,7 +57,6 @@ class Salesperson(models.Model):
     def __str__(self):
         return f"{self.employee_code} - {self.full_name}"
 
-
 class CustomerAssignment(models.Model):
     """
     Assigns customers to salespersons.
@@ -100,7 +99,6 @@ class CustomerAssignment(models.Model):
             f"{self.salesperson} → "
             f"{self.customer}"
         )
-
 
 class Visit(models.Model):
     """
@@ -198,6 +196,233 @@ class Visit(models.Model):
             f"{self.visit_date} - "
             f"{self.customer.name} - "
             f"{self.salesperson.full_name}"
+        )
+
+class VisitCustomerSnapshot(models.Model):
+    """
+    Immutable customer feature snapshot captured
+    when a sales visit starts.
+
+    This snapshot is intended for historical analysis
+    and future ML dataset generation.
+
+    It must not be refreshed from current Customer360 data.
+    """
+
+    visit = models.OneToOneField(
+        "Visit",
+        on_delete=models.CASCADE,
+        related_name="customer_snapshot",
+    )
+
+    customer = models.ForeignKey(
+        "customers.Customer",
+        on_delete=models.PROTECT,
+        related_name="visit_snapshots",
+    )
+
+    customer_grade_code = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+    )
+
+    segment = models.CharField(
+        max_length=30,
+        null=True,
+        blank=True,
+    )
+
+    total_orders = models.PositiveIntegerField(
+        default=0,
+    )
+
+    total_sales_amount = models.DecimalField(
+        max_digits=18,
+        decimal_places=2,
+        default=0,
+    )
+
+    average_order_value = models.DecimalField(
+        max_digits=18,
+        decimal_places=2,
+        default=0,
+    )
+
+    days_since_last_purchase = models.PositiveIntegerField(
+        default=0,
+    )
+
+    recency_score = models.PositiveIntegerField(
+        default=0,
+    )
+
+    frequency_score = models.PositiveIntegerField(
+        default=0,
+    )
+
+    monetary_score = models.PositiveIntegerField(
+        default=0,
+    )
+
+    rfm_score = models.PositiveIntegerField(
+        default=0,
+    )
+
+    top_category = models.CharField(
+        max_length=200,
+        null=True,
+        blank=True,
+    )
+
+    top_product_code = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+    )
+
+    captured_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    source_customer360_calculated_at = (
+        models.DateTimeField(
+            null=True,
+            blank=True,
+        )
+    )
+
+    class Meta:
+        ordering = [
+            "-captured_at",
+            "-id",
+        ]
+
+    def __str__(self):
+        return (
+            f"Visit {self.visit_id} / "
+            f"{self.customer.customer_code}"
+        )
+
+class VisitCommercialSnapshot(models.Model):
+    """
+    Immutable commercial decision snapshot captured
+    when a sales visit starts.
+
+    This snapshot freezes the commercial context and
+    decision signals that were available at decision time.
+
+    It must not be refreshed from current inventory,
+    promotion, target, or commercial decision data.
+    """
+
+    visit = models.OneToOneField(
+        "Visit",
+        on_delete=models.CASCADE,
+        related_name="commercial_snapshot",
+    )
+
+    customer = models.ForeignKey(
+        "customers.Customer",
+        on_delete=models.PROTECT,
+        related_name="commercial_visit_snapshots",
+    )
+
+    salesperson = models.ForeignKey(
+        "Salesperson",
+        on_delete=models.PROTECT,
+        related_name="commercial_visit_snapshots",
+    )
+
+    # ---------------------------------------------
+    # Primary recommendation / decision identity
+    # ---------------------------------------------
+
+    primary_product_code = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+    )
+
+    recommendation_type = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+    )
+
+    # ---------------------------------------------
+    # Commercial decision
+    # ---------------------------------------------
+
+    commercial_score = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+
+    commercial_priority = models.CharField(
+        max_length=30,
+        null=True,
+        blank=True,
+    )
+
+    commercial_blocked = models.BooleanField(
+        default=False,
+    )
+
+    # ---------------------------------------------
+    # Decision-time commercial facts
+    # ---------------------------------------------
+
+    target_context = models.JSONField(
+        default=list,
+        blank=True,
+    )
+
+    inventory_context = models.JSONField(
+        default=dict,
+        blank=True,
+    )
+
+    promotion_context = models.JSONField(
+        default=list,
+        blank=True,
+    )
+
+    commercial_signals = models.JSONField(
+        default=list,
+        blank=True,
+    )
+
+    decision_reasons = models.JSONField(
+        default=list,
+        blank=True,
+    )
+
+    why_now = models.JSONField(
+        default=list,
+        blank=True,
+    )
+
+    # ---------------------------------------------
+    # Snapshot metadata
+    # ---------------------------------------------
+
+    captured_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    class Meta:
+        ordering = [
+            "-captured_at",
+            "-id",
+        ]
+
+    def __str__(self):
+        return (
+            f"Commercial / Visit {self.visit_id} / "
+            f"{self.customer.customer_code}"
         )
 
 class SalesOutcome(models.Model):

@@ -19,6 +19,8 @@ from django.contrib.auth.decorators import login_required
 from rest_framework.permissions import IsAuthenticated
 from .services import (
     build_pre_visit_briefs,
+    capture_visit_customer_snapshot,
+    capture_visit_commercial_snapshot,
 )
 from apps.targets.services import (
     get_salesperson_target_progress,
@@ -1384,6 +1386,18 @@ class VisitStartAPIView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+        # =========================================
+        # IMMUTABLE CUSTOMER SNAPSHOT
+        # =========================================
+
+        capture_visit_commercial_snapshot(
+            visit=visit
+        )
+
+        capture_visit_customer_snapshot(
+            visit=visit
+        )
 
         visit.status = (
             Visit.VisitStatus.IN_PROGRESS

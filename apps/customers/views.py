@@ -17,6 +17,7 @@ from apps.visits.models import (
 from apps.sales.services import get_customer_sales_history
 
 from apps.visits.services import (
+    build_customer_outcome_history,
     build_pre_visit_briefs,
     resolve_recommendation_outcome,
 )
@@ -259,6 +260,12 @@ def customer_search(request):
                     )
                 )
 
+                outcome_history = (
+                    build_customer_outcome_history(
+                        customer=customer,
+                        limit=10,
+                    )
+                )
                 # -------------------------------------
                 # AI CONTEXT
                 # -------------------------------------
@@ -272,6 +279,9 @@ def customer_search(request):
                             "sales_session"
                         ),
                         recommendations=recommendations,
+                        outcome_history=(
+                            outcome_history
+                        ),
                     )
                 )
 
