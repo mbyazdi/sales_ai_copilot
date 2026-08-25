@@ -2091,6 +2091,2369 @@ def get_recommendation_performance(customer=None):
 
     return result
 
+def build_outcome_analytics_contract(
+    customer=None,
+):
+    """
+    Build the canonical V2.9 outcome analytics contract.
+
+    Important:
+    - Raw SalesOutcome rows are never counted directly
+      as final recommendation outcomes.
+    - Final outcomes are resolved per Visit + Recommendation
+      using resolve_recommendation_outcome().
+    - NOT_PRESENTED is excluded from the presented denominator.
+    - No ML prediction or causal inference is performed.
+    """
+
+    from collections import defaultdict
+
+    queryset = (
+        SalesOutcome.objects
+        .filter(
+            recommendation__isnull=False,
+        )
+        .select_related(
+            "visit",
+            "visit__customer",
+            "recommendation",
+        )
+    )
+
+    if customer is not None:
+
+        queryset = queryset.filter(
+            visit__customer=customer
+        )
+
+    pairs = (
+        queryset
+        .order_by()
+        .values(
+            "visit_id",
+            "recommendation_id",
+
+            "visit__salesperson_id",
+            "visit__salesperson__employee_code",
+            "visit__salesperson__first_name",
+            "visit__salesperson__last_name",
+
+            "recommendation__recommendation_type",
+
+            "recommendation__product_id",
+            "recommendation__product__product_code",
+            "recommendation__product__name",
+
+            "recommendation__product__brand__code",
+            "recommendation__product__brand__name",
+
+            "recommendation__product__category__code",
+            "recommendation__product__category__name",
+
+            "recommendation__product__product_group",
+        )
+        .distinct()
+    )
+
+    def empty_metrics():
+
+        return {
+            "resolved_recommendations": 0,
+            "presented": 0,
+            "purchased": 0,
+            "interested": 0,
+            "follow_up": 0,
+            "rejected": 0,
+            "not_presented": 0,
+            "total_quantity": 0,
+            "total_revenue": 0.0,
+        }
+
+    summary_metrics = empty_metrics()
+
+    grouped_metrics = defaultdict(
+        empty_metrics
+    )
+
+    product_metrics = defaultdict(
+        empty_metrics
+    )
+
+    product_dimensions = {}
+
+    salesperson_metrics = defaultdict(
+        empty_metrics
+    )
+
+    salesperson_dimensions = {}
+    # =====================================================
+    # CANONICAL RESOLVED OUTCOMES
+    # =====================================================
+
+    for pair in pairs:
+
+        recommendation_type = (
+            pair[
+                "recommendation__recommendation_type"
+            ]
+        )
+
+        if not recommendation_type:
+            continue
+
+        product_id = (
+            pair.get(
+                "recommendation__product_id"
+            )
+        )
+
+        if product_id is not None:
+
+            product_dimensions[
+                product_id
+            ] = {
+                "product_id": (
+                    product_id
+                ),
+
+                "product_code": (
+                    pair.get(
+                        "recommendation__product__product_code"
+                    )
+                ),
+
+                "product_name": (
+                    pair.get(
+                        "recommendation__product__name"
+                    )
+                ),
+
+                "brand_code": (
+                    pair.get(
+                        "recommendation__product__brand__code"
+                    )
+                ),
+
+                "brand_name": (
+                    pair.get(
+                        "recommendation__product__brand__name"
+                    )
+                ),
+
+                "category_code": (
+                    pair.get(
+                        "recommendation__product__category__code"
+                    )
+                ),
+
+                "category_name": (
+                    pair.get(
+                        "recommendation__product__category__name"
+                    )
+                ),
+
+                "product_group": (
+                    pair.get(
+                        "recommendation__product__product_group"
+                    )
+                ),
+            }
+
+        salesperson_id = (
+            pair.get(
+                "visit__salesperson_id"
+            )
+        )
+
+        if salesperson_id is not None:
+
+            first_name = (
+                pair.get(
+                    "visit__salesperson__first_name"
+                )
+                or ""
+            )
+
+            last_name = (
+                pair.get(
+                    "visit__salesperson__last_name"
+                )
+                or ""
+            )
+
+            salesperson_dimensions[
+                salesperson_id
+            ] = {
+                "salesperson_id": (
+                    salesperson_id
+                ),
+
+                "employee_code": (
+                    pair.get(
+                        "visit__salesperson__employee_code"
+                    )
+                ),
+
+                "first_name": (
+                    first_name
+                ),
+
+                "last_name": (
+                    last_name
+                ),
+
+                "full_name": (
+                    f"{first_name} {last_name}"
+                    .strip()
+                ),
+            }
+
+        resolved = (
+            resolve_recommendation_outcome(
+                visit_id=(
+                    pair["visit_id"]
+                ),
+                recommendation_id=(
+                    pair["recommendation_id"]
+                ),
+            )
+        )
+
+        if not resolved:
+            continue
+
+        outcome_name = (
+            resolved.get(
+                "outcome"
+            )
+        )
+
+        quantity = int(
+            resolved.get(
+                "quantity"
+            )
+            or 0
+        )
+
+        sales_amount = float(
+            resolved.get(
+                "sales_amount"
+            )
+            or 0
+        )
+
+        targets = [
+            summary_metrics,
+            grouped_metrics[
+                recommendation_type
+            ],
+        ]
+
+        if product_id is not None:
+
+            targets.append(
+                product_metrics[
+                    product_id
+                ]
+            )
+
+        if salesperson_id is not None:
+
+            targets.append(
+                salesperson_metrics[
+                    salesperson_id
+                ]
+            )
+
+        for metrics in targets:
+
+            metrics[
+                "resolved_recommendations"
+            ] += 1
+
+            if outcome_name == "PURCHASED":
+
+                metrics[
+                    "presented"
+                ] += 1
+
+                metrics[
+                    "purchased"
+                ] += 1
+
+                metrics[
+                    "total_quantity"
+                ] += quantity
+
+                metrics[
+                    "total_revenue"
+                ] += sales_amount
+
+            elif outcome_name == "INTERESTED":
+
+                metrics[
+                    "presented"
+                ] += 1
+
+                metrics[
+                    "interested"
+                ] += 1
+
+            elif outcome_name == "FOLLOW_UP":
+
+                metrics[
+                    "presented"
+                ] += 1
+
+                metrics[
+                    "follow_up"
+                ] += 1
+
+            elif outcome_name == "REJECTED":
+
+                metrics[
+                    "presented"
+                ] += 1
+
+                metrics[
+                    "rejected"
+                ] += 1
+
+            elif outcome_name == "NOT_PRESENTED":
+
+                metrics[
+                    "not_presented"
+                ] += 1
+
+    # =====================================================
+    # NORMALIZATION
+    # =====================================================
+
+    def normalize_metrics(
+        metrics,
+    ):
+
+        resolved_recommendations = (
+            metrics[
+                "resolved_recommendations"
+            ]
+        )
+
+        presented = (
+            metrics[
+                "presented"
+            ]
+        )
+
+        purchased = (
+            metrics[
+                "purchased"
+            ]
+        )
+
+        interested = (
+            metrics[
+                "interested"
+            ]
+        )
+
+        follow_up = (
+            metrics[
+                "follow_up"
+            ]
+        )
+
+        rejected = (
+            metrics[
+                "rejected"
+            ]
+        )
+
+        not_presented = (
+            metrics[
+                "not_presented"
+            ]
+        )
+
+        total_quantity = (
+            metrics[
+                "total_quantity"
+            ]
+        )
+
+        total_revenue = float(
+            metrics[
+                "total_revenue"
+            ]
+            or 0
+        )
+
+        conversion_rate = (
+            (
+                purchased
+                / presented
+            )
+            * 100
+            if presented
+            else 0
+        )
+
+        interest_rate = (
+            (
+                interested
+                / presented
+            )
+            * 100
+            if presented
+            else 0
+        )
+
+        follow_up_rate = (
+            (
+                follow_up
+                / presented
+            )
+            * 100
+            if presented
+            else 0
+        )
+
+        rejection_rate = (
+            (
+                rejected
+                / presented
+            )
+            * 100
+            if presented
+            else 0
+        )
+
+        engagement_rate = (
+            (
+                purchased
+                + interested
+                + follow_up
+            )
+            / presented
+            * 100
+            if presented
+            else 0
+        )
+
+        average_revenue = (
+            total_revenue
+            / purchased
+            if purchased
+            else 0
+        )
+
+        if presented == 0:
+
+            data_quality = (
+                "NO_PRESENTED_DATA"
+            )
+
+        elif presented < 3:
+
+            data_quality = (
+                "INSUFFICIENT_DATA"
+            )
+
+        elif presented < 10:
+
+            data_quality = (
+                "LIMITED_DATA"
+            )
+
+        else:
+
+            data_quality = (
+                "SUFFICIENT_DATA"
+            )
+
+        return {
+            "resolved_recommendations": (
+                resolved_recommendations
+            ),
+
+            "presented": presented,
+
+            "purchased": purchased,
+
+            "interested": interested,
+
+            "follow_up": follow_up,
+
+            "rejected": rejected,
+
+            "not_presented": (
+                not_presented
+            ),
+
+            "total_quantity": (
+                total_quantity
+            ),
+
+            "total_revenue": round(
+                total_revenue,
+                2,
+            ),
+
+            "average_revenue": round(
+                average_revenue,
+                2,
+            ),
+
+            "conversion_rate": round(
+                conversion_rate,
+                2,
+            ),
+
+            "interest_rate": round(
+                interest_rate,
+                2,
+            ),
+
+            "follow_up_rate": round(
+                follow_up_rate,
+                2,
+            ),
+
+            "rejection_rate": round(
+                rejection_rate,
+                2,
+            ),
+
+            "engagement_rate": round(
+                engagement_rate,
+                2,
+            ),
+
+            "data_quality": (
+                data_quality
+            ),
+        }
+
+    # =====================================================
+    # GROUPS
+    # =====================================================
+
+    groups = []
+
+    for (
+        recommendation_type,
+        metrics,
+    ) in grouped_metrics.items():
+
+        normalized = (
+            normalize_metrics(
+                metrics
+            )
+        )
+
+        groups.append({
+            "recommendation_type": (
+                recommendation_type
+            ),
+            **normalized,
+        })
+
+    groups.sort(
+        key=lambda item: (
+            item[
+                "recommendation_type"
+            ]
+            or ""
+        )
+    )
+
+    # =====================================================
+    # PRODUCT GROUPS
+    # =====================================================
+
+    product_groups = []
+
+    for (
+        product_id,
+        metrics,
+    ) in product_metrics.items():
+
+        normalized = (
+            normalize_metrics(
+                metrics
+            )
+        )
+
+        dimension = (
+            product_dimensions.get(
+                product_id,
+                {},
+            )
+        )
+
+        product_groups.append({
+            "product_id": (
+                dimension.get(
+                    "product_id"
+                )
+            ),
+
+            "product_code": (
+                dimension.get(
+                    "product_code"
+                )
+            ),
+
+            "product_name": (
+                dimension.get(
+                    "product_name"
+                )
+            ),
+
+            "brand_code": (
+                dimension.get(
+                    "brand_code"
+                )
+            ),
+
+            "brand_name": (
+                dimension.get(
+                    "brand_name"
+                )
+            ),
+
+            "category_code": (
+                dimension.get(
+                    "category_code"
+                )
+            ),
+
+            "category_name": (
+                dimension.get(
+                    "category_name"
+                )
+            ),
+
+            "product_group": (
+                dimension.get(
+                    "product_group"
+                )
+            ),
+
+            **normalized,
+        })
+
+    product_groups.sort(
+        key=lambda item: (
+            item[
+                "product_code"
+            ]
+            or ""
+        )
+    )
+    # =====================================================
+    # SALESPERSON GROUPS
+    # =====================================================
+
+    salesperson_groups = []
+
+    for (
+        salesperson_id,
+        metrics,
+    ) in salesperson_metrics.items():
+
+        normalized = (
+            normalize_metrics(
+                metrics
+            )
+        )
+
+        dimension = (
+            salesperson_dimensions.get(
+                salesperson_id,
+                {},
+            )
+        )
+
+        salesperson_groups.append({
+            "salesperson_id": (
+                dimension.get(
+                    "salesperson_id"
+                )
+            ),
+
+            "employee_code": (
+                dimension.get(
+                    "employee_code"
+                )
+            ),
+
+            "first_name": (
+                dimension.get(
+                    "first_name"
+                )
+            ),
+
+            "last_name": (
+                dimension.get(
+                    "last_name"
+                )
+            ),
+
+            "full_name": (
+                dimension.get(
+                    "full_name"
+                )
+            ),
+
+            **normalized,
+        })
+
+    salesperson_groups.sort(
+        key=lambda item: (
+            item[
+                "employee_code"
+            ]
+            or ""
+        )
+    )
+
+    summary = (
+        normalize_metrics(
+            summary_metrics
+        )
+    )
+
+    # =====================================================
+    # CONTRACT
+    # =====================================================
+
+    return {
+        "ready": (
+            summary[
+                "resolved_recommendations"
+            ]
+            > 0
+        ),
+
+        "reason": (
+            "OUTCOME_ANALYTICS_READY"
+            if (
+                summary[
+                    "resolved_recommendations"
+                ]
+                > 0
+            )
+            else "NO_RESOLVED_RECOMMENDATION_OUTCOMES"
+        ),
+
+        "schema_version": (
+            "V2.9.1"
+        ),
+
+        "scope": {
+            "customer_id": (
+                customer.id
+                if customer is not None
+                else None
+            ),
+
+            "customer_code": (
+                customer.customer_code
+                if customer is not None
+                else None
+            ),
+
+            "outcome_resolution": (
+                "VISIT_RECOMMENDATION_CANONICAL"
+            ),
+
+            "presented_definition": (
+                "RESOLVED_EXCLUDING_NOT_PRESENTED"
+            ),
+        },
+
+        "summary": summary,
+
+        "groups": groups,
+
+        "product_groups": (
+            product_groups
+        ),
+
+        "salesperson_groups": (
+            salesperson_groups
+        ),
+
+        "analytics_rules": {
+            "raw_outcome_rows_used_as_final": (
+                False
+            ),
+
+            "not_presented_in_denominator": (
+                False
+            ),
+
+            "ml_prediction_used": False,
+
+            "causal_inference_used": False,
+        },
+    }
+
+def build_recommendation_type_analytics(
+    customer=None,
+):
+    """
+    Build V2.9.2 recommendation-type performance analytics.
+
+    This layer is descriptive only.
+
+    It uses the canonical V2.9.1 outcome analytics contract
+    and does not modify recommendation decisions.
+
+    Important:
+    - NOT_PRESENTED is excluded from presented denominators.
+    - No causal inference is performed.
+    - No ML prediction or training is performed.
+    """
+
+    base_contract = (
+        build_outcome_analytics_contract(
+            customer=customer
+        )
+    )
+
+    groups = (
+        base_contract.get(
+            "groups"
+        )
+        or []
+    )
+
+    items = []
+
+    for group in groups:
+
+        item = {
+            "recommendation_type": (
+                group.get(
+                    "recommendation_type"
+                )
+            ),
+
+            "resolved_recommendations": (
+                group.get(
+                    "resolved_recommendations",
+                    0,
+                )
+            ),
+
+            "presented": (
+                group.get(
+                    "presented",
+                    0,
+                )
+            ),
+
+            "purchased": (
+                group.get(
+                    "purchased",
+                    0,
+                )
+            ),
+
+            "interested": (
+                group.get(
+                    "interested",
+                    0,
+                )
+            ),
+
+            "follow_up": (
+                group.get(
+                    "follow_up",
+                    0,
+                )
+            ),
+
+            "rejected": (
+                group.get(
+                    "rejected",
+                    0,
+                )
+            ),
+
+            "not_presented": (
+                group.get(
+                    "not_presented",
+                    0,
+                )
+            ),
+
+            "total_quantity": (
+                group.get(
+                    "total_quantity",
+                    0,
+                )
+            ),
+
+            "total_revenue": (
+                group.get(
+                    "total_revenue",
+                    0,
+                )
+            ),
+
+            "average_revenue": (
+                group.get(
+                    "average_revenue",
+                    0,
+                )
+            ),
+
+            "conversion_rate": (
+                group.get(
+                    "conversion_rate",
+                    0,
+                )
+            ),
+
+            "interest_rate": (
+                group.get(
+                    "interest_rate",
+                    0,
+                )
+            ),
+
+            "follow_up_rate": (
+                group.get(
+                    "follow_up_rate",
+                    0,
+                )
+            ),
+
+            "rejection_rate": (
+                group.get(
+                    "rejection_rate",
+                    0,
+                )
+            ),
+
+            "engagement_rate": (
+                group.get(
+                    "engagement_rate",
+                    0,
+                )
+            ),
+
+            "data_quality": (
+                group.get(
+                    "data_quality"
+                )
+            ),
+        }
+
+        items.append(
+            item
+        )
+
+    # =====================================================
+    # RANKINGS
+    # =====================================================
+
+    eligible_for_ranking = [
+        item
+        for item in items
+        if item[
+            "presented"
+        ] > 0
+    ]
+
+    best_conversion = None
+    best_revenue = None
+    best_engagement = None
+
+    if eligible_for_ranking:
+
+        best_conversion = max(
+            eligible_for_ranking,
+            key=lambda item: (
+                item[
+                    "conversion_rate"
+                ],
+                item[
+                    "presented"
+                ],
+                item[
+                    "recommendation_type"
+                ]
+                or "",
+            ),
+        )
+
+        best_revenue = max(
+            eligible_for_ranking,
+            key=lambda item: (
+                item[
+                    "total_revenue"
+                ],
+                item[
+                    "purchased"
+                ],
+                item[
+                    "recommendation_type"
+                ]
+                or "",
+            ),
+        )
+
+        best_engagement = max(
+            eligible_for_ranking,
+            key=lambda item: (
+                item[
+                    "engagement_rate"
+                ],
+                item[
+                    "presented"
+                ],
+                item[
+                    "recommendation_type"
+                ]
+                or "",
+            ),
+        )
+
+    # =====================================================
+    # DISPLAY ORDER
+    # =====================================================
+
+    items.sort(
+        key=lambda item: (
+            -item[
+                "conversion_rate"
+            ],
+            -item[
+                "presented"
+            ],
+            item[
+                "recommendation_type"
+            ]
+            or "",
+        )
+    )
+
+    # =====================================================
+    # CONTRACT
+    # =====================================================
+
+    return {
+        "ready": (
+            base_contract.get(
+                "ready",
+                False,
+            )
+        ),
+
+        "reason": (
+            "RECOMMENDATION_TYPE_ANALYTICS_READY"
+            if base_contract.get(
+                "ready"
+            )
+            else (
+                base_contract.get(
+                    "reason"
+                )
+                or "NO_ANALYTICS_DATA"
+            )
+        ),
+
+        "schema_version": (
+            "V2.9.2"
+        ),
+
+        "source_contract_schema_version": (
+            base_contract.get(
+                "schema_version"
+            )
+        ),
+
+        "scope": (
+            base_contract.get(
+                "scope"
+            )
+            or {}
+        ),
+
+        "summary": (
+            base_contract.get(
+                "summary"
+            )
+            or {}
+        ),
+
+        "ranking": {
+            "best_conversion_type": (
+                best_conversion[
+                    "recommendation_type"
+                ]
+                if best_conversion
+                else None
+            ),
+
+            "best_revenue_type": (
+                best_revenue[
+                    "recommendation_type"
+                ]
+                if best_revenue
+                else None
+            ),
+
+            "best_engagement_type": (
+                best_engagement[
+                    "recommendation_type"
+                ]
+                if best_engagement
+                else None
+            ),
+        },
+
+        "items": items,
+
+        "analytics_rules": {
+            "source_is_canonical_v2_9_1": (
+                True
+            ),
+
+            "not_presented_in_denominator": (
+                False
+            ),
+
+            "ranking_is_descriptive": (
+                True
+            ),
+
+            "causal_inference_used": (
+                False
+            ),
+
+            "ml_prediction_used": (
+                False
+            ),
+
+            "ml_training_performed": (
+                False
+            ),
+        },
+    }
+
+def build_product_performance_analytics(
+    customer=None,
+):
+    """
+    Build V2.9.3 product-level performance analytics.
+
+    This layer is descriptive only and uses
+    the canonical V2.9.1 product groups.
+
+    Important:
+    - Final outcomes are not resolved again here.
+    - NOT_PRESENTED remains excluded from presented.
+    - No causal inference is performed.
+    - No ML prediction or training is performed.
+    """
+
+    base_contract = (
+        build_outcome_analytics_contract(
+            customer=customer
+        )
+    )
+
+    product_groups = (
+        base_contract.get(
+            "product_groups"
+        )
+        or []
+    )
+
+    items = []
+
+    for group in product_groups:
+
+        items.append({
+            "product_id": (
+                group.get(
+                    "product_id"
+                )
+            ),
+
+            "product_code": (
+                group.get(
+                    "product_code"
+                )
+            ),
+
+            "product_name": (
+                group.get(
+                    "product_name"
+                )
+            ),
+
+            "brand_code": (
+                group.get(
+                    "brand_code"
+                )
+            ),
+
+            "brand_name": (
+                group.get(
+                    "brand_name"
+                )
+            ),
+
+            "category_code": (
+                group.get(
+                    "category_code"
+                )
+            ),
+
+            "category_name": (
+                group.get(
+                    "category_name"
+                )
+            ),
+
+            "product_group": (
+                group.get(
+                    "product_group"
+                )
+            ),
+
+            "resolved_recommendations": (
+                group.get(
+                    "resolved_recommendations",
+                    0,
+                )
+            ),
+
+            "presented": (
+                group.get(
+                    "presented",
+                    0,
+                )
+            ),
+
+            "purchased": (
+                group.get(
+                    "purchased",
+                    0,
+                )
+            ),
+
+            "interested": (
+                group.get(
+                    "interested",
+                    0,
+                )
+            ),
+
+            "follow_up": (
+                group.get(
+                    "follow_up",
+                    0,
+                )
+            ),
+
+            "rejected": (
+                group.get(
+                    "rejected",
+                    0,
+                )
+            ),
+
+            "not_presented": (
+                group.get(
+                    "not_presented",
+                    0,
+                )
+            ),
+
+            "total_quantity": (
+                group.get(
+                    "total_quantity",
+                    0,
+                )
+            ),
+
+            "total_revenue": (
+                group.get(
+                    "total_revenue",
+                    0,
+                )
+            ),
+
+            "average_revenue": (
+                group.get(
+                    "average_revenue",
+                    0,
+                )
+            ),
+
+            "conversion_rate": (
+                group.get(
+                    "conversion_rate",
+                    0,
+                )
+            ),
+
+            "interest_rate": (
+                group.get(
+                    "interest_rate",
+                    0,
+                )
+            ),
+
+            "follow_up_rate": (
+                group.get(
+                    "follow_up_rate",
+                    0,
+                )
+            ),
+
+            "rejection_rate": (
+                group.get(
+                    "rejection_rate",
+                    0,
+                )
+            ),
+
+            "engagement_rate": (
+                group.get(
+                    "engagement_rate",
+                    0,
+                )
+            ),
+
+            "data_quality": (
+                group.get(
+                    "data_quality"
+                )
+            ),
+        })
+
+    eligible_for_ranking = [
+        item
+        for item in items
+        if item[
+            "presented"
+        ] > 0
+    ]
+
+    best_conversion = None
+    best_revenue = None
+    best_engagement = None
+
+    if eligible_for_ranking:
+
+        best_conversion = max(
+            eligible_for_ranking,
+            key=lambda item: (
+                item[
+                    "conversion_rate"
+                ],
+                item[
+                    "presented"
+                ],
+                item[
+                    "product_code"
+                ]
+                or "",
+            ),
+        )
+
+        best_revenue = max(
+            eligible_for_ranking,
+            key=lambda item: (
+                item[
+                    "total_revenue"
+                ],
+                item[
+                    "purchased"
+                ],
+                item[
+                    "product_code"
+                ]
+                or "",
+            ),
+        )
+
+        best_engagement = max(
+            eligible_for_ranking,
+            key=lambda item: (
+                item[
+                    "engagement_rate"
+                ],
+                item[
+                    "presented"
+                ],
+                item[
+                    "product_code"
+                ]
+                or "",
+            ),
+        )
+
+    items.sort(
+        key=lambda item: (
+            -item[
+                "conversion_rate"
+            ],
+            -item[
+                "presented"
+            ],
+            item[
+                "product_code"
+            ]
+            or "",
+        )
+    )
+
+    return {
+        "ready": (
+            base_contract.get(
+                "ready",
+                False,
+            )
+        ),
+
+        "reason": (
+            "PRODUCT_PERFORMANCE_ANALYTICS_READY"
+            if base_contract.get(
+                "ready"
+            )
+            else (
+                base_contract.get(
+                    "reason"
+                )
+                or "NO_ANALYTICS_DATA"
+            )
+        ),
+
+        "schema_version": (
+            "V2.9.3"
+        ),
+
+        "source_contract_schema_version": (
+            base_contract.get(
+                "schema_version"
+            )
+        ),
+
+        "scope": (
+            base_contract.get(
+                "scope"
+            )
+            or {}
+        ),
+
+        "summary": (
+            base_contract.get(
+                "summary"
+            )
+            or {}
+        ),
+
+        "ranking": {
+            "best_conversion_product_code": (
+                best_conversion[
+                    "product_code"
+                ]
+                if best_conversion
+                else None
+            ),
+
+            "best_revenue_product_code": (
+                best_revenue[
+                    "product_code"
+                ]
+                if best_revenue
+                else None
+            ),
+
+            "best_engagement_product_code": (
+                best_engagement[
+                    "product_code"
+                ]
+                if best_engagement
+                else None
+            ),
+        },
+
+        "items": items,
+
+        "analytics_rules": {
+            "source_is_canonical_v2_9_1": True,
+
+            "product_dimension_from_canonical_contract": (
+                True
+            ),
+
+            "not_presented_in_denominator": False,
+
+            "ranking_is_descriptive": True,
+
+            "causal_inference_used": False,
+
+            "ml_prediction_used": False,
+
+            "ml_training_performed": False,
+        },
+    }
+
+def build_category_performance_analytics(
+    customer=None,
+):
+    """
+    Build V2.9.4 category-level performance analytics.
+
+    This layer aggregates canonical V2.9.1 product groups.
+
+    Important:
+    - Final outcomes are not resolved again here.
+    - NOT_PRESENTED remains excluded from presented.
+    - No causal inference is performed.
+    - No ML prediction or training is performed.
+    """
+
+    base_contract = (
+        build_outcome_analytics_contract(
+            customer=customer
+        )
+    )
+
+    product_groups = (
+        base_contract.get(
+            "product_groups"
+        )
+        or []
+    )
+
+    category_metrics = {}
+
+    for product in product_groups:
+
+        category_code = (
+            product.get(
+                "category_code"
+            )
+        )
+
+        category_name = (
+            product.get(
+                "category_name"
+            )
+        )
+
+        category_key = (
+            category_code
+            or category_name
+            or "UNCLASSIFIED"
+        )
+
+        if category_key not in category_metrics:
+
+            category_metrics[
+                category_key
+            ] = {
+                "category_code": (
+                    category_code
+                ),
+
+                "category_name": (
+                    category_name
+                ),
+
+                "resolved_recommendations": 0,
+                "presented": 0,
+                "purchased": 0,
+                "interested": 0,
+                "follow_up": 0,
+                "rejected": 0,
+                "not_presented": 0,
+                "total_quantity": 0,
+                "total_revenue": 0.0,
+            }
+
+        item = (
+            category_metrics[
+                category_key
+            ]
+        )
+
+        item[
+            "resolved_recommendations"
+        ] += (
+            product.get(
+                "resolved_recommendations",
+                0,
+            )
+            or 0
+        )
+
+        item["presented"] += (
+            product.get(
+                "presented",
+                0,
+            )
+            or 0
+        )
+
+        item["purchased"] += (
+            product.get(
+                "purchased",
+                0,
+            )
+            or 0
+        )
+
+        item["interested"] += (
+            product.get(
+                "interested",
+                0,
+            )
+            or 0
+        )
+
+        item["follow_up"] += (
+            product.get(
+                "follow_up",
+                0,
+            )
+            or 0
+        )
+
+        item["rejected"] += (
+            product.get(
+                "rejected",
+                0,
+            )
+            or 0
+        )
+
+        item["not_presented"] += (
+            product.get(
+                "not_presented",
+                0,
+            )
+            or 0
+        )
+
+        item["total_quantity"] += (
+            product.get(
+                "total_quantity",
+                0,
+            )
+            or 0
+        )
+
+        item["total_revenue"] += float(
+            product.get(
+                "total_revenue",
+                0,
+            )
+            or 0
+        )
+
+    items = []
+
+    for item in category_metrics.values():
+
+        presented = (
+            item["presented"]
+        )
+
+        purchased = (
+            item["purchased"]
+        )
+
+        interested = (
+            item["interested"]
+        )
+
+        follow_up = (
+            item["follow_up"]
+        )
+
+        rejected = (
+            item["rejected"]
+        )
+
+        total_revenue = float(
+            item["total_revenue"]
+            or 0
+        )
+
+        conversion_rate = (
+            (
+                purchased
+                / presented
+            )
+            * 100
+            if presented
+            else 0
+        )
+
+        interest_rate = (
+            (
+                interested
+                / presented
+            )
+            * 100
+            if presented
+            else 0
+        )
+
+        follow_up_rate = (
+            (
+                follow_up
+                / presented
+            )
+            * 100
+            if presented
+            else 0
+        )
+
+        rejection_rate = (
+            (
+                rejected
+                / presented
+            )
+            * 100
+            if presented
+            else 0
+        )
+
+        engagement_rate = (
+            (
+                purchased
+                + interested
+                + follow_up
+            )
+            / presented
+            * 100
+            if presented
+            else 0
+        )
+
+        average_revenue = (
+            total_revenue
+            / purchased
+            if purchased
+            else 0
+        )
+
+        if presented == 0:
+
+            data_quality = (
+                "NO_PRESENTED_DATA"
+            )
+
+        elif presented < 3:
+
+            data_quality = (
+                "INSUFFICIENT_DATA"
+            )
+
+        elif presented < 10:
+
+            data_quality = (
+                "LIMITED_DATA"
+            )
+
+        else:
+
+            data_quality = (
+                "SUFFICIENT_DATA"
+            )
+
+        items.append({
+            "category_code": (
+                item[
+                    "category_code"
+                ]
+            ),
+
+            "category_name": (
+                item[
+                    "category_name"
+                ]
+            ),
+
+            "resolved_recommendations": (
+                item[
+                    "resolved_recommendations"
+                ]
+            ),
+
+            "presented": presented,
+
+            "purchased": purchased,
+
+            "interested": interested,
+
+            "follow_up": follow_up,
+
+            "rejected": rejected,
+
+            "not_presented": (
+                item[
+                    "not_presented"
+                ]
+            ),
+
+            "total_quantity": (
+                item[
+                    "total_quantity"
+                ]
+            ),
+
+            "total_revenue": round(
+                total_revenue,
+                2,
+            ),
+
+            "average_revenue": round(
+                average_revenue,
+                2,
+            ),
+
+            "conversion_rate": round(
+                conversion_rate,
+                2,
+            ),
+
+            "interest_rate": round(
+                interest_rate,
+                2,
+            ),
+
+            "follow_up_rate": round(
+                follow_up_rate,
+                2,
+            ),
+
+            "rejection_rate": round(
+                rejection_rate,
+                2,
+            ),
+
+            "engagement_rate": round(
+                engagement_rate,
+                2,
+            ),
+
+            "data_quality": (
+                data_quality
+            ),
+        })
+
+    eligible_for_ranking = [
+        item
+        for item in items
+        if item[
+            "presented"
+        ] > 0
+    ]
+
+    best_conversion = None
+    best_revenue = None
+    best_engagement = None
+
+    if eligible_for_ranking:
+
+        best_conversion = max(
+            eligible_for_ranking,
+            key=lambda item: (
+                item[
+                    "conversion_rate"
+                ],
+                item[
+                    "presented"
+                ],
+                item[
+                    "category_code"
+                ]
+                or item[
+                    "category_name"
+                ]
+                or "",
+            ),
+        )
+
+        best_revenue = max(
+            eligible_for_ranking,
+            key=lambda item: (
+                item[
+                    "total_revenue"
+                ],
+                item[
+                    "purchased"
+                ],
+                item[
+                    "category_code"
+                ]
+                or item[
+                    "category_name"
+                ]
+                or "",
+            ),
+        )
+
+        best_engagement = max(
+            eligible_for_ranking,
+            key=lambda item: (
+                item[
+                    "engagement_rate"
+                ],
+                item[
+                    "presented"
+                ],
+                item[
+                    "category_code"
+                ]
+                or item[
+                    "category_name"
+                ]
+                or "",
+            ),
+        )
+
+    items.sort(
+        key=lambda item: (
+            -item[
+                "conversion_rate"
+            ],
+            -item[
+                "presented"
+            ],
+            item[
+                "category_code"
+            ]
+            or item[
+                "category_name"
+            ]
+            or "",
+        )
+    )
+
+    return {
+        "ready": (
+            base_contract.get(
+                "ready",
+                False,
+            )
+        ),
+
+        "reason": (
+            "CATEGORY_PERFORMANCE_ANALYTICS_READY"
+            if base_contract.get(
+                "ready"
+            )
+            else (
+                base_contract.get(
+                    "reason"
+                )
+                or "NO_ANALYTICS_DATA"
+            )
+        ),
+
+        "schema_version": (
+            "V2.9.4"
+        ),
+
+        "source_contract_schema_version": (
+            base_contract.get(
+                "schema_version"
+            )
+        ),
+
+        "scope": (
+            base_contract.get(
+                "scope"
+            )
+            or {}
+        ),
+
+        "summary": (
+            base_contract.get(
+                "summary"
+            )
+            or {}
+        ),
+
+        "ranking": {
+            "best_conversion_category_code": (
+                best_conversion[
+                    "category_code"
+                ]
+                if best_conversion
+                else None
+            ),
+
+            "best_revenue_category_code": (
+                best_revenue[
+                    "category_code"
+                ]
+                if best_revenue
+                else None
+            ),
+
+            "best_engagement_category_code": (
+                best_engagement[
+                    "category_code"
+                ]
+                if best_engagement
+                else None
+            ),
+        },
+
+        "items": items,
+
+        "analytics_rules": {
+            "source_is_canonical_v2_9_1": True,
+
+            "category_dimension_from_product_groups": (
+                True
+            ),
+
+            "not_presented_in_denominator": False,
+
+            "ranking_is_descriptive": True,
+
+            "causal_inference_used": False,
+
+            "ml_prediction_used": False,
+
+            "ml_training_performed": False,
+        },
+    }
+
+def build_salesperson_performance_analytics(
+    customer=None,
+):
+    """
+    Build V2.9.5 salesperson-level performance analytics.
+
+    This layer uses canonical V2.9.1 salesperson groups.
+
+    Important:
+    - Final outcomes are not resolved again here.
+    - Attribution is based on Visit.salesperson.
+    - NOT_PRESENTED remains excluded from presented.
+    - No causal inference is performed.
+    - No ML prediction or training is performed.
+    """
+
+    base_contract = (
+        build_outcome_analytics_contract(
+            customer=customer
+        )
+    )
+
+    salesperson_groups = (
+        base_contract.get(
+            "salesperson_groups"
+        )
+        or []
+    )
+
+    items = []
+
+    for group in salesperson_groups:
+
+        items.append({
+            "salesperson_id": (
+                group.get(
+                    "salesperson_id"
+                )
+            ),
+
+            "employee_code": (
+                group.get(
+                    "employee_code"
+                )
+            ),
+
+            "first_name": (
+                group.get(
+                    "first_name"
+                )
+            ),
+
+            "last_name": (
+                group.get(
+                    "last_name"
+                )
+            ),
+
+            "full_name": (
+                group.get(
+                    "full_name"
+                )
+            ),
+
+            "resolved_recommendations": (
+                group.get(
+                    "resolved_recommendations",
+                    0,
+                )
+            ),
+
+            "presented": (
+                group.get(
+                    "presented",
+                    0,
+                )
+            ),
+
+            "purchased": (
+                group.get(
+                    "purchased",
+                    0,
+                )
+            ),
+
+            "interested": (
+                group.get(
+                    "interested",
+                    0,
+                )
+            ),
+
+            "follow_up": (
+                group.get(
+                    "follow_up",
+                    0,
+                )
+            ),
+
+            "rejected": (
+                group.get(
+                    "rejected",
+                    0,
+                )
+            ),
+
+            "not_presented": (
+                group.get(
+                    "not_presented",
+                    0,
+                )
+            ),
+
+            "total_quantity": (
+                group.get(
+                    "total_quantity",
+                    0,
+                )
+            ),
+
+            "total_revenue": (
+                group.get(
+                    "total_revenue",
+                    0,
+                )
+            ),
+
+            "average_revenue": (
+                group.get(
+                    "average_revenue",
+                    0,
+                )
+            ),
+
+            "conversion_rate": (
+                group.get(
+                    "conversion_rate",
+                    0,
+                )
+            ),
+
+            "interest_rate": (
+                group.get(
+                    "interest_rate",
+                    0,
+                )
+            ),
+
+            "follow_up_rate": (
+                group.get(
+                    "follow_up_rate",
+                    0,
+                )
+            ),
+
+            "rejection_rate": (
+                group.get(
+                    "rejection_rate",
+                    0,
+                )
+            ),
+
+            "engagement_rate": (
+                group.get(
+                    "engagement_rate",
+                    0,
+                )
+            ),
+
+            "data_quality": (
+                group.get(
+                    "data_quality"
+                )
+            ),
+        })
+
+    eligible_for_ranking = [
+        item
+        for item in items
+        if item["presented"] > 0
+    ]
+
+    best_conversion = None
+    best_revenue = None
+    best_engagement = None
+
+    if eligible_for_ranking:
+
+        best_conversion = max(
+            eligible_for_ranking,
+            key=lambda item: (
+                item["conversion_rate"],
+                item["presented"],
+                item["employee_code"]
+                or "",
+            ),
+        )
+
+        best_revenue = max(
+            eligible_for_ranking,
+            key=lambda item: (
+                item["total_revenue"],
+                item["purchased"],
+                item["employee_code"]
+                or "",
+            ),
+        )
+
+        best_engagement = max(
+            eligible_for_ranking,
+            key=lambda item: (
+                item["engagement_rate"],
+                item["presented"],
+                item["employee_code"]
+                or "",
+            ),
+        )
+
+    items.sort(
+        key=lambda item: (
+            -item["conversion_rate"],
+            -item["presented"],
+            item["employee_code"]
+            or "",
+        )
+    )
+
+    return {
+        "ready": (
+            base_contract.get(
+                "ready",
+                False,
+            )
+        ),
+
+        "reason": (
+            "SALESPERSON_PERFORMANCE_ANALYTICS_READY"
+            if base_contract.get(
+                "ready"
+            )
+            else (
+                base_contract.get(
+                    "reason"
+                )
+                or "NO_ANALYTICS_DATA"
+            )
+        ),
+
+        "schema_version": (
+            "V2.9.5"
+        ),
+
+        "source_contract_schema_version": (
+            base_contract.get(
+                "schema_version"
+            )
+        ),
+
+        "scope": (
+            base_contract.get(
+                "scope"
+            )
+            or {}
+        ),
+
+        "summary": (
+            base_contract.get(
+                "summary"
+            )
+            or {}
+        ),
+
+        "ranking": {
+            "best_conversion_salesperson_code": (
+                best_conversion[
+                    "employee_code"
+                ]
+                if best_conversion
+                else None
+            ),
+
+            "best_revenue_salesperson_code": (
+                best_revenue[
+                    "employee_code"
+                ]
+                if best_revenue
+                else None
+            ),
+
+            "best_engagement_salesperson_code": (
+                best_engagement[
+                    "employee_code"
+                ]
+                if best_engagement
+                else None
+            ),
+        },
+
+        "items": items,
+
+        "analytics_rules": {
+            "source_is_canonical_v2_9_1": True,
+
+            "salesperson_dimension_from_visit": True,
+
+            "not_presented_in_denominator": False,
+
+            "ranking_is_descriptive": True,
+
+            "causal_inference_used": False,
+
+            "ml_prediction_used": False,
+
+            "ml_training_performed": False,
+        },
+    }
+
 def build_ml_learning_contract(
     visit,
 ):
