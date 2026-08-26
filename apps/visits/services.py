@@ -2107,6 +2107,7 @@ def build_outcome_analytics_contract(
     """
 
     from collections import defaultdict
+    from datetime import timedelta
 
     queryset = (
         SalesOutcome.objects
@@ -2132,6 +2133,8 @@ def build_outcome_analytics_contract(
         .values(
             "visit_id",
             "recommendation_id",
+
+            "visit__visit_date",
 
             "visit__salesperson_id",
             "visit__salesperson__employee_code",
@@ -2186,6 +2189,18 @@ def build_outcome_analytics_contract(
     )
 
     salesperson_dimensions = {}
+
+    day_metrics = defaultdict(
+        empty_metrics
+    )
+
+    week_metrics = defaultdict(
+        empty_metrics
+    )
+
+    month_metrics = defaultdict(
+        empty_metrics
+    )
     # =====================================================
     # CANONICAL RESOLVED OUTCOMES
     # =====================================================
@@ -2308,6 +2323,37 @@ def build_outcome_analytics_contract(
                 ),
             }
 
+        visit_date = (
+            pair.get(
+                "visit__visit_date"
+            )
+        )
+
+        day_key = None
+        week_key = None
+        month_key = None
+
+        if visit_date is not None:
+
+            day_key = (
+                visit_date
+            )
+
+            week_key = (
+                visit_date
+                - timedelta(
+                    days=(
+                        visit_date.weekday()
+                    )
+                )
+            )
+
+            month_key = (
+                visit_date.replace(
+                    day=1
+                )
+            )
+
         resolved = (
             resolve_recommendation_outcome(
                 visit_id=(
@@ -2362,6 +2408,30 @@ def build_outcome_analytics_contract(
             targets.append(
                 salesperson_metrics[
                     salesperson_id
+                ]
+            )
+
+        if day_key is not None:
+
+            targets.append(
+                day_metrics[
+                    day_key
+                ]
+            )
+
+        if week_key is not None:
+
+            targets.append(
+                week_metrics[
+                    week_key
+                ]
+            )
+
+        if month_key is not None:
+
+            targets.append(
+                month_metrics[
+                    month_key
                 ]
             )
 
@@ -2825,6 +2895,134 @@ def build_outcome_analytics_contract(
     )
 
     # =====================================================
+    # PERIOD GROUPS
+    # =====================================================
+
+    day_groups = []
+
+    for (
+        period_start,
+        metrics,
+    ) in day_metrics.items():
+
+        day_groups.append({
+            "period_start": (
+                period_start
+            ),
+
+            "period_end": (
+                period_start
+            ),
+
+            **normalize_metrics(
+                metrics
+            ),
+        })
+
+    day_groups.sort(
+        key=lambda item: (
+            item[
+                "period_start"
+            ]
+        )
+    )
+
+
+    week_groups = []
+
+    for (
+        period_start,
+        metrics,
+    ) in week_metrics.items():
+
+        week_groups.append({
+            "period_start": (
+                period_start
+            ),
+
+            "period_end": (
+                period_start
+                + timedelta(
+                    days=6
+                )
+            ),
+
+            **normalize_metrics(
+                metrics
+            ),
+        })
+
+    week_groups.sort(
+        key=lambda item: (
+            item[
+                "period_start"
+            ]
+        )
+    )
+
+
+    month_groups = []
+
+    for (
+        period_start,
+        metrics,
+    ) in month_metrics.items():
+
+        if period_start.month == 12:
+
+            next_month = (
+                period_start.replace(
+                    year=(
+                        period_start.year
+                        + 1
+                    ),
+                    month=1,
+                    day=1,
+                )
+            )
+
+        else:
+
+            next_month = (
+                period_start.replace(
+                    month=(
+                        period_start.month
+                        + 1
+                    ),
+                    day=1,
+                )
+            )
+
+        period_end = (
+            next_month
+            - timedelta(
+                days=1
+            )
+        )
+
+        month_groups.append({
+            "period_start": (
+                period_start
+            ),
+
+            "period_end": (
+                period_end
+            ),
+
+            **normalize_metrics(
+                metrics
+            ),
+        })
+
+    month_groups.sort(
+        key=lambda item: (
+            item[
+                "period_start"
+            ]
+        )
+    )
+
+    # =====================================================
     # CONTRACT
     # =====================================================
 
@@ -2884,6 +3082,20 @@ def build_outcome_analytics_contract(
         "salesperson_groups": (
             salesperson_groups
         ),
+
+        "period_groups": {
+            "day": (
+                day_groups
+            ),
+
+            "week": (
+                week_groups
+            ),
+
+            "month": (
+                month_groups
+            ),
+        },
 
         "analytics_rules": {
             "raw_outcome_rows_used_as_final": (
