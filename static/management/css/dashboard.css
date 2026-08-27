@@ -555,6 +555,392 @@
 }
 
 /* =========================================================
+   V3.0.9.3 MANAGEMENT DECISION SUPPORT
+========================================================= */
+
+.decision-support-section {
+    position: relative;
+}
+
+
+.decision-support-description {
+    margin: 8px 0 0;
+
+    color: #7b8499;
+
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+
+.decision-support-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 34px;
+
+    padding:
+        7px
+        12px;
+
+    border-radius: 999px;
+
+    background: #fff7e8;
+    border: 1px solid #f3d7a4;
+
+    color: #9a650b;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+
+/* ---------------------------------------------------------
+   ATTENTION GRID
+--------------------------------------------------------- */
+
+.decision-attention-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 18px;
+
+    margin-bottom: 22px;
+}
+
+
+.decision-attention-card {
+    position: relative;
+
+    padding: 22px;
+
+    background: #ffffff;
+
+    border: 1px solid #e3e7ef;
+    border-radius: 16px;
+
+    box-shadow:
+        0 6px 20px
+        rgba(
+            31,
+            45,
+            78,
+            0.04
+        );
+
+    overflow: hidden;
+}
+
+
+.decision-attention-card::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    right: 0;
+
+    width: 4px;
+    height: 100%;
+
+    background: #9aa2b1;
+}
+
+
+.decision-attention-card.attention::before {
+    background: #e3a72f;
+}
+
+
+.decision-attention-card.caution::before {
+    background: #d98545;
+}
+
+
+.decision-attention-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 18px;
+
+    margin-bottom: 14px;
+}
+
+
+.decision-attention-type {
+    margin-bottom: 6px;
+
+    color: #8a94a8;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.7px;
+}
+
+
+.decision-attention-header h3 {
+    margin: 0;
+
+    color: #263147;
+
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+
+.decision-attention-value {
+    min-width: 54px;
+
+    padding:
+        8px
+        10px;
+
+    border-radius: 12px;
+
+    background: #f7f8fb;
+
+    color: #34405a;
+
+    font-size: 15px;
+    font-weight: 900;
+
+    text-align: center;
+
+    white-space: nowrap;
+}
+
+
+.decision-attention-card.attention
+.decision-attention-value {
+    background: #fff7e8;
+    color: #98620b;
+}
+
+
+.decision-attention-card.caution
+.decision-attention-value {
+    background: #fff3eb;
+    color: #a95824;
+}
+
+
+.decision-attention-message {
+    margin: 0;
+
+    color: #69748a;
+
+    font-size: 12px;
+    line-height: 1.9;
+}
+
+
+.decision-attention-action {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 14px;
+
+    margin-top: 16px;
+
+    padding-top: 14px;
+
+    border-top: 1px solid #edf0f5;
+}
+
+
+.decision-attention-action span {
+    color: #929bad;
+
+    font-size: 10px;
+}
+
+
+.decision-attention-action strong {
+    color: #36425a;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    line-height: 1.7;
+
+    text-align: left;
+}
+
+
+/* ---------------------------------------------------------
+   PERFORMANCE HIGHLIGHTS
+--------------------------------------------------------- */
+
+.decision-highlights-panel {
+    padding: 24px;
+}
+
+
+.decision-source-badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding:
+        6px
+        10px;
+
+    border-radius: 999px;
+
+    background: #eef1ff;
+    border: 1px solid #d8ddff;
+
+    color: #5263ca;
+
+    font-size: 9px;
+    font-weight: 900;
+
+    letter-spacing: 0.5px;
+
+    white-space: nowrap;
+}
+
+
+.decision-highlight-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(0, 1fr)
+        );
+
+    gap: 14px;
+
+    margin-top: 20px;
+}
+
+
+.decision-highlight-card {
+    min-width: 0;
+
+    padding: 18px;
+
+    background: #fafbfe;
+
+    border: 1px solid #e8ebf2;
+    border-radius: 14px;
+}
+
+
+.decision-highlight-metric {
+    margin-bottom: 10px;
+
+    color: #8993a7;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 0.5px;
+}
+
+
+.decision-highlight-entity {
+    overflow: hidden;
+
+    color: #273249;
+
+    font-size: 13px;
+    font-weight: 800;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.decision-highlight-code {
+    margin-top: 5px;
+
+    color: #768198;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    direction: ltr;
+
+    text-align: right;
+}
+
+
+.decision-highlight-value {
+    margin-top: 16px;
+
+    color: #3a4ca5;
+
+    font-size: 21px;
+    font-weight: 900;
+}
+
+
+.decision-highlight-source {
+    margin-top: 7px;
+
+    color: #a0a7b4;
+
+    font-size: 9px;
+}
+
+
+/* ---------------------------------------------------------
+   RESPONSIVE
+--------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+
+    .decision-highlight-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+}
+
+
+@media (max-width: 800px) {
+
+    .decision-attention-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+}
+
+
+@media (max-width: 620px) {
+
+    .decision-highlight-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .decision-attention-header {
+        flex-direction: column;
+    }
+
+    .decision-attention-action {
+        flex-direction: column;
+    }
+
+}
+
+/* =========================================================
    TREND
 ========================================================= */
 

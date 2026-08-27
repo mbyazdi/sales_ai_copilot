@@ -110,6 +110,26 @@
             "executiveModel"
         );
 
+    const decisionSupportSection =
+        document.getElementById(
+            "decisionSupportSection"
+        );
+
+    const decisionSupportCount =
+        document.getElementById(
+            "decisionSupportCount"
+        );
+
+    const decisionAttentionGrid =
+        document.getElementById(
+            "decisionAttentionGrid"
+        );
+
+    const decisionHighlightGrid =
+        document.getElementById(
+            "decisionHighlightGrid"
+        );
+
     /* =========================================================
        STATE
     ========================================================= */
@@ -341,6 +361,34 @@
        KPI CARDS
     ========================================================= */
 
+    function escapeHtml(value) {
+
+        return String(
+            value ?? ""
+        )
+            .replaceAll(
+                "&",
+                "&amp;"
+            )
+            .replaceAll(
+                "<",
+                "&lt;"
+            )
+            .replaceAll(
+                ">",
+                "&gt;"
+            )
+            .replaceAll(
+                '"',
+                "&quot;"
+            )
+            .replaceAll(
+                "'",
+                "&#039;"
+            );
+
+    }
+
     function renderKpis(kpis) {
 
         if (!kpiGrid) {
@@ -569,6 +617,321 @@
 
                 executiveModel.textContent =
                     "Deterministic Backend";
+
+            }
+
+        }
+
+    }
+
+    function renderDecisionSupport() {
+
+        const decisionSupport =
+            dashboardData
+                ?.decision_support
+            || {};
+
+        if (
+            !decisionSupportSection
+            || !decisionSupport.ready
+        ) {
+
+            if (decisionSupportSection) {
+
+                decisionSupportSection.hidden =
+                    true;
+
+            }
+
+            return;
+        }
+
+        decisionSupportSection.hidden =
+            false;
+
+
+        /* -----------------------------------------
+           ATTENTION COUNT
+        ----------------------------------------- */
+
+        const attentionSummary =
+            decisionSupport
+                .attention_summary
+            || {};
+
+        if (decisionSupportCount) {
+
+            const count =
+                attentionSummary
+                    .attention_item_count
+                ?? 0;
+
+            decisionSupportCount.textContent =
+                `${formatNumber(count)} مورد نیازمند توجه`;
+
+        }
+
+
+        /* -----------------------------------------
+           ATTENTION ITEMS
+        ----------------------------------------- */
+
+        const attentionItems =
+            decisionSupport
+                .attention_items
+            || [];
+
+        if (decisionAttentionGrid) {
+
+            decisionAttentionGrid.innerHTML =
+                "";
+
+            if (!attentionItems.length) {
+
+                decisionAttentionGrid.innerHTML = `
+                    <div class="dashboard-empty">
+                        موردی برای توجه مدیریتی ثبت نشده است.
+                    </div>
+                `;
+
+            } else {
+
+                attentionItems.forEach(
+                    function (item) {
+
+                        const card =
+                            document.createElement(
+                                "article"
+                            );
+
+                        const levelClass =
+                            normalizeClass(
+                                item.level
+                                || "UNKNOWN"
+                            );
+
+                        card.className =
+                            (
+                                "decision-attention-card "
+                                + levelClass
+                            );
+
+                        const title =
+                            item.title
+                            || "—";
+
+                        const message =
+                            item.message
+                            || "—";
+
+                        const action =
+                            item.suggested_action
+                            || "—";
+
+                        let displayValue =
+                            item.value
+                            ?? "—";
+
+                        if (
+                            item.unit
+                            === "COUNT"
+                        ) {
+
+                            displayValue =
+                                formatNumber(
+                                    item.value
+                                );
+
+                        } else if (
+                            item.unit
+                            === "STATUS"
+                        ) {
+
+                            displayValue =
+                                dataQualityLabels[
+                                    item.value
+                                ]
+                                || item.value
+                                || "—";
+
+                        }
+
+                        card.innerHTML = `
+                            <div class="decision-attention-header">
+
+                                <div>
+
+                                    <div class="decision-attention-type">
+                                        ${escapeHtml(
+                                            item.type
+                                            || ""
+                                        )}
+                                    </div>
+
+                                    <h3>
+                                        ${escapeHtml(
+                                            title
+                                        )}
+                                    </h3>
+
+                                </div>
+
+                                <div class="decision-attention-value">
+                                    ${escapeHtml(
+                                        String(
+                                            displayValue
+                                        )
+                                    )}
+                                </div>
+
+                            </div>
+
+                            <p class="decision-attention-message">
+                                ${escapeHtml(
+                                    message
+                                )}
+                            </p>
+
+                            <div class="decision-attention-action">
+
+                                <span>
+                                    اقدام پیشنهادی
+                                </span>
+
+                                <strong>
+                                    ${escapeHtml(
+                                        action
+                                    )}
+                                </strong>
+
+                            </div>
+                        `;
+
+                        decisionAttentionGrid.appendChild(
+                            card
+                        );
+
+                    }
+                );
+
+            }
+
+        }
+
+
+        /* -----------------------------------------
+           PERFORMANCE HIGHLIGHTS
+        ----------------------------------------- */
+
+        const highlights =
+            decisionSupport
+                .performance_highlights
+            || [];
+
+        if (decisionHighlightGrid) {
+
+            decisionHighlightGrid.innerHTML =
+                "";
+
+            if (!highlights.length) {
+
+                decisionHighlightGrid.innerHTML = `
+                    <div class="dashboard-empty">
+                        نکته برجسته‌ای برای نمایش وجود ندارد.
+                    </div>
+                `;
+
+            } else {
+
+                highlights.forEach(
+                    function (item) {
+
+                        const card =
+                            document.createElement(
+                                "article"
+                            );
+
+                        card.className =
+                            "decision-highlight-card";
+
+                        let value =
+                            item.value
+                            ?? "—";
+
+                        if (
+                            item.unit
+                            === "PERCENT"
+                        ) {
+
+                            value =
+                                formatPercent(
+                                    item.value
+                                );
+
+                        } else if (
+                            item.unit
+                            === "CURRENCY"
+                        ) {
+
+                            value =
+                                formatMoney(
+                                    item.value
+                                );
+
+                        } else if (
+                            item.unit
+                            === "COUNT"
+                        ) {
+
+                            value =
+                                formatNumber(
+                                    item.value
+                                );
+
+                        }
+
+                        card.innerHTML = `
+                            <div class="decision-highlight-metric">
+                                ${escapeHtml(
+                                    item.metric
+                                    || "—"
+                                )}
+                            </div>
+
+                            <div class="decision-highlight-entity">
+                                ${escapeHtml(
+                                    item.entity_name
+                                    || item.entity_code
+                                    || "—"
+                                )}
+                            </div>
+
+                            <div class="decision-highlight-code">
+                                ${escapeHtml(
+                                    item.entity_code
+                                    || ""
+                                )}
+                            </div>
+
+                            <div class="decision-highlight-value">
+                                ${escapeHtml(
+                                    String(
+                                        value
+                                    )
+                                )}
+                            </div>
+
+                            <div class="decision-highlight-source">
+                                Backend Ranking
+                            </div>
+                        `;
+
+                        decisionHighlightGrid.appendChild(
+                            card
+                        );
+
+                    }
+                );
 
             }
 
@@ -1979,6 +2342,8 @@
         );
 
         renderExecutiveIntelligence();
+
+        renderDecisionSupport();
 
         renderTrends();
 

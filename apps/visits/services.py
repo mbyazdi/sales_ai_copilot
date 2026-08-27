@@ -7119,6 +7119,639 @@ def build_management_executive_intelligence_context(
         },
     }
 
+def build_management_decision_support_context(
+    customer=None,
+):
+    """
+    Build V3.0.9.1 deterministic management decision-support context.
+
+    This layer converts existing approved management facts into
+    concise management attention items and performance highlights.
+
+    Important:
+    - Existing KPI values remain authoritative.
+    - Existing backend rankings remain authoritative.
+    - No KPI is recalculated.
+    - No ranking is recalculated.
+    - Ranked entities are resolved by lookup only.
+    - Attention rules are deterministic.
+    - Suggested actions are operational and non-predictive.
+    - No causal inference is performed.
+    - No future prediction is performed.
+    - No ML prediction or training is performed.
+    - Ollama is not required.
+    """
+
+    # =====================================================
+    # AUTHORITATIVE SOURCE CONTRACTS
+    # =====================================================
+
+    dashboard = (
+        build_management_dashboard_contract(
+            customer=customer
+        )
+    )
+
+    executive_context = (
+        build_management_executive_intelligence_context(
+            customer=customer
+        )
+    )
+
+    dashboard_ready = (
+        dashboard.get(
+            "ready",
+            False,
+        )
+        is True
+    )
+
+    executive_ready = (
+        executive_context.get(
+            "ready",
+            False,
+        )
+        is True
+    )
+
+    if not (
+        dashboard_ready
+        and executive_ready
+    ):
+        return {
+            "ready": False,
+
+            "reason": (
+                "MANAGEMENT_DECISION_SUPPORT_CONTEXT_NOT_READY"
+            ),
+
+            "schema_version": (
+                "V3.0.9.1"
+            ),
+
+            "source_versions": {
+                "dashboard": (
+                    dashboard.get(
+                        "schema_version"
+                    )
+                ),
+
+                "executive_context": (
+                    executive_context.get(
+                        "schema_version"
+                    )
+                ),
+            },
+
+            "scope": (
+                dashboard.get(
+                    "scope"
+                )
+                or {}
+            ),
+
+            "attention_summary": {},
+
+            "attention_items": [],
+
+            "performance_highlights": [],
+
+            "data_quality": {},
+
+            "decision_support_rules": {
+                "source_is_existing_management_contracts": True,
+
+                "follow_up_value_copied": True,
+
+                "data_quality_copied": True,
+
+                "rankings_copied": True,
+
+                "ranked_entities_resolved_by_lookup_only": True,
+
+                "attention_rules_are_deterministic": True,
+
+                "suggested_actions_are_non_predictive": True,
+
+                "kpi_recalculation_performed": False,
+
+                "ranking_recalculation_performed": False,
+
+                "performance_scoring_performed": False,
+
+                "trend_interpretation_performed": False,
+
+                "causal_inference_used": False,
+
+                "future_prediction_used": False,
+
+                "ml_prediction_used": False,
+
+                "ml_training_performed": False,
+
+                "ollama_required": False,
+            },
+        }
+
+    # =====================================================
+    # APPROVED SOURCE FACTS
+    # =====================================================
+
+    summary = (
+        executive_context.get(
+            "executive_summary"
+        )
+        or {}
+    )
+
+    performance_facts = (
+        executive_context.get(
+            "performance_facts"
+        )
+        or {}
+    )
+
+    sales_team_facts = (
+        executive_context.get(
+            "sales_team_facts"
+        )
+        or {}
+    )
+
+    data_quality = (
+        executive_context.get(
+            "data_quality"
+        )
+        or {}
+    )
+
+    follow_up_count = (
+        summary.get(
+            "follow_up",
+            0,
+        )
+        or 0
+    )
+
+    data_quality_status = (
+        data_quality.get(
+            "status"
+        )
+        or summary.get(
+            "data_quality"
+        )
+        or "UNKNOWN"
+    )
+
+    # =====================================================
+    # DETERMINISTIC ATTENTION ITEMS
+    # =====================================================
+
+    attention_items = []
+
+    if follow_up_count > 0:
+
+        attention_items.append({
+            "key": (
+                "FOLLOW_UP_ATTENTION"
+            ),
+
+            "type": (
+                "FOLLOW_UP"
+            ),
+
+            "level": (
+                "ATTENTION"
+            ),
+
+            "title": (
+                "Follow-up requires attention"
+            ),
+
+            "value": (
+                follow_up_count
+            ),
+
+            "unit": (
+                "COUNT"
+            ),
+
+            "message": (
+                f"{follow_up_count} recorded "
+                "recommendation outcome"
+                f"{'' if follow_up_count == 1 else 's'} "
+                "is in FOLLOW_UP status."
+            ),
+
+            "suggested_action": (
+                "Review the recorded follow-up outcome"
+                if follow_up_count == 1
+                else
+                "Review the recorded follow-up outcomes"
+            ),
+        })
+
+    if (
+        data_quality_status
+        == "LIMITED_DATA"
+    ):
+
+        attention_items.append({
+            "key": (
+                "LIMITED_DATA_ATTENTION"
+            ),
+
+            "type": (
+                "DATA_QUALITY"
+            ),
+
+            "level": (
+                "CAUTION"
+            ),
+
+            "title": (
+                "Limited analytics data"
+            ),
+
+            "value": (
+                "LIMITED_DATA"
+            ),
+
+            "unit": (
+                "STATUS"
+            ),
+
+            "message": (
+                "Management analytics currently "
+                "report LIMITED_DATA."
+            ),
+
+            "suggested_action": (
+                "Interpret rankings and rates as "
+                "descriptive observations."
+            ),
+        })
+
+    elif (
+        data_quality_status
+        == "INSUFFICIENT_DATA"
+    ):
+
+        attention_items.append({
+            "key": (
+                "INSUFFICIENT_DATA_ATTENTION"
+            ),
+
+            "type": (
+                "DATA_QUALITY"
+            ),
+
+            "level": (
+                "CAUTION"
+            ),
+
+            "title": (
+                "Insufficient analytics data"
+            ),
+
+            "value": (
+                "INSUFFICIENT_DATA"
+            ),
+
+            "unit": (
+                "STATUS"
+            ),
+
+            "message": (
+                "Management analytics currently "
+                "report INSUFFICIENT_DATA."
+            ),
+
+            "suggested_action": (
+                "Review the available underlying data "
+                "before interpreting management metrics."
+            ),
+        })
+
+    # =====================================================
+    # SOURCE RANKING LOOKUPS
+    # =====================================================
+
+    product_facts = (
+        performance_facts.get(
+            "product"
+        )
+        or {}
+    )
+
+    brand_facts = (
+        performance_facts.get(
+            "brand"
+        )
+        or {}
+    )
+
+    best_conversion_product = (
+        product_facts.get(
+            "best_conversion"
+        )
+        or {}
+    )
+
+    best_engagement_product = (
+        product_facts.get(
+            "best_engagement"
+        )
+        or {}
+    )
+
+    best_revenue_brand = (
+        brand_facts.get(
+            "best_revenue"
+        )
+        or {}
+    )
+
+    best_conversion_salesperson = (
+        sales_team_facts.get(
+            "best_conversion"
+        )
+        or {}
+    )
+
+    # =====================================================
+    # DETERMINISTIC PERFORMANCE HIGHLIGHTS
+    # =====================================================
+
+    performance_highlights = []
+
+    if best_conversion_product:
+
+        performance_highlights.append({
+            "key": (
+                "BEST_CONVERSION_PRODUCT"
+            ),
+
+            "dimension": (
+                "PRODUCT"
+            ),
+
+            "metric": (
+                "CONVERSION_RATE"
+            ),
+
+            "entity_code": (
+                best_conversion_product.get(
+                    "product_code"
+                )
+            ),
+
+            "entity_name": (
+                best_conversion_product.get(
+                    "product_name"
+                )
+            ),
+
+            "value": (
+                best_conversion_product.get(
+                    "conversion_rate"
+                )
+            ),
+
+            "unit": (
+                "PERCENT"
+            ),
+
+            "source": (
+                "BACKEND_RANKING"
+            ),
+        })
+
+    if best_engagement_product:
+
+        performance_highlights.append({
+            "key": (
+                "BEST_ENGAGEMENT_PRODUCT"
+            ),
+
+            "dimension": (
+                "PRODUCT"
+            ),
+
+            "metric": (
+                "ENGAGEMENT_RATE"
+            ),
+
+            "entity_code": (
+                best_engagement_product.get(
+                    "product_code"
+                )
+            ),
+
+            "entity_name": (
+                best_engagement_product.get(
+                    "product_name"
+                )
+            ),
+
+            "value": (
+                best_engagement_product.get(
+                    "engagement_rate"
+                )
+            ),
+
+            "unit": (
+                "PERCENT"
+            ),
+
+            "source": (
+                "BACKEND_RANKING"
+            ),
+        })
+
+    if best_revenue_brand:
+
+        performance_highlights.append({
+            "key": (
+                "BEST_REVENUE_BRAND"
+            ),
+
+            "dimension": (
+                "BRAND"
+            ),
+
+            "metric": (
+                "TOTAL_REVENUE"
+            ),
+
+            "entity_code": (
+                best_revenue_brand.get(
+                    "brand_code"
+                )
+            ),
+
+            "entity_name": (
+                best_revenue_brand.get(
+                    "brand_name"
+                )
+            ),
+
+            "value": (
+                best_revenue_brand.get(
+                    "total_revenue"
+                )
+            ),
+
+            "unit": (
+                "CURRENCY"
+            ),
+
+            "source": (
+                "BACKEND_RANKING"
+            ),
+        })
+
+    if best_conversion_salesperson:
+
+        performance_highlights.append({
+            "key": (
+                "BEST_CONVERSION_SALESPERSON"
+            ),
+
+            "dimension": (
+                "SALESPERSON"
+            ),
+
+            "metric": (
+                "CONVERSION_RATE"
+            ),
+
+            "entity_code": (
+                best_conversion_salesperson.get(
+                    "employee_code"
+                )
+            ),
+
+            "entity_name": (
+                best_conversion_salesperson.get(
+                    "full_name"
+                )
+            ),
+
+            "value": (
+                best_conversion_salesperson.get(
+                    "conversion_rate"
+                )
+            ),
+
+            "unit": (
+                "PERCENT"
+            ),
+
+            "source": (
+                "BACKEND_RANKING"
+            ),
+        })
+
+    # =====================================================
+    # FINAL CONTRACT
+    # =====================================================
+
+    return {
+        "ready": True,
+
+        "reason": (
+            "MANAGEMENT_DECISION_SUPPORT_CONTEXT_READY"
+        ),
+
+        "schema_version": (
+            "V3.0.9.1"
+        ),
+
+        "source_versions": {
+            "dashboard": (
+                dashboard.get(
+                    "schema_version"
+                )
+            ),
+
+            "executive_context": (
+                executive_context.get(
+                    "schema_version"
+                )
+            ),
+        },
+
+        "scope": (
+            dashboard.get(
+                "scope"
+            )
+            or {}
+        ),
+
+        "attention_summary": {
+            "follow_up_count": (
+                follow_up_count
+            ),
+
+            "data_quality": (
+                data_quality_status
+            ),
+
+            "attention_item_count": (
+                len(
+                    attention_items
+                )
+            ),
+        },
+
+        "attention_items": (
+            attention_items
+        ),
+
+        "performance_highlights": (
+            performance_highlights
+        ),
+
+        "data_quality": (
+            data_quality
+        ),
+
+        "decision_support_rules": {
+            "source_is_existing_management_contracts": True,
+
+            "follow_up_value_copied": True,
+
+            "data_quality_copied": True,
+
+            "rankings_copied": True,
+
+            "ranked_entities_resolved_by_lookup_only": True,
+
+            "attention_rules_are_deterministic": True,
+
+            "suggested_actions_are_non_predictive": True,
+
+            "kpi_recalculation_performed": False,
+
+            "ranking_recalculation_performed": False,
+
+            "performance_scoring_performed": False,
+
+            "trend_interpretation_performed": False,
+
+            "causal_inference_used": False,
+
+            "future_prediction_used": False,
+
+            "ml_prediction_used": False,
+
+            "ml_training_performed": False,
+
+            "ollama_required": False,
+        },
+    }
+
 def build_ml_learning_contract(
     visit,
 ):

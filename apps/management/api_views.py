@@ -11,6 +11,7 @@ from apps.visits.services import (
     build_management_performance_sections_contract,
     build_management_sales_team_contract,
     build_management_executive_intelligence_context,
+    build_management_decision_support_context,
 )
 
 
@@ -182,6 +183,16 @@ class ManagementDashboardAPIView(APIView):
         }
 
         # =====================================================
+        # MANAGEMENT DECISION SUPPORT
+        # =====================================================
+
+        decision_support = (
+            build_management_decision_support_context(
+                customer=None
+            )
+        )
+
+        # =====================================================
         # API READINESS
         # =====================================================
 
@@ -206,6 +217,10 @@ class ManagementDashboardAPIView(APIView):
                 "ready",
                 False,
             ),
+            decision_support.get(
+                "ready",
+                False,
+            ),
         ])
 
         # =====================================================
@@ -222,7 +237,7 @@ class ManagementDashboardAPIView(APIView):
             ),
 
             "schema_version": (
-                "V3.0.8.4"
+                "V3.0.9.2"
             ),
 
             "source_versions": {
@@ -261,6 +276,13 @@ class ManagementDashboardAPIView(APIView):
                         "schema_version"
                     )
                 ),
+
+                "decision_support": (
+                    decision_support.get(
+                        "schema_version"
+                    )
+                ),
+
             },
 
             "scope": (
@@ -290,6 +312,10 @@ class ManagementDashboardAPIView(APIView):
                 executive_intelligence
             ),
 
+            "decision_support": (
+                decision_support
+            ),
+
             "api_rules": {
                 "backend_contracts_only": True,
 
@@ -316,5 +342,12 @@ class ManagementDashboardAPIView(APIView):
                 "ollama_optional": True,
 
                 "ollama_failure_blocks_dashboard": False,
+
+                "decision_support_backend_controlled": True,
+
+                "attention_rules_deterministic": True,
+
+                "decision_support_prediction_used": False,
+
             },
         })
