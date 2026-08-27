@@ -2188,6 +2188,12 @@ def build_outcome_analytics_contract(
         empty_metrics
     )
 
+    brand_metrics = defaultdict(
+        empty_metrics
+    )
+
+    brand_dimensions = {}
+
     salesperson_dimensions = {}
 
     day_metrics = defaultdict(
@@ -2270,6 +2276,28 @@ def build_outcome_analytics_contract(
                 "product_group": (
                     pair.get(
                         "recommendation__product__product_group"
+                    )
+                ),
+            }
+
+        brand_code = (
+            pair.get(
+                "recommendation__product__brand__code"
+            )
+        )
+
+        if brand_code:
+
+            brand_dimensions[
+                brand_code
+            ] = {
+                "brand_code": (
+                    brand_code
+                ),
+
+                "brand_name": (
+                    pair.get(
+                        "recommendation__product__brand__name"
                     )
                 ),
             }
@@ -2400,6 +2428,14 @@ def build_outcome_analytics_contract(
             targets.append(
                 product_metrics[
                     product_id
+                ]
+            )
+
+        if brand_code:
+
+            targets.append(
+                brand_metrics[
+                    brand_code
                 ]
             )
 
@@ -2821,6 +2857,56 @@ def build_outcome_analytics_contract(
             or ""
         )
     )
+
+    # =====================================================
+    # BRAND GROUPS
+    # =====================================================
+
+    brand_groups = []
+
+    for (
+        brand_code,
+        metrics,
+    ) in brand_metrics.items():
+
+        normalized = (
+            normalize_metrics(
+                metrics
+            )
+        )
+
+        dimension = (
+            brand_dimensions.get(
+                brand_code,
+                {},
+            )
+        )
+
+        brand_groups.append({
+            "brand_code": (
+                dimension.get(
+                    "brand_code"
+                )
+            ),
+
+            "brand_name": (
+                dimension.get(
+                    "brand_name"
+                )
+            ),
+
+            **normalized,
+        })
+
+    brand_groups.sort(
+        key=lambda item: (
+            item[
+                "brand_code"
+            ]
+            or ""
+        )
+    )
+
     # =====================================================
     # SALESPERSON GROUPS
     # =====================================================
@@ -3077,6 +3163,10 @@ def build_outcome_analytics_contract(
 
         "product_groups": (
             product_groups
+        ),
+
+        "brand_groups": (
+            brand_groups
         ),
 
         "salesperson_groups": (
@@ -4653,6 +4743,305 @@ def build_salesperson_performance_analytics(
             "source_is_canonical_v2_9_1": True,
 
             "salesperson_dimension_from_visit": True,
+
+            "not_presented_in_denominator": False,
+
+            "ranking_is_descriptive": True,
+
+            "causal_inference_used": False,
+
+            "ml_prediction_used": False,
+
+            "ml_training_performed": False,
+        },
+    }
+
+def build_brand_performance_analytics(
+    customer=None,
+):
+    """
+    Build V2.9.7 brand-level performance analytics.
+
+    This layer uses canonical V2.9.1 brand groups.
+
+    Important:
+    - Final outcomes are not resolved again here.
+    - Brand attribution comes from recommendation product brand.
+    - NOT_PRESENTED remains excluded from presented.
+    - No causal inference is performed.
+    - No ML prediction or training is performed.
+    """
+
+    base_contract = (
+        build_outcome_analytics_contract(
+            customer=customer
+        )
+    )
+
+    brand_groups = (
+        base_contract.get(
+            "brand_groups"
+        )
+        or []
+    )
+
+    items = []
+
+    for group in brand_groups:
+
+        items.append({
+            "brand_code": (
+                group.get(
+                    "brand_code"
+                )
+            ),
+
+            "brand_name": (
+                group.get(
+                    "brand_name"
+                )
+            ),
+
+            "resolved_recommendations": (
+                group.get(
+                    "resolved_recommendations",
+                    0,
+                )
+            ),
+
+            "presented": (
+                group.get(
+                    "presented",
+                    0,
+                )
+            ),
+
+            "purchased": (
+                group.get(
+                    "purchased",
+                    0,
+                )
+            ),
+
+            "interested": (
+                group.get(
+                    "interested",
+                    0,
+                )
+            ),
+
+            "follow_up": (
+                group.get(
+                    "follow_up",
+                    0,
+                )
+            ),
+
+            "rejected": (
+                group.get(
+                    "rejected",
+                    0,
+                )
+            ),
+
+            "not_presented": (
+                group.get(
+                    "not_presented",
+                    0,
+                )
+            ),
+
+            "total_quantity": (
+                group.get(
+                    "total_quantity",
+                    0,
+                )
+            ),
+
+            "total_revenue": (
+                group.get(
+                    "total_revenue",
+                    0,
+                )
+            ),
+
+            "average_revenue": (
+                group.get(
+                    "average_revenue",
+                    0,
+                )
+            ),
+
+            "conversion_rate": (
+                group.get(
+                    "conversion_rate",
+                    0,
+                )
+            ),
+
+            "interest_rate": (
+                group.get(
+                    "interest_rate",
+                    0,
+                )
+            ),
+
+            "follow_up_rate": (
+                group.get(
+                    "follow_up_rate",
+                    0,
+                )
+            ),
+
+            "rejection_rate": (
+                group.get(
+                    "rejection_rate",
+                    0,
+                )
+            ),
+
+            "engagement_rate": (
+                group.get(
+                    "engagement_rate",
+                    0,
+                )
+            ),
+
+            "data_quality": (
+                group.get(
+                    "data_quality"
+                )
+            ),
+        })
+
+    eligible_for_ranking = [
+        item
+        for item in items
+        if item["presented"] > 0
+    ]
+
+    best_conversion = None
+    best_revenue = None
+    best_engagement = None
+
+    if eligible_for_ranking:
+
+        best_conversion = max(
+            eligible_for_ranking,
+            key=lambda item: (
+                item["conversion_rate"],
+                item["presented"],
+                item["brand_code"]
+                or "",
+            ),
+        )
+
+        best_revenue = max(
+            eligible_for_ranking,
+            key=lambda item: (
+                item["total_revenue"],
+                item["purchased"],
+                item["brand_code"]
+                or "",
+            ),
+        )
+
+        best_engagement = max(
+            eligible_for_ranking,
+            key=lambda item: (
+                item["engagement_rate"],
+                item["presented"],
+                item["brand_code"]
+                or "",
+            ),
+        )
+
+    items.sort(
+        key=lambda item: (
+            -item["conversion_rate"],
+            -item["presented"],
+            item["brand_code"]
+            or "",
+        )
+    )
+
+    return {
+        "ready": (
+            base_contract.get(
+                "ready",
+                False,
+            )
+        ),
+
+        "reason": (
+            "BRAND_PERFORMANCE_ANALYTICS_READY"
+            if base_contract.get(
+                "ready"
+            )
+            else (
+                base_contract.get(
+                    "reason"
+                )
+                or "NO_ANALYTICS_DATA"
+            )
+        ),
+
+        "schema_version": (
+            "V2.9.7"
+        ),
+
+        "source_contract_schema_version": (
+            base_contract.get(
+                "schema_version"
+            )
+        ),
+
+        "scope": (
+            base_contract.get(
+                "scope"
+            )
+            or {}
+        ),
+
+        "summary": (
+            base_contract.get(
+                "summary"
+            )
+            or {}
+        ),
+
+        "ranking": {
+            "best_conversion_brand_code": (
+                best_conversion[
+                    "brand_code"
+                ]
+                if best_conversion
+                else None
+            ),
+
+            "best_revenue_brand_code": (
+                best_revenue[
+                    "brand_code"
+                ]
+                if best_revenue
+                else None
+            ),
+
+            "best_engagement_brand_code": (
+                best_engagement[
+                    "brand_code"
+                ]
+                if best_engagement
+                else None
+            ),
+        },
+
+        "items": items,
+
+        "analytics_rules": {
+            "source_is_canonical_v2_9_1": True,
+
+            "brand_dimension_from_recommendation_product": True,
 
             "not_presented_in_denominator": False,
 
