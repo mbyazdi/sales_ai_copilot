@@ -41,6 +41,10 @@ urlpatterns = [
         include("apps.management.urls"),
     ),
     path(
+        "api/management/",
+        include("apps.management.api_urls"),
+    ),
+    path(
         "api/sales/",
         include("apps.sales.urls"),
     ),

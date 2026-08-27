@@ -1,0 +1,1027 @@
+* {
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.management-dashboard {
+    width: min(1560px, 96%);
+    margin: 34px auto 48px;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.management-dashboard-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+
+    margin-bottom: 28px;
+}
+
+.dashboard-eyebrow,
+.section-eyebrow,
+.panel-eyebrow {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: #6f7ca6;
+}
+
+.management-dashboard-header h1 {
+    margin: 8px 0 8px;
+    font-size: 30px;
+    line-height: 1.35;
+    color: #172033;
+}
+
+.management-dashboard-header p {
+    margin: 0;
+    color: #6e7890;
+    line-height: 1.9;
+    font-size: 14px;
+}
+
+.dashboard-quality {
+    min-width: 170px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    padding: 16px 18px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #ffffff,
+            #f8faff
+        );
+
+    border: 1px solid #e3e8f2;
+    border-radius: 16px;
+
+    box-shadow:
+        0 8px 24px rgba(
+            42,
+            56,
+            88,
+            0.06
+        );
+}
+
+.quality-label {
+    font-size: 12px;
+    color: #7b8599;
+    margin-bottom: 6px;
+}
+
+.quality-value {
+    font-size: 14px;
+    font-weight: 800;
+    color: #3447c4;
+}
+
+
+/* =========================================================
+   GLOBAL SECTION
+========================================================= */
+
+.dashboard-section {
+    margin-top: 30px;
+}
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    margin-bottom: 16px;
+}
+
+.section-heading h2 {
+    margin: 6px 0 0;
+    font-size: 20px;
+    color: #1e2739;
+}
+
+
+/* =========================================================
+   LOADING / ERROR
+========================================================= */
+
+.dashboard-loading,
+.dashboard-error {
+    padding: 18px 20px;
+    border-radius: 14px;
+    margin-bottom: 22px;
+    font-size: 13px;
+}
+
+.dashboard-loading {
+    background: #f5f7fc;
+    border: 1px solid #e5e9f2;
+    color: #65708a;
+}
+
+.dashboard-error {
+    background: #fff1f1;
+    border: 1px solid #f2cdcd;
+    color: #b73838;
+}
+
+
+/* =========================================================
+   KPI GRID
+========================================================= */
+
+.kpi-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(0, 1fr)
+        );
+
+    gap: 16px;
+}
+
+.kpi-card {
+    position: relative;
+    overflow: hidden;
+
+    min-height: 138px;
+
+    padding: 20px 22px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #ffffff 0%,
+            #fbfcff 100%
+        );
+
+    border: 1px solid #e3e8f1;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 7px 22px rgba(
+            36,
+            50,
+            82,
+            0.05
+        );
+
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        border-color 0.18s ease;
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 12px 28px rgba(
+            36,
+            50,
+            82,
+            0.08
+        );
+
+    border-color: #d4dbea;
+}
+
+.kpi-card::after {
+    content: "";
+
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    width: 4px;
+    height: 100%;
+
+    background: #6f7ff5;
+}
+
+.kpi-card[data-key="conversion_rate"]::after {
+    background: #5668f5;
+}
+
+.kpi-card[data-key="total_revenue"]::after {
+    background: #12a06a;
+}
+
+.kpi-card[data-key="engagement_rate"]::after {
+    background: #2b8ecb;
+}
+
+.kpi-card[data-key="presented"]::after {
+    background: #8b6ee8;
+}
+
+.kpi-card[data-key="purchased"]::after {
+    background: #179765;
+}
+
+.kpi-card[data-key="interest_rate"]::after {
+    background: #e19a2b;
+}
+
+.kpi-card[data-key="data_quality"]::after {
+    background: #6b7280;
+}
+
+.kpi-label {
+    color: #7b8498;
+    font-size: 12px;
+    margin-bottom: 12px;
+}
+
+.kpi-value {
+    font-size: 28px;
+    font-weight: 900;
+    color: #1a2333;
+    line-height: 1.2;
+}
+
+.kpi-meta {
+    margin-top: 12px;
+    color: #9199aa;
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   PANELS
+========================================================= */
+
+.dashboard-panel {
+    background: #ffffff;
+
+    border: 1px solid #e3e8f1;
+
+    border-radius: 18px;
+
+    padding: 22px;
+
+    box-shadow:
+        0 7px 22px rgba(
+            36,
+            50,
+            82,
+            0.045
+        );
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+
+    margin-bottom: 16px;
+}
+
+.panel-header h3 {
+    margin: 6px 0 0;
+    font-size: 17px;
+    color: #273044;
+}
+
+
+/* =========================================================
+   TREND
+========================================================= */
+
+.trend-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 18px;
+}
+
+.trend-period-selector {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 4px;
+
+    border: 1px solid #e1e6ef;
+
+    border-radius: 12px;
+
+    background: #f7f9fc;
+}
+
+.trend-period-selector button {
+    border: 0;
+    background: transparent;
+
+    padding: 8px 13px;
+
+    border-radius: 9px;
+
+    color: #737d91;
+
+    font-family: inherit;
+    font-size: 12px;
+
+    cursor: pointer;
+}
+
+.trend-period-selector button.active {
+    background: #ffffff;
+    color: #3346c4;
+    font-weight: 800;
+
+    box-shadow:
+        0 2px 7px rgba(
+            45,
+            60,
+            100,
+            0.08
+        );
+}
+
+.trend-chart {
+    min-height: 250px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #fbfcff,
+            #f7f9fd
+        );
+
+    color: #9199aa;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   PERFORMANCE TABS
+========================================================= */
+
+.performance-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    margin-bottom: 14px;
+}
+
+.performance-tab {
+    border: 1px solid #e1e6ef;
+    background: #ffffff;
+
+    color: #65708a;
+
+    padding: 9px 14px;
+
+    border-radius: 10px;
+
+    font-family: inherit;
+    font-size: 12px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.performance-tab:hover {
+    border-color: #cfd6e7;
+}
+
+.performance-tab.active {
+    background: #eef1ff;
+    border-color: #cfd5ff;
+    color: #394dcc;
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   PERFORMANCE CONTENT
+========================================================= */
+
+.performance-content {
+    min-height: 180px;
+}
+
+.performance-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    margin-bottom: 18px;
+}
+
+.performance-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 7px 10px;
+
+    border-radius: 999px;
+
+    background: #f6f8fc;
+    border: 1px solid #e5e9f1;
+
+    font-size: 11px;
+    color: #667188;
+}
+
+
+/* =========================================================
+   SALES TEAM SUMMARY
+========================================================= */
+
+.team-summary-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(0, 1fr)
+        );
+
+    gap: 14px;
+
+    margin-bottom: 16px;
+}
+
+.team-summary-card {
+    background: #ffffff;
+
+    border: 1px solid #e3e8f1;
+
+    border-radius: 15px;
+
+    padding: 17px 18px;
+
+    box-shadow:
+        0 5px 17px rgba(
+            35,
+            50,
+            80,
+            0.04
+        );
+}
+
+.team-summary-label {
+    color: #7a8498;
+    font-size: 11px;
+    margin-bottom: 8px;
+}
+
+.team-summary-value {
+    color: #242e42;
+    font-size: 18px;
+    font-weight: 850;
+}
+
+
+/* =========================================================
+   TABLES
+========================================================= */
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.sales-team-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.sales-team-table th,
+.sales-team-table td {
+    padding: 14px 12px;
+
+    border-bottom: 1px solid #edf0f5;
+
+    text-align: center;
+    white-space: nowrap;
+}
+
+.sales-team-table th {
+    background: #f8f9fc;
+
+    color: #68738a;
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.sales-team-table td {
+    color: #2e374a;
+    font-size: 12px;
+}
+
+.sales-team-table tbody tr:hover {
+    background: #fafbfe;
+}
+
+.salesperson-cell {
+    text-align: right !important;
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   BADGES
+========================================================= */
+
+.data-quality-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 6px 9px;
+
+    border-radius: 999px;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    background: #f3f5f8;
+    color: #657087;
+}
+
+.data-quality-badge.sufficient-data {
+    background: #e9f8f1;
+    color: #13764f;
+}
+
+.data-quality-badge.limited-data {
+    background: #fff6e8;
+    color: #9e680e;
+}
+
+.data-quality-badge.insufficient-data {
+    background: #fff0f0;
+    color: #ad3d3d;
+}
+
+.data-quality-badge.no-presented-data {
+    background: #f1f3f6;
+    color: #6e7686;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.dashboard-empty {
+    padding: 26px 18px;
+
+    text-align: center;
+
+    color: #8992a5;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1250px) {
+
+    .kpi-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+    .team-summary-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+}
+
+
+@media (max-width: 900px) {
+
+    .management-dashboard-header {
+        flex-direction: column;
+    }
+
+    .dashboard-quality {
+        width: 100%;
+    }
+
+    .trend-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+
+@media (max-width: 680px) {
+
+    .management-dashboard {
+        width: 94%;
+        margin-top: 22px;
+    }
+
+    .management-dashboard-header h1 {
+        font-size: 24px;
+    }
+
+    .kpi-grid,
+    .team-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-panel {
+        padding: 16px;
+    }
+
+    .trend-period-selector {
+        width: 100%;
+    }
+
+    .trend-period-selector button {
+        flex: 1;
+    }
+}
+/* =========================================================
+   V3.0.6 DATA RENDERING
+========================================================= */
+
+.trend-list {
+    width: 100%;
+    padding: 10px 16px;
+}
+
+.trend-list-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+
+    padding: 12px 2px;
+
+    border-bottom: 1px solid #e9edf4;
+}
+
+.trend-list-row:last-child {
+    border-bottom: 0;
+}
+
+.trend-period-label {
+    color: #798399;
+    font-size: 11px;
+}
+
+.trend-period-value {
+    color: #27334a;
+    font-size: 14px;
+}
+
+.performance-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 760px;
+}
+
+.performance-table th,
+.performance-table td {
+    padding: 13px 12px;
+    text-align: center;
+    border-bottom: 1px solid #edf0f5;
+    white-space: nowrap;
+}
+
+.performance-table th {
+    background: #f8f9fc;
+    color: #68738a;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.performance-table td {
+    color: #30394c;
+    font-size: 12px;
+}
+
+.performance-table tbody tr:hover {
+    background: #fafbfe;
+}
+
+.performance-entity-cell {
+    text-align: right !important;
+    font-weight: 800;
+}
+
+.salesperson-cell small {
+    color: #8992a4;
+    font-weight: 500;
+}
+
+/* =========================================================
+   V3.0.7 MANAGEMENT CHARTS
+========================================================= */
+
+.management-chart {
+    width: 100%;
+}
+
+.management-chart-body {
+    position: relative;
+    width: 100%;
+    min-height: 250px;
+}
+
+.management-chart-svg {
+    display: block;
+
+    width: 100%;
+    height: 250px;
+
+    overflow: visible;
+}
+
+
+/* ---------------------------------------------------------
+   GRID
+--------------------------------------------------------- */
+
+.chart-grid line {
+    stroke: #e7ebf3;
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+}
+
+
+/* ---------------------------------------------------------
+   AREA
+--------------------------------------------------------- */
+
+.chart-area {
+    fill: rgba(
+        83,
+        109,
+        254,
+        0.08
+    );
+}
+
+
+/* ---------------------------------------------------------
+   LINE
+--------------------------------------------------------- */
+
+.chart-line {
+    stroke: #536dfe;
+    stroke-width: 3;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    vector-effect: non-scaling-stroke;
+}
+
+
+/* ---------------------------------------------------------
+   POINT
+--------------------------------------------------------- */
+
+.chart-point {
+    fill: #ffffff;
+    stroke: #536dfe;
+
+    stroke-width: 3;
+
+    vector-effect: non-scaling-stroke;
+
+    cursor: pointer;
+
+    transition:
+        r 0.15s ease,
+        stroke-width 0.15s ease;
+}
+
+.chart-point:hover,
+.chart-point:focus {
+    r: 7;
+    stroke-width: 4;
+    outline: none;
+}
+
+
+/* ---------------------------------------------------------
+   TOOLTIP
+--------------------------------------------------------- */
+
+.chart-tooltip {
+    position: absolute;
+
+    top: 16px;
+    left: 16px;
+
+    z-index: 5;
+
+    min-width: 130px;
+
+    padding: 10px 12px;
+
+    border-radius: 10px;
+
+    background: #182033;
+    color: #ffffff;
+
+    box-shadow:
+        0 8px 24px rgba(
+            25,
+            34,
+            55,
+            0.18
+        );
+
+    pointer-events: none;
+}
+
+.chart-tooltip-period {
+    font-size: 10px;
+    opacity: 0.72;
+    margin-bottom: 4px;
+}
+
+.chart-tooltip-value {
+    font-size: 14px;
+    font-weight: 900;
+}
+
+
+/* ---------------------------------------------------------
+   X LABELS
+--------------------------------------------------------- */
+
+.chart-x-labels {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+
+    padding:
+        4px
+        12px
+        0;
+
+    direction: ltr;
+}
+
+.chart-x-labels span {
+    flex: 1;
+
+    overflow: hidden;
+
+    color: #8992a5;
+
+    font-size: 9px;
+
+    text-align: center;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* ---------------------------------------------------------
+   CHART TYPE ACCENTS
+--------------------------------------------------------- */
+
+#revenueTrend .chart-line {
+    stroke: #15986a;
+}
+
+#revenueTrend .chart-point {
+    stroke: #15986a;
+}
+
+#revenueTrend .chart-area {
+    fill: rgba(
+        21,
+        152,
+        106,
+        0.08
+    );
+}
+
+
+/* ---------------------------------------------------------
+   TRANSITIONS
+--------------------------------------------------------- */
+
+.trend-chart {
+    overflow: hidden;
+}
+
+.management-chart {
+    animation:
+        management-chart-fade
+        0.22s ease;
+}
+
+@keyframes management-chart-fade {
+
+    from {
+        opacity: 0;
+        transform: translateY(3px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+
+/* ---------------------------------------------------------
+   RESPONSIVE
+--------------------------------------------------------- */
+
+@media (max-width: 680px) {
+
+    .management-chart-svg {
+        height: 220px;
+    }
+
+    .management-chart-body {
+        min-height: 220px;
+    }
+
+    .chart-x-labels span {
+        font-size: 8px;
+    }
+
+}
+
+.performance-ranking {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    margin-bottom: 18px;
+}
+
+.ranking-chip {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 7px 11px;
+
+    border-radius: 999px;
+
+    background: #eef1ff;
+
+    border: 1px solid #d7dcff;
+
+    color: #4052c7;
+
+    font-size: 10px;
+    font-weight: 800;
+}

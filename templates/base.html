@@ -62,14 +62,14 @@
 
                 {% if request.user.is_staff or request.user.is_superuser %}
 
-                    <a
-                        href="{% url 'recommendation-performance-dashboard' %}"
-                        class="nav-item
-                            {% if request.resolver_match.url_name == 'recommendation-performance-dashboard' %}
-                                active
-                            {% endif %}
-                        "
-                    >
+                        <a
+                            href="{% url 'management-dashboard' %}"
+                            class="nav-item
+                                {% if request.resolver_match.url_name == 'management-dashboard' %}
+                                    active
+                                {% endif %}
+                            "
+                        >
                         <span class="nav-icon">⌂</span>
                         <span>Manager Dashboard</span>
                     </a>

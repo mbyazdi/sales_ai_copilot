@@ -5055,6 +5055,1531 @@ def build_brand_performance_analytics(
         },
     }
 
+def build_management_dashboard_contract(
+    customer=None,
+):
+    """
+    Build V3.0.1 management dashboard contract.
+
+    This contract composes existing V2.9 analytics services
+    into one dashboard-ready backend structure.
+
+    Important:
+    - No KPI is recalculated here.
+    - V2.9 remains the source of truth.
+    - No ML prediction is used.
+    - No causal inference is performed.
+    """
+
+    outcome = (
+        build_outcome_analytics_contract(
+            customer=customer
+        )
+    )
+
+    recommendation_type = (
+        build_recommendation_type_analytics(
+            customer=customer
+        )
+    )
+
+    product = (
+        build_product_performance_analytics(
+            customer=customer
+        )
+    )
+
+    category = (
+        build_category_performance_analytics(
+            customer=customer
+        )
+    )
+
+    salesperson = (
+        build_salesperson_performance_analytics(
+            customer=customer
+        )
+    )
+
+    brand = (
+        build_brand_performance_analytics(
+            customer=customer
+        )
+    )
+
+    period_groups = (
+        outcome.get(
+            "period_groups"
+        )
+        or {}
+    )
+
+    summary = (
+        outcome.get(
+            "summary"
+        )
+        or {}
+    )
+
+    return {
+        "ready": (
+            outcome.get(
+                "ready",
+                False,
+            )
+        ),
+
+        "reason": (
+            "MANAGEMENT_DASHBOARD_CONTRACT_READY"
+            if outcome.get(
+                "ready"
+            )
+            else (
+                outcome.get(
+                    "reason"
+                )
+                or "NO_MANAGEMENT_ANALYTICS_DATA"
+            )
+        ),
+
+        "schema_version": (
+            "V3.0.1"
+        ),
+
+        "source_versions": {
+            "outcome": (
+                outcome.get(
+                    "schema_version"
+                )
+            ),
+
+            "recommendation_type": (
+                recommendation_type.get(
+                    "schema_version"
+                )
+            ),
+
+            "product": (
+                product.get(
+                    "schema_version"
+                )
+            ),
+
+            "category": (
+                category.get(
+                    "schema_version"
+                )
+            ),
+
+            "salesperson": (
+                salesperson.get(
+                    "schema_version"
+                )
+            ),
+
+            "brand": (
+                brand.get(
+                    "schema_version"
+                )
+            ),
+        },
+
+        "scope": (
+            outcome.get(
+                "scope"
+            )
+            or {}
+        ),
+
+        "executive_summary": {
+            "resolved_recommendations": (
+                summary.get(
+                    "resolved_recommendations",
+                    0,
+                )
+            ),
+
+            "presented": (
+                summary.get(
+                    "presented",
+                    0,
+                )
+            ),
+
+            "purchased": (
+                summary.get(
+                    "purchased",
+                    0,
+                )
+            ),
+
+            "interested": (
+                summary.get(
+                    "interested",
+                    0,
+                )
+            ),
+
+            "follow_up": (
+                summary.get(
+                    "follow_up",
+                    0,
+                )
+            ),
+
+            "rejected": (
+                summary.get(
+                    "rejected",
+                    0,
+                )
+            ),
+
+            "not_presented": (
+                summary.get(
+                    "not_presented",
+                    0,
+                )
+            ),
+
+            "total_quantity": (
+                summary.get(
+                    "total_quantity",
+                    0,
+                )
+            ),
+
+            "total_revenue": (
+                summary.get(
+                    "total_revenue",
+                    0,
+                )
+            ),
+
+            "average_revenue": (
+                summary.get(
+                    "average_revenue",
+                    0,
+                )
+            ),
+
+            "conversion_rate": (
+                summary.get(
+                    "conversion_rate",
+                    0,
+                )
+            ),
+
+            "interest_rate": (
+                summary.get(
+                    "interest_rate",
+                    0,
+                )
+            ),
+
+            "follow_up_rate": (
+                summary.get(
+                    "follow_up_rate",
+                    0,
+                )
+            ),
+
+            "rejection_rate": (
+                summary.get(
+                    "rejection_rate",
+                    0,
+                )
+            ),
+
+            "engagement_rate": (
+                summary.get(
+                    "engagement_rate",
+                    0,
+                )
+            ),
+
+            "data_quality": (
+                summary.get(
+                    "data_quality"
+                )
+            ),
+        },
+
+        "performance": {
+            "recommendation_type": {
+                "ranking": (
+                    recommendation_type.get(
+                        "ranking"
+                    )
+                    or {}
+                ),
+
+                "items": (
+                    recommendation_type.get(
+                        "items"
+                    )
+                    or []
+                ),
+            },
+
+            "product": {
+                "ranking": (
+                    product.get(
+                        "ranking"
+                    )
+                    or {}
+                ),
+
+                "items": (
+                    product.get(
+                        "items"
+                    )
+                    or []
+                ),
+            },
+
+            "category": {
+                "ranking": (
+                    category.get(
+                        "ranking"
+                    )
+                    or {}
+                ),
+
+                "items": (
+                    category.get(
+                        "items"
+                    )
+                    or []
+                ),
+            },
+
+            "salesperson": {
+                "ranking": (
+                    salesperson.get(
+                        "ranking"
+                    )
+                    or {}
+                ),
+
+                "items": (
+                    salesperson.get(
+                        "items"
+                    )
+                    or []
+                ),
+            },
+
+            "brand": {
+                "ranking": (
+                    brand.get(
+                        "ranking"
+                    )
+                    or {}
+                ),
+
+                "items": (
+                    brand.get(
+                        "items"
+                    )
+                    or []
+                ),
+            },
+        },
+
+        "periods": {
+            "day": (
+                period_groups.get(
+                    "day"
+                )
+                or []
+            ),
+
+            "week": (
+                period_groups.get(
+                    "week"
+                )
+                or []
+            ),
+
+            "month": (
+                period_groups.get(
+                    "month"
+                )
+                or []
+            ),
+        },
+
+        "dashboard_rules": {
+            "source_is_v2_9_analytics": True,
+
+            "kpi_recalculation_performed": False,
+
+            "frontend_kpi_calculation_required": False,
+
+            "not_presented_in_denominator": False,
+
+            "ranking_is_descriptive": True,
+
+            "ml_prediction_used": False,
+
+            "ml_training_performed": False,
+
+            "causal_inference_used": False,
+
+            "ollama_required": False,
+        },
+    }
+
+def build_management_kpi_trend_contract(
+    customer=None,
+):
+    """
+    Build V3.0.2 management KPI and trend contract.
+
+    This layer transforms the V3.0.1 dashboard contract
+    into UI-ready KPI cards and time-series structures.
+
+    Important:
+    - KPI values are copied from V3.0.1.
+    - Period metrics are copied from canonical V2.9 periods.
+    - No business KPI is recalculated here.
+    - No ML prediction is used.
+    - No causal inference is performed.
+    """
+
+    dashboard = (
+        build_management_dashboard_contract(
+            customer=customer
+        )
+    )
+
+    summary = (
+        dashboard.get(
+            "executive_summary"
+        )
+        or {}
+    )
+
+    periods = (
+        dashboard.get(
+            "periods"
+        )
+        or {}
+    )
+
+    # =====================================================
+    # KPI CARDS
+    # =====================================================
+
+    kpis = [
+        {
+            "key": (
+                "conversion_rate"
+            ),
+
+            "label": (
+                "Conversion Rate"
+            ),
+
+            "value": (
+                summary.get(
+                    "conversion_rate",
+                    0,
+                )
+            ),
+
+            "unit": (
+                "PERCENT"
+            ),
+
+            "format": (
+                "PERCENT"
+            ),
+        },
+
+        {
+            "key": (
+                "total_revenue"
+            ),
+
+            "label": (
+                "Total Revenue"
+            ),
+
+            "value": (
+                summary.get(
+                    "total_revenue",
+                    0,
+                )
+            ),
+
+            "unit": (
+                "CURRENCY"
+            ),
+
+            "format": (
+                "NUMBER"
+            ),
+        },
+
+        {
+            "key": (
+                "engagement_rate"
+            ),
+
+            "label": (
+                "Engagement Rate"
+            ),
+
+            "value": (
+                summary.get(
+                    "engagement_rate",
+                    0,
+                )
+            ),
+
+            "unit": (
+                "PERCENT"
+            ),
+
+            "format": (
+                "PERCENT"
+            ),
+        },
+
+        {
+            "key": (
+                "presented"
+            ),
+
+            "label": (
+                "Presented Recommendations"
+            ),
+
+            "value": (
+                summary.get(
+                    "presented",
+                    0,
+                )
+            ),
+
+            "unit": (
+                "COUNT"
+            ),
+
+            "format": (
+                "INTEGER"
+            ),
+        },
+
+        {
+            "key": (
+                "purchased"
+            ),
+
+            "label": (
+                "Purchased"
+            ),
+
+            "value": (
+                summary.get(
+                    "purchased",
+                    0,
+                )
+            ),
+
+            "unit": (
+                "COUNT"
+            ),
+
+            "format": (
+                "INTEGER"
+            ),
+        },
+
+        {
+            "key": (
+                "average_revenue"
+            ),
+
+            "label": (
+                "Average Revenue"
+            ),
+
+            "value": (
+                summary.get(
+                    "average_revenue",
+                    0,
+                )
+            ),
+
+            "unit": (
+                "CURRENCY"
+            ),
+
+            "format": (
+                "NUMBER"
+            ),
+        },
+
+        {
+            "key": (
+                "interest_rate"
+            ),
+
+            "label": (
+                "Interest Rate"
+            ),
+
+            "value": (
+                summary.get(
+                    "interest_rate",
+                    0,
+                )
+            ),
+
+            "unit": (
+                "PERCENT"
+            ),
+
+            "format": (
+                "PERCENT"
+            ),
+        },
+
+        {
+            "key": (
+                "data_quality"
+            ),
+
+            "label": (
+                "Data Quality"
+            ),
+
+            "value": (
+                summary.get(
+                    "data_quality"
+                )
+            ),
+
+            "unit": (
+                "STATUS"
+            ),
+
+            "format": (
+                "TEXT"
+            ),
+        },
+    ]
+
+    # =====================================================
+    # TREND NORMALIZATION
+    # =====================================================
+
+    def build_trend_points(
+        source_items,
+    ):
+
+        result = []
+
+        for item in source_items:
+
+            result.append({
+                "period_start": (
+                    item.get(
+                        "period_start"
+                    )
+                ),
+
+                "period_end": (
+                    item.get(
+                        "period_end"
+                    )
+                ),
+
+                "resolved_recommendations": (
+                    item.get(
+                        "resolved_recommendations",
+                        0,
+                    )
+                ),
+
+                "presented": (
+                    item.get(
+                        "presented",
+                        0,
+                    )
+                ),
+
+                "purchased": (
+                    item.get(
+                        "purchased",
+                        0,
+                    )
+                ),
+
+                "interested": (
+                    item.get(
+                        "interested",
+                        0,
+                    )
+                ),
+
+                "follow_up": (
+                    item.get(
+                        "follow_up",
+                        0,
+                    )
+                ),
+
+                "rejected": (
+                    item.get(
+                        "rejected",
+                        0,
+                    )
+                ),
+
+                "not_presented": (
+                    item.get(
+                        "not_presented",
+                        0,
+                    )
+                ),
+
+                "total_quantity": (
+                    item.get(
+                        "total_quantity",
+                        0,
+                    )
+                ),
+
+                "total_revenue": (
+                    item.get(
+                        "total_revenue",
+                        0,
+                    )
+                ),
+
+                "average_revenue": (
+                    item.get(
+                        "average_revenue",
+                        0,
+                    )
+                ),
+
+                "conversion_rate": (
+                    item.get(
+                        "conversion_rate",
+                        0,
+                    )
+                ),
+
+                "interest_rate": (
+                    item.get(
+                        "interest_rate",
+                        0,
+                    )
+                ),
+
+                "follow_up_rate": (
+                    item.get(
+                        "follow_up_rate",
+                        0,
+                    )
+                ),
+
+                "rejection_rate": (
+                    item.get(
+                        "rejection_rate",
+                        0,
+                    )
+                ),
+
+                "engagement_rate": (
+                    item.get(
+                        "engagement_rate",
+                        0,
+                    )
+                ),
+
+                "data_quality": (
+                    item.get(
+                        "data_quality"
+                    )
+                ),
+            })
+
+        return result
+
+    day_trend = (
+        build_trend_points(
+            periods.get(
+                "day"
+            )
+            or []
+        )
+    )
+
+    week_trend = (
+        build_trend_points(
+            periods.get(
+                "week"
+            )
+            or []
+        )
+    )
+
+    month_trend = (
+        build_trend_points(
+            periods.get(
+                "month"
+            )
+            or []
+        )
+    )
+
+    # =====================================================
+    # FINAL CONTRACT
+    # =====================================================
+
+    return {
+        "ready": (
+            dashboard.get(
+                "ready",
+                False,
+            )
+        ),
+
+        "reason": (
+            "MANAGEMENT_KPI_TREND_READY"
+            if dashboard.get(
+                "ready"
+            )
+            else (
+                dashboard.get(
+                    "reason"
+                )
+                or "NO_MANAGEMENT_ANALYTICS_DATA"
+            )
+        ),
+
+        "schema_version": (
+            "V3.0.2"
+        ),
+
+        "source_dashboard_schema_version": (
+            dashboard.get(
+                "schema_version"
+            )
+        ),
+
+        "scope": (
+            dashboard.get(
+                "scope"
+            )
+            or {}
+        ),
+
+        "kpis": (
+            kpis
+        ),
+
+        "trends": {
+            "day": (
+                day_trend
+            ),
+
+            "week": (
+                week_trend
+            ),
+
+            "month": (
+                month_trend
+            ),
+        },
+
+        "trend_metrics": [
+            "presented",
+            "purchased",
+            "total_revenue",
+            "conversion_rate",
+            "interest_rate",
+            "engagement_rate",
+        ],
+
+        "data_quality": (
+            summary.get(
+                "data_quality"
+            )
+        ),
+
+        "dashboard_rules": {
+            "source_is_v3_0_1": True,
+
+            "source_is_v2_9_analytics": True,
+
+            "kpi_values_copied_from_source": True,
+
+            "trend_values_copied_from_source": True,
+
+            "kpi_recalculation_performed": False,
+
+            "trend_metric_recalculation_performed": False,
+
+            "frontend_kpi_calculation_required": False,
+
+            "frontend_trend_calculation_required": False,
+
+            "ml_prediction_used": False,
+
+            "ml_training_performed": False,
+
+            "causal_inference_used": False,
+
+            "ollama_required": False,
+        },
+    }
+
+def build_management_performance_sections_contract(
+    customer=None,
+):
+    """
+    Build V3.0.3 management performance sections contract.
+
+    This layer prepares UI-ready performance sections from
+    the V3.0.1 management dashboard contract.
+
+    Important:
+    - Performance metrics are copied from V3.0.1.
+    - Rankings are copied from V3.0.1.
+    - No KPI or ranking is recalculated here.
+    - Salesperson performance is intentionally excluded
+      and handled separately in V3.0.4.
+    - No ML prediction or causal inference is performed.
+    """
+
+    dashboard = (
+        build_management_dashboard_contract(
+            customer=customer
+        )
+    )
+
+    performance = (
+        dashboard.get(
+            "performance"
+        )
+        or {}
+    )
+
+    # =====================================================
+    # SECTION DEFINITIONS
+    # =====================================================
+
+    section_definitions = [
+        {
+            "key": (
+                "recommendation_type"
+            ),
+
+            "title": (
+                "Recommendation Performance"
+            ),
+
+            "entity_type": (
+                "RECOMMENDATION_TYPE"
+            ),
+
+            "identity_fields": [
+                "recommendation_type",
+            ],
+        },
+
+        {
+            "key": (
+                "product"
+            ),
+
+            "title": (
+                "Product Performance"
+            ),
+
+            "entity_type": (
+                "PRODUCT"
+            ),
+
+            "identity_fields": [
+                "product_id",
+                "product_code",
+                "product_name",
+            ],
+        },
+
+        {
+            "key": (
+                "category"
+            ),
+
+            "title": (
+                "Category Performance"
+            ),
+
+            "entity_type": (
+                "CATEGORY"
+            ),
+
+            "identity_fields": [
+                "category_code",
+                "category_name",
+            ],
+        },
+
+        {
+            "key": (
+                "brand"
+            ),
+
+            "title": (
+                "Brand Performance"
+            ),
+
+            "entity_type": (
+                "BRAND"
+            ),
+
+            "identity_fields": [
+                "brand_code",
+                "brand_name",
+            ],
+        },
+    ]
+
+    # =====================================================
+    # BUILD SECTIONS
+    # =====================================================
+
+    sections = []
+
+    for definition in section_definitions:
+
+        key = (
+            definition[
+                "key"
+            ]
+        )
+
+        source = (
+            performance.get(
+                key
+            )
+            or {}
+        )
+
+        items = (
+            source.get(
+                "items"
+            )
+            or []
+        )
+
+        ranking = (
+            source.get(
+                "ranking"
+            )
+            or {}
+        )
+
+        sections.append({
+            "key": (
+                key
+            ),
+
+            "title": (
+                definition[
+                    "title"
+                ]
+            ),
+
+            "entity_type": (
+                definition[
+                    "entity_type"
+                ]
+            ),
+
+            "identity_fields": (
+                definition[
+                    "identity_fields"
+                ]
+            ),
+
+            "item_count": (
+                len(
+                    items
+                )
+            ),
+
+            "ranking": (
+                ranking
+            ),
+
+            "items": (
+                items
+            ),
+        })
+
+    section_map = {
+        item[
+            "key"
+        ]: item
+        for item in sections
+    }
+
+    # =====================================================
+    # FINAL CONTRACT
+    # =====================================================
+
+    return {
+        "ready": (
+            dashboard.get(
+                "ready",
+                False,
+            )
+        ),
+
+        "reason": (
+            "MANAGEMENT_PERFORMANCE_SECTIONS_READY"
+            if dashboard.get(
+                "ready"
+            )
+            else (
+                dashboard.get(
+                    "reason"
+                )
+                or "NO_MANAGEMENT_ANALYTICS_DATA"
+            )
+        ),
+
+        "schema_version": (
+            "V3.0.3"
+        ),
+
+        "source_dashboard_schema_version": (
+            dashboard.get(
+                "schema_version"
+            )
+        ),
+
+        "scope": (
+            dashboard.get(
+                "scope"
+            )
+            or {}
+        ),
+
+        "section_order": [
+            "recommendation_type",
+            "product",
+            "category",
+            "brand",
+        ],
+
+        "sections": (
+            sections
+        ),
+
+        "section_map": (
+            section_map
+        ),
+
+        "display_metrics": [
+            "presented",
+            "purchased",
+            "interested",
+            "follow_up",
+            "rejected",
+            "not_presented",
+            "total_quantity",
+            "total_revenue",
+            "average_revenue",
+            "conversion_rate",
+            "interest_rate",
+            "engagement_rate",
+            "data_quality",
+        ],
+
+        "dashboard_rules": {
+            "source_is_v3_0_1": True,
+
+            "source_is_v2_9_analytics": True,
+
+            "performance_values_copied_from_source": True,
+
+            "rankings_copied_from_source": True,
+
+            "performance_recalculation_performed": False,
+
+            "ranking_recalculation_performed": False,
+
+            "frontend_performance_calculation_required": False,
+
+            "frontend_ranking_calculation_required": False,
+
+            "salesperson_section_included": False,
+
+            "ml_prediction_used": False,
+
+            "ml_training_performed": False,
+
+            "causal_inference_used": False,
+
+            "ollama_required": False,
+        },
+    }
+
+def build_management_sales_team_contract(
+    customer=None,
+):
+    """
+    Build V3.0.4 management sales-team contract.
+
+    This layer prepares salesperson analytics for
+    management dashboard consumption.
+
+    Important:
+    - Salesperson metrics are copied from V3.0.1.
+    - Rankings are copied from V3.0.1.
+    - No salesperson KPI is recalculated here.
+    - No causal interpretation is performed.
+    - No ML prediction or training is performed.
+    """
+
+    dashboard = (
+        build_management_dashboard_contract(
+            customer=customer
+        )
+    )
+
+    performance = (
+        dashboard.get(
+            "performance"
+        )
+        or {}
+    )
+
+    salesperson_source = (
+        performance.get(
+            "salesperson"
+        )
+        or {}
+    )
+
+    items = (
+        salesperson_source.get(
+            "items"
+        )
+        or []
+    )
+
+    ranking = (
+        salesperson_source.get(
+            "ranking"
+        )
+        or {}
+    )
+
+    # =====================================================
+    # TEAM SUMMARY
+    # =====================================================
+
+    team_summary = {
+        "salesperson_count": (
+            len(
+                items
+            )
+        ),
+
+        "active_analytics_rows": (
+            len(
+                [
+                    item
+                    for item in items
+                    if (
+                        item.get(
+                            "resolved_recommendations",
+                            0,
+                        )
+                        > 0
+                    )
+                ]
+            )
+        ),
+
+        "best_conversion_salesperson_code": (
+            ranking.get(
+                "best_conversion_salesperson_code"
+            )
+        ),
+
+        "best_revenue_salesperson_code": (
+            ranking.get(
+                "best_revenue_salesperson_code"
+            )
+        ),
+
+        "best_engagement_salesperson_code": (
+            ranking.get(
+                "best_engagement_salesperson_code"
+            )
+        ),
+    }
+
+    # =====================================================
+    # LEADERBOARD
+    # =====================================================
+
+    leaderboard = []
+
+    for item in items:
+
+        leaderboard.append({
+            "salesperson_id": (
+                item.get(
+                    "salesperson_id"
+                )
+            ),
+
+            "employee_code": (
+                item.get(
+                    "employee_code"
+                )
+            ),
+
+            "first_name": (
+                item.get(
+                    "first_name"
+                )
+            ),
+
+            "last_name": (
+                item.get(
+                    "last_name"
+                )
+            ),
+
+            "full_name": (
+                item.get(
+                    "full_name"
+                )
+            ),
+
+            "resolved_recommendations": (
+                item.get(
+                    "resolved_recommendations",
+                    0,
+                )
+            ),
+
+            "presented": (
+                item.get(
+                    "presented",
+                    0,
+                )
+            ),
+
+            "purchased": (
+                item.get(
+                    "purchased",
+                    0,
+                )
+            ),
+
+            "interested": (
+                item.get(
+                    "interested",
+                    0,
+                )
+            ),
+
+            "follow_up": (
+                item.get(
+                    "follow_up",
+                    0,
+                )
+            ),
+
+            "rejected": (
+                item.get(
+                    "rejected",
+                    0,
+                )
+            ),
+
+            "not_presented": (
+                item.get(
+                    "not_presented",
+                    0,
+                )
+            ),
+
+            "total_quantity": (
+                item.get(
+                    "total_quantity",
+                    0,
+                )
+            ),
+
+            "total_revenue": (
+                item.get(
+                    "total_revenue",
+                    0,
+                )
+            ),
+
+            "average_revenue": (
+                item.get(
+                    "average_revenue",
+                    0,
+                )
+            ),
+
+            "conversion_rate": (
+                item.get(
+                    "conversion_rate",
+                    0,
+                )
+            ),
+
+            "interest_rate": (
+                item.get(
+                    "interest_rate",
+                    0,
+                )
+            ),
+
+            "follow_up_rate": (
+                item.get(
+                    "follow_up_rate",
+                    0,
+                )
+            ),
+
+            "rejection_rate": (
+                item.get(
+                    "rejection_rate",
+                    0,
+                )
+            ),
+
+            "engagement_rate": (
+                item.get(
+                    "engagement_rate",
+                    0,
+                )
+            ),
+
+            "data_quality": (
+                item.get(
+                    "data_quality"
+                )
+            ),
+        })
+
+    # =====================================================
+    # FINAL CONTRACT
+    # =====================================================
+
+    return {
+        "ready": (
+            dashboard.get(
+                "ready",
+                False,
+            )
+        ),
+
+        "reason": (
+            "MANAGEMENT_SALES_TEAM_READY"
+            if dashboard.get(
+                "ready"
+            )
+            else (
+                dashboard.get(
+                    "reason"
+                )
+                or "NO_MANAGEMENT_ANALYTICS_DATA"
+            )
+        ),
+
+        "schema_version": (
+            "V3.0.4"
+        ),
+
+        "source_dashboard_schema_version": (
+            dashboard.get(
+                "schema_version"
+            )
+        ),
+
+        "scope": (
+            dashboard.get(
+                "scope"
+            )
+            or {}
+        ),
+
+        "team_summary": (
+            team_summary
+        ),
+
+        "ranking": (
+            ranking
+        ),
+
+        "leaderboard": (
+            leaderboard
+        ),
+
+        "display_metrics": [
+            "presented",
+            "purchased",
+            "interested",
+            "follow_up",
+            "rejected",
+            "not_presented",
+            "total_quantity",
+            "total_revenue",
+            "average_revenue",
+            "conversion_rate",
+            "interest_rate",
+            "engagement_rate",
+            "data_quality",
+        ],
+
+        "dashboard_rules": {
+            "source_is_v3_0_1": True,
+
+            "source_is_v2_9_analytics": True,
+
+            "salesperson_values_copied_from_source": True,
+
+            "rankings_copied_from_source": True,
+
+            "salesperson_metric_recalculation_performed": False,
+
+            "ranking_recalculation_performed": False,
+
+            "leaderboard_is_descriptive": True,
+
+            "frontend_salesperson_calculation_required": False,
+
+            "causal_inference_used": False,
+
+            "ml_prediction_used": False,
+
+            "ml_training_performed": False,
+
+            "ollama_required": False,
+        },
+    }
+
 def build_ml_learning_contract(
     visit,
 ):

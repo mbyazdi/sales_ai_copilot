@@ -1,5 +1,18 @@
-from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.admin.views.decorators import (
+    staff_member_required,
+)
 from django.shortcuts import render
+
+
+@staff_member_required(
+    login_url="/accounts/login/",
+)
+def management_dashboard(request):
+
+    return render(
+        request,
+        "management/dashboard.html",
+    )
 
 
 @staff_member_required(

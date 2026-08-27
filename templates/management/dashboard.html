@@ -1,0 +1,382 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block title %}
+    Management Dashboard
+{% endblock %}
+
+
+{% block extra_css %}
+
+    <link
+        rel="stylesheet"
+        href="{% static 'management/css/dashboard.css' %}"
+    >
+
+{% endblock %}
+
+
+{% block breadcrumb %}
+    Manager / Management Dashboard
+{% endblock %}
+
+
+{% block content %}
+
+<div
+    class="management-dashboard"
+    id="managementDashboard"
+>
+
+    <!-- =========================================
+         PAGE HEADER
+    ========================================== -->
+
+    <header class="management-dashboard-header">
+
+        <div>
+
+            <div class="dashboard-eyebrow">
+                SALES AI COPILOT
+            </div>
+
+            <h1>
+                داشبورد هوشمند مدیریت فروش
+            </h1>
+
+            <p>
+                نمای یکپارچه عملکرد فروش،
+                پیشنهادهای هوشمند و تیم فروش
+            </p>
+
+        </div>
+
+
+        <div
+            class="dashboard-quality"
+            id="dashboardQuality"
+        >
+            <span class="quality-label">
+                کیفیت داده
+            </span>
+
+            <span
+                class="quality-value"
+                id="dashboardQualityValue"
+            >
+                —
+            </span>
+        </div>
+
+    </header>
+
+
+    <!-- =========================================
+         LOADING / ERROR
+    ========================================== -->
+
+    <div
+        class="dashboard-loading"
+        id="dashboardLoading"
+    >
+        در حال دریافت اطلاعات داشبورد...
+    </div>
+
+
+    <div
+        class="dashboard-error"
+        id="dashboardError"
+        hidden
+    ></div>
+
+
+    <!-- =========================================
+         KPI CARDS
+    ========================================== -->
+
+    <section class="dashboard-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <div class="section-eyebrow">
+                    EXECUTIVE SUMMARY
+                </div>
+
+                <h2>
+                    شاخص‌های کلیدی عملکرد
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="kpi-grid"
+            id="dashboardKpiGrid"
+        ></div>
+
+    </section>
+
+
+    <!-- =========================================
+         TRENDS
+    ========================================== -->
+
+    <section class="dashboard-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <div class="section-eyebrow">
+                    PERFORMANCE TREND
+                </div>
+
+                <h2>
+                    روند عملکرد فروش
+                </h2>
+
+            </div>
+
+
+            <div
+                class="trend-period-selector"
+                id="trendPeriodSelector"
+            >
+
+                <button
+                    type="button"
+                    data-period="day"
+                    class="active"
+                >
+                    روزانه
+                </button>
+
+                <button
+                    type="button"
+                    data-period="week"
+                >
+                    هفتگی
+                </button>
+
+                <button
+                    type="button"
+                    data-period="month"
+                >
+                    ماهانه
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="trend-grid">
+
+            <article class="dashboard-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <div class="panel-eyebrow">
+                            CONVERSION
+                        </div>
+
+                        <h3>
+                            نرخ تبدیل
+                        </h3>
+
+                    </div>
+
+                </div>
+
+                <div
+                    class="trend-chart"
+                    id="conversionTrend"
+                ></div>
+
+            </article>
+
+
+            <article class="dashboard-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <div class="panel-eyebrow">
+                            REVENUE
+                        </div>
+
+                        <h3>
+                            روند فروش
+                        </h3>
+
+                    </div>
+
+                </div>
+
+                <div
+                    class="trend-chart"
+                    id="revenueTrend"
+                ></div>
+
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         PERFORMANCE SECTIONS
+    ========================================== -->
+
+    <section class="dashboard-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <div class="section-eyebrow">
+                    SALES INTELLIGENCE
+                </div>
+
+                <h2>
+                    تحلیل عملکرد
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="performance-tabs"
+            id="performanceTabs"
+        ></div>
+
+
+        <article class="dashboard-panel">
+
+            <div
+                class="performance-content"
+                id="performanceContent"
+            ></div>
+
+        </article>
+
+    </section>
+
+
+    <!-- =========================================
+         SALES TEAM
+    ========================================== -->
+
+    <section class="dashboard-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <div class="section-eyebrow">
+                    SALES TEAM
+                </div>
+
+                <h2>
+                    عملکرد تیم فروش
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="team-summary-grid"
+            id="teamSummaryGrid"
+        ></div>
+
+
+        <article class="dashboard-panel">
+
+            <div class="table-wrapper">
+
+                <table class="sales-team-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                فروشنده
+                            </th>
+
+                            <th>
+                                پیشنهاد ارائه‌شده
+                            </th>
+
+                            <th>
+                                خرید
+                            </th>
+
+                            <th>
+                                نرخ تبدیل
+                            </th>
+
+                            <th>
+                                نرخ تعامل
+                            </th>
+
+                            <th>
+                                فروش
+                            </th>
+
+                            <th>
+                                کیفیت داده
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="salesTeamTableBody"
+                    ></tbody>
+
+                </table>
+
+            </div>
+
+        </article>
+
+    </section>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+
+    window.managementDashboardConfig = {
+        apiUrl:
+            "/api/management/v1/dashboard/"
+    };
+
+</script>
+
+
+<script
+    src="{% static 'management/js/dashboard.js' %}"
+></script>
+
+{% endblock %}
