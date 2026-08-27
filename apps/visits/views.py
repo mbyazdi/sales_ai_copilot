@@ -21,6 +21,7 @@ from .services import (
     build_pre_visit_briefs,
     capture_visit_customer_snapshot,
     capture_visit_commercial_snapshot,
+    sync_visit_outcome_state,
 )
 from apps.targets.services import (
     get_salesperson_target_progress,
@@ -576,78 +577,25 @@ class SalesOutcomeCreateAPIView(APIView):
         )
 
         # =========================================
-        # UPDATE VISIT
+        # SYNCHRONIZE DERIVED VISIT STATE
         # =========================================
 
-        update_fields = []
 
-        # -----------------------------------------
-        # PURCHASE RESULT
-        # -----------------------------------------
+        sync_visit_outcome_state(
+            visit=visit,
 
-        if outcome == SalesOutcome.Outcome.PURCHASED:
-
-            visit.order_created = True
-
-            visit.order_amount = (
-                sales_amount
-            )
-
-            update_fields.extend([
-                "order_created",
-                "order_amount",
-            ])
-
-
-        # -----------------------------------------
-        # FOLLOW-UP RESULT
-        # -----------------------------------------
-
-        if outcome == SalesOutcome.Outcome.FOLLOW_UP:
-
-            visit.follow_up_required = True
-
-            visit.follow_up_date = (
+            follow_up_date=(
                 parsed_follow_up_date
-            )
-
-            update_fields.extend([
-                "follow_up_required",
-                "follow_up_date",
-            ])
-            FollowUpTask.objects.update_or_create(
-                visit=visit,
-                customer=visit.customer,
-                salesperson=visit.salesperson,
-                status=FollowUpTask.Status.OPEN,
-                defaults={
-                    "due_date": (
-                        parsed_follow_up_date
-                    ),
-                    "notes": (
-                        notes
-                    ),
-                },
-            )
-
-
-        # -----------------------------------------
-        # SAVE VISIT
-        # -----------------------------------------
-
-        if update_fields:
-
-            update_fields.append(
-                "updated_at"
-            )
-
-            visit.save(
-                update_fields=list(
-                    dict.fromkeys(
-                        update_fields
-                    )
+                if (
+                    outcome
+                    == SalesOutcome.Outcome.FOLLOW_UP
                 )
-            )
+                else None
+            ),
+
+            follow_up_notes=notes,
+        )
+
 
         # =========================================
         # RESPONSE
@@ -1359,30 +1307,18 @@ class VisitStartAPIView(APIView):
 
         if (
             visit.status
-            == Visit.VisitStatus.CANCELLED
+            != Visit.VisitStatus.PLANNED
         ):
 
             return Response(
                 {
                     "detail": (
-                        "Cancelled visit cannot "
-                        "be started."
-                    )
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        if (
-            visit.status
-            == Visit.VisitStatus.COMPLETED
-        ):
-
-            return Response(
-                {
-                    "detail": (
-                        "Completed visit cannot "
-                        "be started again."
-                    )
+                        "Visit can only be started "
+                        "while it is planned."
+                    ),
+                    "visit_status": (
+                        visit.status
+                    ),
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )

@@ -26,14 +26,7 @@ from apps.core.commercial_decision import (
 from apps.targets.services import (
     get_salesperson_target_progress,
 )
-
-OUTCOME_PRIORITY = {
-    "PURCHASED": 5,
-    "INTERESTED": 4,
-    "FOLLOW_UP": 3,
-    "REJECTED": 2,
-    "NOT_PRESENTED": 1,
-}
+from django.utils import timezone
 
 def build_pre_visit_briefs(
     visits,
@@ -779,13 +772,7 @@ def resolve_recommendation_outcome(
     if not outcomes:
         return None
 
-    final_outcome = max(
-        outcomes,
-        key=lambda item: OUTCOME_PRIORITY.get(
-            item.outcome,
-            0,
-        ),
-    )
+    final_outcome = outcomes[0]
 
     quantity = 0
     sales_amount = 0
@@ -825,6 +812,201 @@ def resolve_recommendation_outcome(
         "events_count": len(outcomes),
         "last_event_id": outcomes[0].id,
         "last_event_at": outcomes[0].created_at,
+    }
+
+def sync_visit_outcome_state(
+    visit,
+    follow_up_date=None,
+    follow_up_notes="",
+):
+    """
+    Synchronize Visit-derived commercial state from the
+    current resolved recommendation outcomes.
+
+    Important:
+    - Raw SalesOutcome events remain immutable history.
+    - Current outcome = latest event per Visit + Recommendation.
+    - Purchase state is derived from current resolved outcomes.
+    - Follow-up state is derived from current resolved outcomes
+      together with the visit-level FollowUpTask.
+    - Existing DONE / CANCELLED tasks are never reopened.
+    """
+
+    recommendation_ids = list(
+        SalesOutcome.objects
+        .filter(
+            visit=visit,
+            recommendation__isnull=False,
+        )
+        .order_by()
+        .values_list(
+            "recommendation_id",
+            flat=True,
+        )
+        .distinct()
+    )
+
+    resolved_outcomes = []
+
+    for recommendation_id in recommendation_ids:
+
+        resolved = resolve_recommendation_outcome(
+            visit_id=visit.id,
+            recommendation_id=recommendation_id,
+        )
+
+        if resolved:
+            resolved_outcomes.append(
+                resolved
+            )
+
+    # =====================================================
+    # PURCHASE STATE
+    # =====================================================
+
+    current_purchases = [
+        item
+        for item in resolved_outcomes
+        if item.get("outcome")
+        == SalesOutcome.Outcome.PURCHASED
+    ]
+
+    visit.order_created = bool(
+        current_purchases
+    )
+
+    visit.order_amount = sum(
+        (
+            item.get("sales_amount")
+            or 0
+        )
+        for item in current_purchases
+    )
+
+    # =====================================================
+    # FOLLOW-UP STATE
+    # =====================================================
+
+    current_follow_ups = [
+        item
+        for item in resolved_outcomes
+        if item.get("outcome")
+        == SalesOutcome.Outcome.FOLLOW_UP
+    ]
+
+    open_tasks = (
+        FollowUpTask.objects
+        .filter(
+            visit=visit,
+            status=FollowUpTask.Status.OPEN,
+        )
+        .order_by(
+            "due_date",
+            "id",
+        )
+    )
+
+    if current_follow_ups:
+
+        open_task = open_tasks.first()
+
+        if follow_up_date is not None:
+
+            if open_task:
+
+                open_task.due_date = (
+                    follow_up_date
+                )
+
+                open_task.notes = (
+                    follow_up_notes
+                    or ""
+                )
+
+                open_task.save(
+                    update_fields=[
+                        "due_date",
+                        "notes",
+                        "updated_at",
+                    ]
+                )
+
+            else:
+
+                open_task = (
+                    FollowUpTask.objects.create(
+                        visit=visit,
+                        customer=visit.customer,
+                        salesperson=visit.salesperson,
+                        due_date=follow_up_date,
+                        status=FollowUpTask.Status.OPEN,
+                        notes=(
+                            follow_up_notes
+                            or ""
+                        ),
+                    )
+                )
+
+        if open_task:
+
+            visit.follow_up_required = True
+
+            visit.follow_up_date = (
+                open_task.due_date
+            )
+
+        else:
+
+            # A current FOLLOW_UP exists, but there is
+            # no date available to safely reconstruct
+            # a task. Preserve existing Visit state.
+            visit.follow_up_required = True
+
+    else:
+
+        open_tasks.update(
+            status=FollowUpTask.Status.CANCELLED,
+            completed_at=None,
+            updated_at=timezone.now(),
+        )
+
+        visit.follow_up_required = False
+        visit.follow_up_date = None
+
+    # =====================================================
+    # SAVE DERIVED VISIT STATE
+    # =====================================================
+
+    visit.save(
+        update_fields=[
+            "order_created",
+            "order_amount",
+            "follow_up_required",
+            "follow_up_date",
+            "updated_at",
+        ]
+    )
+
+    return {
+        "resolved_outcomes": (
+            resolved_outcomes
+        ),
+
+        "order_created": (
+            visit.order_created
+        ),
+
+        "order_amount": (
+            visit.order_amount
+        ),
+
+        "follow_up_required": (
+            visit.follow_up_required
+        ),
+
+        "follow_up_date": (
+            visit.follow_up_date
+        ),
     }
 
 def capture_visit_customer_snapshot(

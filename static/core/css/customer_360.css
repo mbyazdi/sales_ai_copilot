@@ -5358,6 +5358,61 @@ html {
     transform: translateY(0);
 }
 
+/* =========================================================
+   IN-PROGRESS / COMPLETE-VISIT CTA
+========================================================= */
+
+.visit-state-in_progress #completeVisitButton {
+    min-width: 150px;
+    min-height: 44px;
+
+    padding: 10px 22px;
+
+    border: 0;
+    border-radius: 12px;
+
+    background: #273249;
+
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 7px 18px
+        rgba(
+            39,
+            50,
+            73,
+            0.18
+        );
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        opacity 0.15s ease;
+}
+
+
+.visit-state-in_progress #completeVisitButton:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 9px 22px
+        rgba(
+            39,
+            50,
+            73,
+            0.24
+        );
+}
+
+
+.visit-state-in_progress #completeVisitButton:active {
+    transform: translateY(0);
+}
 
 /*
  * Outcome controls stay visually secondary
@@ -6648,4 +6703,43 @@ html {
         justify-content:
             flex-start;
     }
+}
+/* =========================================================
+   V3.0.10.5
+   PRIMARY RECOMMENDATION OUTCOME STATUS VISIBILITY
+========================================================= */
+
+.recommendation-outcome-card.is-primary
+.recommendation-outcome-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.20);
+}
+
+.recommendation-outcome-card.is-primary
+.recommendation-outcome-status
+.status-label {
+    color: #111827;
+    font-weight: 800;
+    opacity: 1;
+}
+
+.recommendation-outcome-card.is-primary
+.recommendation-outcome-status
+.status-value {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 4px 9px;
+
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.92);
+    color: #25314d;
+
+    font-weight: 900;
+    line-height: 1.4;
 }

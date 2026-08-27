@@ -1861,6 +1861,99 @@
         );
     }
 
+    function updateVisitStateBanner(
+        status
+    ) {
+
+        const banner =
+            document.querySelector(
+                ".visit-state-banner"
+            );
+
+        if (!banner) {
+            return;
+        }
+
+        const icon =
+            banner.querySelector(
+                ".visit-state-banner-icon"
+            );
+
+        const title =
+            banner.querySelector(
+                ".visit-state-banner-title"
+            );
+
+        const text =
+            banner.querySelector(
+                ".visit-state-banner-text"
+            );
+
+        if (
+            !icon
+            || !title
+            || !text
+        ) {
+            return;
+        }
+
+        if (status === "PLANNED") {
+
+            icon.textContent =
+                "🗓️";
+
+            title.textContent =
+                "جلسه هنوز شروع نشده است";
+
+            text.textContent =
+                "قبل از شروع ویزیت، پیشنهادها و اطلاعات مشتری را مرور کنید. "
+                + "ثبت نتیجه فروش بعد از شروع رسمی ویزیت فعال می‌شود.";
+
+            return;
+        }
+
+        if (status === "IN_PROGRESS") {
+
+            icon.textContent =
+                "⚡";
+
+            title.textContent =
+                "ویزیت در حال انجام است";
+
+            text.textContent =
+                "اکنون می‌توانید از Sales Copilot استفاده کنید، "
+                + "پیشنهادها را مطرح کنید و نتیجه هر تعامل را ثبت کنید.";
+
+            return;
+        }
+
+        if (status === "COMPLETED") {
+
+            icon.textContent =
+                "✓";
+
+            title.textContent =
+                "این ویزیت تکمیل شده است";
+
+            text.textContent =
+                "این صفحه اکنون در حالت مرور قرار دارد. "
+                + "نتایج ثبت‌شده قابل مشاهده هستند اما Outcome جدید ثبت نمی‌شود.";
+
+            return;
+        }
+
+        if (status === "CANCELLED") {
+
+            icon.textContent =
+                "✕";
+
+            title.textContent =
+                "این ویزیت لغو شده است";
+
+            text.textContent =
+                "عملیات فروش برای این ویزیت غیرفعال است.";
+        }
+    }
 
     /* =========================================================
     VISIT API
@@ -2022,6 +2115,9 @@
                 data.visit.status
             );
 
+            updateVisitStateBanner(
+                data.visit.status
+            );
 
             setOutcomeButtonsEnabled(
                 true
@@ -2098,6 +2194,9 @@
                 data.visit.status
             );
 
+            updateVisitStateBanner(
+                data.visit.status
+            );
 
             /*
             * بعد از پایان رسمی ویزیت،
