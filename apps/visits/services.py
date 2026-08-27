@@ -6580,6 +6580,545 @@ def build_management_sales_team_contract(
         },
     }
 
+def build_management_executive_intelligence_context(
+    customer=None,
+):
+    """
+    Build V3.0.8.1 deterministic executive intelligence context.
+
+    This layer prepares approved management facts for later
+    executive narrative generation.
+
+    Important:
+    - KPI values are copied from existing management contracts.
+    - Rankings are copied from existing management contracts.
+    - Ranked identities are resolved only against source items.
+    - No KPI is recalculated.
+    - No ranking is recalculated.
+    - No trend interpretation is performed.
+    - No causal inference is performed.
+    - No ML prediction is used.
+    - Ollama is not used here.
+    """
+
+    dashboard = (
+        build_management_dashboard_contract(
+            customer=customer
+        )
+    )
+
+    kpi_trend = (
+        build_management_kpi_trend_contract(
+            customer=customer
+        )
+    )
+
+    performance = (
+        build_management_performance_sections_contract(
+            customer=customer
+        )
+    )
+
+    sales_team = (
+        build_management_sales_team_contract(
+            customer=customer
+        )
+    )
+
+    summary = (
+        dashboard.get(
+            "executive_summary"
+        )
+        or {}
+    )
+
+    sections = (
+        performance.get(
+            "sections"
+        )
+        or []
+    )
+
+    # =====================================================
+    # SOURCE LOOKUPS
+    # =====================================================
+
+    section_map = {
+        section.get("key"): section
+        for section in sections
+        if section.get("key")
+    }
+
+    def find_item(
+        section_key,
+        identity_field,
+        identity_value,
+    ):
+        """
+        Resolve an existing ranked identity against the
+        already-approved source items.
+
+        This performs lookup only. It does not rank,
+        compare, sort, or calculate.
+        """
+
+        if identity_value is None:
+            return None
+
+        section = (
+            section_map.get(
+                section_key
+            )
+            or {}
+        )
+
+        items = (
+            section.get(
+                "items"
+            )
+            or []
+        )
+
+        for item in items:
+
+            if (
+                item.get(identity_field)
+                == identity_value
+            ):
+                return item
+
+        return None
+
+    # =====================================================
+    # APPROVED KPI FACTS
+    # =====================================================
+
+    approved_kpis = (
+        kpi_trend.get(
+            "kpis"
+        )
+        or []
+    )
+
+    # =====================================================
+    # APPROVED PERFORMANCE RANKINGS
+    # =====================================================
+
+    product_section = (
+        section_map.get("product")
+        or {}
+    )
+
+    category_section = (
+        section_map.get("category")
+        or {}
+    )
+
+    brand_section = (
+        section_map.get("brand")
+        or {}
+    )
+
+    type_section = (
+        section_map.get(
+            "recommendation_type"
+        )
+        or {}
+    )
+
+    product_ranking = (
+        product_section.get(
+            "ranking"
+        )
+        or {}
+    )
+
+    category_ranking = (
+        category_section.get(
+            "ranking"
+        )
+        or {}
+    )
+
+    brand_ranking = (
+        brand_section.get(
+            "ranking"
+        )
+        or {}
+    )
+
+    type_ranking = (
+        type_section.get(
+            "ranking"
+        )
+        or {}
+    )
+
+    best_conversion_product = find_item(
+        "product",
+        "product_code",
+        product_ranking.get(
+            "best_conversion_product_code"
+        ),
+    )
+
+    best_revenue_product = find_item(
+        "product",
+        "product_code",
+        product_ranking.get(
+            "best_revenue_product_code"
+        ),
+    )
+
+    best_engagement_product = find_item(
+        "product",
+        "product_code",
+        product_ranking.get(
+            "best_engagement_product_code"
+        ),
+    )
+
+    best_conversion_category = find_item(
+        "category",
+        "category_code",
+        category_ranking.get(
+            "best_conversion_category_code"
+        ),
+    )
+
+    best_revenue_category = find_item(
+        "category",
+        "category_code",
+        category_ranking.get(
+            "best_revenue_category_code"
+        ),
+    )
+
+    best_engagement_category = find_item(
+        "category",
+        "category_code",
+        category_ranking.get(
+            "best_engagement_category_code"
+        ),
+    )
+
+    best_conversion_brand = find_item(
+        "brand",
+        "brand_code",
+        brand_ranking.get(
+            "best_conversion_brand_code"
+        ),
+    )
+
+    best_revenue_brand = find_item(
+        "brand",
+        "brand_code",
+        brand_ranking.get(
+            "best_revenue_brand_code"
+        ),
+    )
+
+    best_engagement_brand = find_item(
+        "brand",
+        "brand_code",
+        brand_ranking.get(
+            "best_engagement_brand_code"
+        ),
+    )
+
+    best_conversion_type = find_item(
+        "recommendation_type",
+        "recommendation_type",
+        type_ranking.get(
+            "best_conversion_type"
+        ),
+    )
+
+    best_revenue_type = find_item(
+        "recommendation_type",
+        "recommendation_type",
+        type_ranking.get(
+            "best_revenue_type"
+        ),
+    )
+
+    best_engagement_type = find_item(
+        "recommendation_type",
+        "recommendation_type",
+        type_ranking.get(
+            "best_engagement_type"
+        ),
+    )
+
+    # =====================================================
+    # SALES TEAM FACTS
+    # =====================================================
+
+    team_summary = (
+        sales_team.get(
+            "team_summary"
+        )
+        or {}
+    )
+
+    team_ranking = (
+        sales_team.get(
+            "ranking"
+        )
+        or {}
+    )
+
+    leaderboard = (
+        sales_team.get(
+            "leaderboard"
+        )
+        or []
+    )
+
+    def find_salesperson(
+        employee_code,
+    ):
+
+        if employee_code is None:
+            return None
+
+        for item in leaderboard:
+
+            if (
+                item.get("employee_code")
+                == employee_code
+            ):
+                return item
+
+        return None
+
+    best_conversion_salesperson = (
+        find_salesperson(
+            team_ranking.get(
+                "best_conversion_salesperson_code"
+            )
+        )
+    )
+
+    best_revenue_salesperson = (
+        find_salesperson(
+            team_ranking.get(
+                "best_revenue_salesperson_code"
+            )
+        )
+    )
+
+    best_engagement_salesperson = (
+        find_salesperson(
+            team_ranking.get(
+                "best_engagement_salesperson_code"
+            )
+        )
+    )
+
+    # =====================================================
+    # DATA QUALITY
+    # =====================================================
+
+    data_quality = (
+        summary.get(
+            "data_quality"
+        )
+    )
+
+    # =====================================================
+    # FINAL DETERMINISTIC CONTEXT
+    # =====================================================
+
+    return {
+        "ready": (
+            dashboard.get(
+                "ready",
+                False,
+            )
+        ),
+
+        "reason": (
+            "EXECUTIVE_INTELLIGENCE_CONTEXT_READY"
+            if dashboard.get("ready")
+            else (
+                dashboard.get(
+                    "reason"
+                )
+                or "NO_EXECUTIVE_INTELLIGENCE_DATA"
+            )
+        ),
+
+        "schema_version": (
+            "V3.0.8.1"
+        ),
+
+        "source_versions": {
+            "dashboard": (
+                dashboard.get(
+                    "schema_version"
+                )
+            ),
+
+            "kpi_trend": (
+                kpi_trend.get(
+                    "schema_version"
+                )
+            ),
+
+            "performance": (
+                performance.get(
+                    "schema_version"
+                )
+            ),
+
+            "sales_team": (
+                sales_team.get(
+                    "schema_version"
+                )
+            ),
+        },
+
+        "scope": (
+            dashboard.get(
+                "scope"
+            )
+            or {}
+        ),
+
+        "executive_summary": (
+            summary
+        ),
+
+        "approved_kpis": (
+            approved_kpis
+        ),
+
+        "performance_facts": {
+            "recommendation_type": {
+                "best_conversion": (
+                    best_conversion_type
+                ),
+
+                "best_revenue": (
+                    best_revenue_type
+                ),
+
+                "best_engagement": (
+                    best_engagement_type
+                ),
+            },
+
+            "product": {
+                "best_conversion": (
+                    best_conversion_product
+                ),
+
+                "best_revenue": (
+                    best_revenue_product
+                ),
+
+                "best_engagement": (
+                    best_engagement_product
+                ),
+            },
+
+            "category": {
+                "best_conversion": (
+                    best_conversion_category
+                ),
+
+                "best_revenue": (
+                    best_revenue_category
+                ),
+
+                "best_engagement": (
+                    best_engagement_category
+                ),
+            },
+
+            "brand": {
+                "best_conversion": (
+                    best_conversion_brand
+                ),
+
+                "best_revenue": (
+                    best_revenue_brand
+                ),
+
+                "best_engagement": (
+                    best_engagement_brand
+                ),
+            },
+        },
+
+        "sales_team_facts": {
+            "team_summary": (
+                team_summary
+            ),
+
+            "best_conversion": (
+                best_conversion_salesperson
+            ),
+
+            "best_revenue": (
+                best_revenue_salesperson
+            ),
+
+            "best_engagement": (
+                best_engagement_salesperson
+            ),
+        },
+
+        "data_quality": {
+            "status": (
+                data_quality
+            ),
+
+            "limited_data": (
+                data_quality
+                == "LIMITED_DATA"
+            ),
+
+            "insufficient_data": (
+                data_quality
+                == "INSUFFICIENT_DATA"
+            ),
+        },
+
+        "intelligence_rules": {
+            "source_is_management_contracts": True,
+
+            "source_is_v2_9_canonical_analytics": True,
+
+            "kpi_values_copied": True,
+
+            "rankings_copied": True,
+
+            "ranked_entities_resolved_by_lookup_only": True,
+
+            "kpi_recalculation_performed": False,
+
+            "ranking_recalculation_performed": False,
+
+            "sorting_performed": False,
+
+            "trend_interpretation_performed": False,
+
+            "causal_inference_used": False,
+
+            "future_prediction_used": False,
+
+            "ml_prediction_used": False,
+
+            "ml_training_performed": False,
+
+            "ollama_required": False,
+
+            "ollama_used": False,
+        },
+    }
+
 def build_ml_learning_contract(
     visit,
 ):

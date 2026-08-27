@@ -75,6 +75,40 @@
             "salesTeamTableBody"
         );
 
+    const executiveIntelligenceSection =
+        document.getElementById(
+            "executiveIntelligenceSection"
+        );
+
+    const executiveNarrative =
+        document.getElementById(
+            "executiveNarrative"
+        );
+
+    const executiveDataQuality =
+        document.getElementById(
+            "executiveDataQuality"
+        );
+
+    const executiveAiStatus =
+        document.getElementById(
+            "executiveAiStatus"
+        );
+
+    const executiveAiStatusText =
+        document.getElementById(
+            "executiveAiStatusText"
+        );
+
+    const executiveAiStatusDot =
+        document.getElementById(
+            "executiveAiStatusDot"
+        );
+
+    const executiveModel =
+        document.getElementById(
+            "executiveModel"
+        );
 
     /* =========================================================
        STATE
@@ -395,6 +429,152 @@
 
     }
 
+    function renderExecutiveIntelligence() {
+
+        const executive =
+            dashboardData
+                ?.executive_intelligence
+            || {};
+
+        if (
+            !executiveIntelligenceSection
+            || !executive.ready
+        ) {
+
+            if (executiveIntelligenceSection) {
+                executiveIntelligenceSection.hidden =
+                    true;
+            }
+
+            return;
+        }
+
+        executiveIntelligenceSection.hidden =
+            false;
+
+
+        /* -----------------------------------------
+           AUTHORITATIVE NARRATIVE
+        ----------------------------------------- */
+
+        if (executiveNarrative) {
+
+            executiveNarrative.textContent =
+                executive.narrative
+                || "—";
+
+        }
+
+
+        /* -----------------------------------------
+           DATA QUALITY
+        ----------------------------------------- */
+
+        const quality =
+            executive
+                ?.data_quality
+                ?.status
+            || "";
+
+        if (executiveDataQuality) {
+
+            executiveDataQuality.textContent =
+                dataQualityLabels[
+                    quality
+                ]
+                || quality
+                || "—";
+
+            executiveDataQuality.className =
+                "data-quality-badge";
+
+            if (quality) {
+
+                executiveDataQuality.classList.add(
+                    normalizeClass(
+                        quality
+                    )
+                );
+
+            }
+
+        }
+
+
+        /* -----------------------------------------
+           OPTIONAL AI STATUS
+        ----------------------------------------- */
+
+        const llmStatus =
+            executive.llm_status
+            || {};
+
+        const llmAvailable =
+            llmStatus.available
+            === true;
+
+        if (executiveAiStatusText) {
+
+            executiveAiStatusText.textContent =
+                llmAvailable
+                ? "AI Online"
+                : "Backend Narrative";
+
+        }
+
+        if (executiveAiStatus) {
+
+            executiveAiStatus.classList.toggle(
+                "available",
+                llmAvailable
+            );
+
+            executiveAiStatus.classList.toggle(
+                "unavailable",
+                !llmAvailable
+            );
+
+        }
+
+        if (executiveAiStatusDot) {
+
+            executiveAiStatusDot.classList.toggle(
+                "available",
+                llmAvailable
+            );
+
+            executiveAiStatusDot.classList.toggle(
+                "unavailable",
+                !llmAvailable
+            );
+
+        }
+
+
+        /* -----------------------------------------
+           MODEL LABEL
+        ----------------------------------------- */
+
+        if (executiveModel) {
+
+            if (
+                llmAvailable
+                && llmStatus.model
+            ) {
+
+                executiveModel.textContent =
+                    `AI Draft: ${llmStatus.model}`;
+
+            } else {
+
+                executiveModel.textContent =
+                    "Deterministic Backend";
+
+            }
+
+        }
+
+    }
 
     /* =========================================================
        TRENDS
@@ -1797,6 +1977,8 @@
                 ?.kpis
             || []
         );
+
+        renderExecutiveIntelligence();
 
         renderTrends();
 

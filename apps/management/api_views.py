@@ -1,28 +1,43 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.ai.services import (
+    generate_management_executive_narrative,
+)
+
 from apps.visits.services import (
     build_management_dashboard_contract,
     build_management_kpi_trend_contract,
     build_management_performance_sections_contract,
     build_management_sales_team_contract,
+    build_management_executive_intelligence_context,
 )
 
 
 class ManagementDashboardAPIView(APIView):
     """
-    V3.0.5 management dashboard API.
+    V3.0.8.3 management dashboard API.
 
-    The API exposes backend-generated management contracts.
+    The API exposes backend-generated management contracts
+    together with controlled executive intelligence.
 
     Important:
+    - Existing management KPI values remain authoritative.
+    - Existing backend rankings remain authoritative.
+    - Executive facts come from V3.0.8.1.
+    - Executive narrative comes from V3.0.8.2.
+    - The authoritative narrative is deterministic.
+    - Raw LLM draft is never exposed to the frontend.
     - No KPI calculation is performed here.
     - No ranking calculation is performed here.
     - No ML prediction is performed here.
-    - Ollama is not required.
     """
 
     def get(self, request):
+
+        # =====================================================
+        # EXISTING MANAGEMENT CONTRACTS
+        # =====================================================
 
         dashboard = (
             build_management_dashboard_contract(
@@ -48,6 +63,128 @@ class ManagementDashboardAPIView(APIView):
             )
         )
 
+        # =====================================================
+        # EXECUTIVE INTELLIGENCE
+        # =====================================================
+
+        executive_context = (
+            build_management_executive_intelligence_context(
+                customer=None
+            )
+        )
+
+        executive_narrative = (
+            generate_management_executive_narrative(
+                executive_context
+            )
+        )
+
+        executive_intelligence = {
+            "ready": (
+                executive_context.get(
+                    "ready",
+                    False,
+                )
+                and executive_narrative.get(
+                    "ready",
+                    False,
+                )
+            ),
+
+            "reason": (
+                "EXECUTIVE_INTELLIGENCE_READY"
+                if (
+                    executive_context.get(
+                        "ready",
+                        False,
+                    )
+                    and executive_narrative.get(
+                        "ready",
+                        False,
+                    )
+                )
+                else "EXECUTIVE_INTELLIGENCE_NOT_READY"
+            ),
+
+            "schema_version": (
+                "V3.0.8.4"
+            ),
+
+            "source_versions": {
+                "context": (
+                    executive_context.get(
+                        "schema_version"
+                    )
+                ),
+
+                "narrative": (
+                    executive_narrative.get(
+                        "schema_version"
+                    )
+                ),
+            },
+
+            "narrative": (
+                executive_narrative.get(
+                    "narrative"
+                )
+                or ""
+            ),
+
+            "data_quality": (
+                executive_narrative.get(
+                    "data_quality"
+                )
+                or {}
+            ),
+
+            "semantic_validation": (
+                executive_narrative.get(
+                    "semantic_validation"
+                )
+                or {}
+            ),
+
+            "llm_status": (
+                executive_narrative.get(
+                    "llm_status"
+                )
+                or {}
+            ),
+
+            "rules": {
+                "source_context_is_authoritative": True,
+
+                "backend_facts_authoritative": True,
+
+                "authoritative_narrative_is_deterministic": True,
+
+                "llm_draft_exposed_to_frontend": False,
+
+                "kpi_calculation_performed": False,
+
+                "ranking_calculation_performed": False,
+
+                "trend_interpretation_performed": False,
+
+                "causal_inference_used": False,
+
+                "future_prediction_used": False,
+
+                "ml_prediction_used": False,
+
+                "ml_training_performed": False,
+
+                "ollama_optional": True,
+
+                "llm_failure_blocks_dashboard": False,
+            },
+        }
+
+        # =====================================================
+        # API READINESS
+        # =====================================================
+
         ready = all([
             dashboard.get(
                 "ready",
@@ -65,7 +202,15 @@ class ManagementDashboardAPIView(APIView):
                 "ready",
                 False,
             ),
+            executive_intelligence.get(
+                "ready",
+                False,
+            ),
         ])
+
+        # =====================================================
+        # FINAL API CONTRACT
+        # =====================================================
 
         return Response({
             "ready": ready,
@@ -77,7 +222,7 @@ class ManagementDashboardAPIView(APIView):
             ),
 
             "schema_version": (
-                "V3.0.5"
+                "V3.0.8.4"
             ),
 
             "source_versions": {
@@ -101,6 +246,18 @@ class ManagementDashboardAPIView(APIView):
 
                 "sales_team": (
                     sales_team.get(
+                        "schema_version"
+                    )
+                ),
+
+                "executive_context": (
+                    executive_context.get(
+                        "schema_version"
+                    )
+                ),
+
+                "executive_narrative": (
+                    executive_narrative.get(
                         "schema_version"
                     )
                 ),
@@ -129,6 +286,10 @@ class ManagementDashboardAPIView(APIView):
                 sales_team
             ),
 
+            "executive_intelligence": (
+                executive_intelligence
+            ),
+
             "api_rules": {
                 "backend_contracts_only": True,
 
@@ -138,12 +299,22 @@ class ManagementDashboardAPIView(APIView):
 
                 "frontend_business_calculation_required": False,
 
+                "executive_facts_backend_controlled": True,
+
+                "executive_narrative_deterministic": True,
+
+                "llm_draft_exposed_to_frontend": False,
+
                 "ml_prediction_used": False,
 
                 "ml_training_performed": False,
 
                 "causal_inference_used": False,
 
-                "ollama_required": False,
+                "ollama_required_for_existing_dashboard": False,
+
+                "ollama_optional": True,
+
+                "ollama_failure_blocks_dashboard": False,
             },
         })
