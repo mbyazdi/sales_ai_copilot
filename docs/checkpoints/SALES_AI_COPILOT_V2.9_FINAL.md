@@ -1,4 +1,4 @@
-﻿# Sales AI Copilot — V2.9 Final Checkpoint
+# Sales AI Copilot — V2.9 Final Checkpoint
 
 ## Status
 
@@ -462,6 +462,88 @@ Includes:
 
 ---
 
+## Ollama / Sales AI Copilot Integration Verification
+
+The local Ollama integration was verified after completion of the
+V2.9 analytics layer.
+
+### Runtime
+
+- Ollama version: `0.17.4`
+- Base URL: `http://127.0.0.1:11434`
+- Configured model: `qwen3:1.7b`
+- Request timeout: `600` seconds
+- Additional installed model: `qwen3:4b`
+
+### Ollama Client Smoke Test
+
+`apps/ai/ollama_client.py` was tested directly against the local
+Ollama `/api/generate` endpoint.
+
+Result:
+
+- Request successful: `True`
+- Model: `qwen3:1.7b`
+- Done: `True`
+- Non-empty response: `True`
+
+### Sales Copilot Service Smoke Test
+
+`generate_sales_copilot_response()` was tested through the Django
+application service layer.
+
+Result:
+
+- Service successful: `True`
+- Model: `qwen3:1.7b`
+- Done: `True`
+- Non-empty controlled response: `True`
+
+The backend remained responsible for recommendation facts and
+commercial decisions. Ollama was used only for controlled natural
+language generation.
+
+### End-to-End API Verification
+
+The real Sales AI Copilot API path was verified:
+
+`POST /api/ai/v1/sales-copilot/`
+
+The end-to-end request exercised:
+
+`HTTP request -> Django APIView -> customer/context resolution -> recommendation/business services -> Sales AI context -> Ollama client -> qwen3:1.7b -> API response`
+
+Final result:
+
+- HTTP 200: `True`
+- Success: `True`
+- Customer matched: `True`
+- Model returned: `qwen3:1.7b`
+- Done: `True`
+- Non-empty response: `True`
+- All end-to-end strict checks passed: `True`
+
+The initial Django test-client run returned HTTP 400 because
+`testserver` was not accepted by `ALLOWED_HOSTS`. This was a test
+environment host-validation issue rather than an Ollama or Sales
+Copilot integration failure. After running the test with an accepted
+host, the complete end-to-end test passed.
+
+### Integration Decision
+
+Ollama integration status:
+
+`VERIFIED`
+
+Sales AI Copilot end-to-end status:
+
+`PASSED`
+
+The AI layer is therefore confirmed operational on the current
+local development environment and is available for the next
+product/dashboard phase.
+
+---
 ## Git Baseline Before V2.9.7
 
 Previous stable commit:
