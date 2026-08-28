@@ -140,6 +140,7 @@ def customer_search(request):
             )
             sales_history = get_customer_sales_history(
                 customer_code=customer_code,
+                limit=5,
             )
 
             context["sales_history"] = {
