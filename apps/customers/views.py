@@ -306,6 +306,7 @@ def customer_search(request):
                         .exclude(
                             recommendation_id__isnull=True
                         )
+                        .order_by()
                         .values_list(
                             "recommendation_id",
                             flat=True,
