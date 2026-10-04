@@ -1,4 +1,5 @@
 import json
+from django.conf import settings
 
 from .ollama_client import (
     OllamaClient,
@@ -93,6 +94,16 @@ def generate_sales_copilot_response(
         or ""
     )
 
+    if not recommendations:
+        return {
+            "response": (
+                "پیشنهاد فعال برای این مشتری موجود نیست.\n\n"
+                f"اقدام پیشنهادی: {next_best_action}\n\n{talking_point}"
+            ),
+            "model": None,
+            "done": True,
+        }
+
     # =====================================================
     # LIMITED LLM TASK
     # =====================================================
@@ -125,14 +136,16 @@ def generate_sales_copilot_response(
             "بازنویسی کن و اطلاعات جدید نساز."
         )
 
-    client = OllamaClient()
-
-    ai_result = client.generate(
-        prompt=language_prompt,
-        system=(
-            SALES_COPILOT_SYSTEM_PROMPT
-        ),
-    )
+    client = OllamaClient(timeout=min(settings.OLLAMA_TIMEOUT, 5))
+    provider_unavailable = False
+    try:
+        ai_result = client.generate(
+            prompt=language_prompt,
+            system=SALES_COPILOT_SYSTEM_PROMPT,
+        )
+    except OllamaClientError:
+        provider_unavailable = True
+        ai_result = {"response": talking_point, "model": None, "done": True}
 
     suggested_wording = (
         ai_result.get("response")
@@ -163,6 +176,9 @@ def generate_sales_copilot_response(
         f"جمله پیشنهادی برای فروشنده: "
         f"{suggested_wording}"
     )
+
+    if provider_unavailable:
+        response_text += "\n\nهوش مصنوعی در دسترس نیست؛ راهنمای قطعی سامانه نمایش داده شده است."
 
     return {
         "response": response_text,
@@ -1099,7 +1115,7 @@ def generate_management_executive_narrative(
 
     try:
 
-        client = OllamaClient()
+        client = OllamaClient(timeout=min(settings.OLLAMA_TIMEOUT, 5))
 
         ai_result = client.generate(
             prompt=prompt,

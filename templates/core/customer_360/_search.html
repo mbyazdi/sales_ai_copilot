@@ -1,5 +1,8 @@
 <!-- SEARCH -->
-<form class="search-bar" method="get">
+<form class="search-bar" method="get" data-customer-code="{{ customer_code }}">
+    {% if current_visit %}
+    <input type="hidden" name="visit_id" value="{{ current_visit.id }}">
+    {% endif %}
     <input class="search-input" name="customer_code" placeholder="کد مشتری را وارد کنید؛ مثلاً C0003" value="{{ customer_code }}">
     <button class="search-button" type="submit">🔍 جستجوی مشتری</button>
 </form>

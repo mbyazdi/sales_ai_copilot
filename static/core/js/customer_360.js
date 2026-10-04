@@ -14,6 +14,17 @@
         (window.salesAiCopilot &&
             window.salesAiCopilot.visitId) || null;
 
+    const searchForm = document.querySelector("form.search-bar");
+    if (searchForm) {
+        searchForm.addEventListener("submit", function () {
+            const visitField = searchForm.elements.visit_id;
+            if (visitField) {
+                visitField.disabled = searchForm.elements.customer_code.value.trim() !==
+                    searchForm.dataset.customerCode;
+            }
+        });
+    }
+
 
     /* =========================================================
        LABELS

@@ -81,6 +81,8 @@ class ManagementDashboardAPIView(APIView):
             generate_management_executive_narrative(
                 executive_context
             )
+            if executive_context.get("ready")
+            else {"ready": False}
         )
 
         executive_intelligence = {

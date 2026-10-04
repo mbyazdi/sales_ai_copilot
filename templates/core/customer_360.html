@@ -71,6 +71,9 @@
             </a>
 
         </nav>
+        {% if visit_not_found %}
+        <p role="alert">ویزیت انتخاب‌شده معتبر نیست یا متعلق به این مشتری نیست؛ اطلاعات مشتری بدون زمینه ویزیت نمایش داده می‌شود.</p>
+        {% endif %}
         <main
             class="
                 sales-workspace
@@ -219,6 +222,8 @@
 
                             {% include "core/customer_360/_ai_recommendations.html" %}
 
+                        {% else %}
+                            <p role="status">پیشنهاد فعال برای این مشتری موجود نیست. ابتدا نیاز فعلی مشتری را بررسی کنید.</p>
                         {% endif %}
 
                     </div>

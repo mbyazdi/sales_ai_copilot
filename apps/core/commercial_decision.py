@@ -252,18 +252,15 @@ def build_base_sales_session(
     # CUSTOMER STATUS
     # ==========================================
 
+    target_relevance = list(target_relevance or [])
+    # No primary product means there is no product-specific commercial context.
+    commercial_context = commercial_context or {}
+
     if (
         customer_360
         and customer_360.segment
         == "HIGH_VALUE"
     ):
-        target_relevance = list(
-            target_relevance or []
-        )
-
-        commercial_context = (
-            commercial_context or {}
-        )
         customer_status = (
             "مشتری با ارزش بالا و دارای "
             "پتانسیل مناسب برای فروش مجدد"

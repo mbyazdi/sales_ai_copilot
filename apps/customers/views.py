@@ -29,6 +29,7 @@ from apps.targets.services import (
 from apps.core.commercial_decision import (
     build_base_sales_session,
 )
+from apps.core.commercial_context import build_product_commercial_context
 
 def customer_search(request):
 
@@ -46,7 +47,7 @@ def customer_search(request):
 
     context = {
         "customer_code": customer_code,
-        "visit_id": visit_id,
+        "visit_id": "",
 
         "customer": None,
         "customer_360": None,
@@ -131,10 +132,14 @@ def customer_search(request):
                         context["current_visit"] = (
                             current_visit
                         )
+                        context["visit_id"] = current_visit.id
 
                     else:
 
                         context["visit_not_found"] = True
+
+                else:
+                    context["visit_not_found"] = True
 
             context["assignment"] = result.get(
                 "assignment"
@@ -186,6 +191,10 @@ def customer_search(request):
 
                 target_relevance = []
                 commercial_context = None
+                if not current_visit and primary_recommendation:
+                    commercial_context = build_product_commercial_context(
+                        product=primary_recommendation.product, customer=customer,
+                    )
 
                 # -------------------------------------
                 # VISIT-SCOPED COMMERCIAL DECISION
