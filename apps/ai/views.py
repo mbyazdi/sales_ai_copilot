@@ -7,6 +7,8 @@ from apps.ai.services import (
     generate_sales_copilot_response,
 )
 from apps.customers.models import Customer
+from apps.customers.access import customer_access_queryset
+from apps.core.commercial_context import build_product_commercial_context
 from apps.customers.services import (
     build_sales_ai_context,
     get_customer_360,
@@ -97,7 +99,7 @@ class SalesCopilotAPIView(APIView):
         try:
 
             customer = (
-                Customer.objects
+                customer_access_queryset(request.user)
                 .select_related(
                     "grade",
                     "customer_360",
@@ -203,6 +205,11 @@ class SalesCopilotAPIView(APIView):
 
         target_relevance = []
         commercial_context = None
+
+        if current_visit is None and primary is not None:
+            commercial_context = build_product_commercial_context(
+                product=primary.product, customer=customer,
+            )
 
         # -----------------------------------------
         # VISIT-SCOPED COMMERCIAL CONTEXT

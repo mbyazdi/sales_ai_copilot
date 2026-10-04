@@ -11,6 +11,8 @@ from .models import (
     FollowUpTask,
 )
 from apps.customers.models import Customer
+from apps.customers.access import customer_access_queryset
+from django.core.exceptions import PermissionDenied
 from apps.recommendations.models import CustomerRecommendation
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
@@ -690,7 +692,7 @@ class CustomerSalesOutcomeHistoryAPIView(APIView):
         from apps.visits.models import SalesOutcome
 
         customer = get_object_or_404(
-            Customer,
+            customer_access_queryset(request.user),
             customer_code=customer_code,
             is_active=True,
         )
@@ -805,10 +807,14 @@ class RecommendationPerformanceAPIView(APIView):
 
         customer = None
 
+        accessible_customers = customer_access_queryset(request.user)
+        if not customer_code and not request.user.is_staff:
+            raise PermissionDenied("دسترسی به گزارش کلی مجاز نیست.")
+
         if customer_code:
 
             customer = get_object_or_404(
-                Customer,
+                accessible_customers,
                 customer_code=customer_code,
                 is_active=True,
             )

@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.customers.models import Customer
+from apps.customers.access import customer_access_queryset
 from apps.products.models import Product
 
 from .commercial_context import (
@@ -71,7 +72,7 @@ class ProductCommercialContextAPIView(APIView):
         product_code,
     ):
         customer = get_object_or_404(
-            Customer,
+            customer_access_queryset(request.user),
             customer_code=customer_code,
             is_active=True,
         )

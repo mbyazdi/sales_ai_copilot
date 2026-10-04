@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.utils import timezone
 from .models import Customer
+from .access import customer_access_queryset
 from .services import (
     get_customer_360,
     build_sales_ai_context,
@@ -30,6 +31,8 @@ from apps.core.commercial_decision import (
 )
 
 def customer_search(request):
+
+    accessible_customers = customer_access_queryset(request.user)
 
     customer_code = request.GET.get(
         "customer_code",
@@ -74,6 +77,8 @@ def customer_search(request):
     }
 
     if customer_code:
+
+        get_object_or_404(accessible_customers, customer_code=customer_code, is_active=True)
 
         try:
 
@@ -422,7 +427,7 @@ class Customer360APIView(APIView):
     def get(self, request, customer_code):
 
         customer = get_object_or_404(
-            Customer.objects.select_related(
+            customer_access_queryset(request.user).select_related(
                 "grade"
             ),
             customer_code=customer_code,
