@@ -1,7 +1,9 @@
-"""Task 001-B: current access behavior, including gaps; not desired policy.
+"""Task 001-B baseline plus Task 001-B.1A approved security regressions.
+
+Unresolved customer-scope gaps remain explicitly characterized.
 
 Fixtures are independent of demo data. Only the external AI response generator
-is mocked; authorization, queries and context builders execute normally.
+is replaced; authorization, queries and context builders execute normally.
 """
 
 from datetime import date
@@ -13,6 +15,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 
 from apps.customers.models import Customer, Customer360
+from apps.ai.views import build_base_sales_session
 from apps.products.models import Brand, Category, Product
 from apps.recommendations.models import CustomerRecommendation
 from apps.targets.models import SalesTarget
@@ -209,15 +212,33 @@ class AuthorizationBaselineTests(TestCase):
         self.tasks[0].refresh_from_db()
         self.assertEqual(self.tasks[0].status, "DONE")
 
-    def test_inactive_profile_can_read_and_complete_own_follow_up_gap(self):
+    def test_inactive_profile_cannot_read_or_mutate_own_follow_up(self):
         Salesperson.objects.filter(pk=self.rep.pk).update(is_active=False)
         self.authenticate(get_user_model().objects.get(pk=self.user.pk))
-        self.assertEqual(self.client.get(reverse("follow-up-task-list")).status_code, 200)
-        response = self.client.post(reverse("follow-up-task-status", args=[self.tasks[0].pk]),
-                                    {"status": "DONE"}, format="json")
+        task_before = FollowUpTask.objects.filter(pk=self.tasks[0].pk).values().get()
+        visit_before = Visit.objects.filter(pk=self.visits[0].pk).values().get()
+        self.assertEqual(self.client.get(reverse("follow-up-task-list")).status_code, 403)
+        for status in ("DONE", "CANCELLED"):
+            with self.subTest(status=status):
+                response = self.client.post(reverse("follow-up-task-status", args=[self.tasks[0].pk]),
+                                            {"status": status}, format="json")
+                self.assertEqual(response.status_code, 403)
+                self.assertEqual(FollowUpTask.objects.filter(pk=self.tasks[0].pk).values().get(), task_before)
+                self.assertEqual(Visit.objects.filter(pk=self.visits[0].pk).values().get(), visit_before)
+
+    def test_follow_up_dashboard_requires_login_and_active_profile_and_preserves_owner_scope(self):
+        url = reverse("follow-up-dashboard")
+        self.assertEqual(self.client.get(url).status_code, 302)
+        Salesperson.objects.filter(pk=self.rep.pk).update(is_active=False)
+        for user in (self.no_profile, self.user):
+            with self.subTest(user=user.username):
+                self.client.force_login(user)
+                self.assertEqual(self.client.get(url).status_code, 403)
+        self.client.force_login(self.other_user)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.tasks[0].refresh_from_db()
-        self.assertEqual(self.tasks[0].status, "DONE")
+        self.assertEqual([task.pk for task in response.context["today_tasks"]], [self.tasks[1].pk])
+        self.assertEqual(response.context["open_count"], 1)
 
     def test_targets_ignore_other_rep_identifiers_and_return_only_own_target(self):
         self.authenticate()
@@ -251,17 +272,23 @@ class AuthorizationBaselineTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["customer"]["customer_code"], self.other_customer.customer_code)
 
-    def test_management_html_requires_staff_but_api_is_public_gap(self):
+    def test_management_html_and_api_require_staff(self):
         with patch("apps.management.api_views.generate_management_executive_narrative",
                    return_value={"ready": False}) as narrator:
-            for user in (None, self.user):
-                with self.subTest(user=user):
-                    self.client.force_authenticate(user=user)
-                    response = self.client.get(reverse("management_api:dashboard"))
-                    self.assertEqual(response.status_code, 200)
-                    self.assertIn("sales_team", response.data)
-                    self.assertIn(self.other_rep.employee_code, str(response.data["sales_team"]))
-            self.assertEqual(narrator.call_count, 2)
+            with patch("apps.management.api_views.build_management_dashboard_contract") as dashboard:
+                for user in (None, self.user):
+                    with self.subTest(user=user):
+                        self.client.force_authenticate(user=user)
+                        response = self.client.get(reverse("management_api:dashboard"))
+                        self.assertEqual(response.status_code, 403)
+                        dashboard.assert_not_called()
+                        narrator.assert_not_called()
+            self.authenticate(self.staff)
+            response = self.client.get(reverse("management_api:dashboard"))
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("sales_team", response.data)
+            self.assertIn(self.other_rep.employee_code, str(response.data["sales_team"]))
+            narrator.assert_called_once()
         self.client.force_authenticate(user=None)
         for user in (None, self.user, self.staff):
             if user:
@@ -287,27 +314,95 @@ class AuthorizationBaselineTests(TestCase):
                                                         args=[999999]), {"status": "APPROVED"}, format="json")
                     self.assertEqual(response.status_code, 404 if user == self.staff else 403)
 
-    def test_ai_accepts_arbitrary_customer_and_other_owner_visit_context_gap(self):
-        with patch("apps.ai.views.generate_sales_copilot_response",
-                   return_value={"response": "Test response", "done": True}) as generate:
-            for user in (None, self.user):
-                self.client.force_authenticate(user=user)
-                response = self.client.post(reverse("ai:sales-copilot"), {
-                    "customer_code": self.other_customer.customer_code,
-                    "visit_id": self.visits[1].pk, "message": "Explain",
-                }, format="json")
-                self.assertEqual(response.status_code, 200, response.content)
-                self.assertEqual(response.data["visit_id"], self.visits[1].pk)
-                context = generate.call_args.kwargs["sales_ai_context"]
-                self.assertIn(self.other_customer.customer_code, str(context))
-                self.assertIn(self.other_rep.employee_code, str(context))
-            self.assertEqual(generate.call_count, 2)
-
-    def test_ai_rejects_visit_from_different_customer_before_generation(self):
+    def test_ai_rejects_foreign_visit_before_generation(self):
+        self.authenticate()
         with patch("apps.ai.views.generate_sales_copilot_response") as generate:
             response = self.client.post(reverse("ai:sales-copilot"), {
-                "customer_code": self.customer.customer_code,
+                "customer_code": self.other_customer.customer_code,
                 "visit_id": self.visits[1].pk, "message": "Explain",
+            }, format="json")
+            self.assertEqual(response.status_code, 404)
+            generate.assert_not_called()
+
+    def test_ai_anonymous_requests_rejected_before_generation(self):
+        with patch("apps.ai.views.generate_sales_copilot_response") as generate:
+            for extra in ({}, {"visit_id": self.visits[0].pk}):
+                with self.subTest(extra=extra):
+                    response = self.client.post(reverse("ai:sales-copilot"), {
+                        "customer_code": self.customer.customer_code, "message": "Explain", **extra,
+                    }, format="json")
+                    self.assertEqual(response.status_code, 403)
+                    generate.assert_not_called()
+
+    def test_ai_visit_requires_active_profile_without_staff_override(self):
+        Salesperson.objects.filter(pk=self.rep.pk).update(is_active=False)
+        with patch("apps.ai.views.generate_sales_copilot_response") as generate:
+            for user in (self.no_profile, self.staff, get_user_model().objects.get(pk=self.user.pk)):
+                with self.subTest(user=user.username):
+                    self.authenticate(user)
+                    response = self.client.post(reverse("ai:sales-copilot"), {
+                        "customer_code": self.customer.customer_code,
+                        "visit_id": self.visits[0].pk, "message": "Explain",
+                    }, format="json")
+                    self.assertEqual(response.status_code, 403)
+                    generate.assert_not_called()
+
+    def test_ai_owner_visit_retains_context_and_response_contract(self):
+        self.authenticate()
+        with patch("apps.ai.views.generate_sales_copilot_response",
+                   return_value={"model": "test-model", "response": "Test response", "done": True}) as generate:
+            response = self.client.post(reverse("ai:sales-copilot"), {
+                "customer_code": self.customer.customer_code,
+                "visit_id": self.visits[0].pk, "message": "Explain",
+            }, format="json")
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data, {
+                "success": True, "customer_code": self.customer.customer_code,
+                "visit_id": self.visits[0].pk, "model": "test-model",
+                "response": "Test response", "done": True,
+            })
+            generate.assert_called_once()
+            self.assertEqual(generate.call_args.kwargs["user_message"], "Explain")
+            context = generate.call_args.kwargs["sales_ai_context"]
+            self.assertIn(self.customer.customer_code, str(context))
+            self.assertIn(self.rep.employee_code, str(context))
+
+    def test_ai_customer_only_reaches_unassigned_customer_context_gap(self):
+        with patch("apps.ai.views.generate_sales_copilot_response") as generate, \
+                patch("apps.ai.views.build_base_sales_session", wraps=build_base_sales_session) as session:
+            # Authentication is enforced; customer access policy remains deferred.
+            # Preserve the existing customer-only builder failure, without masking
+            # it with a stub or changing unrelated production behavior.
+            for user in (self.user, self.no_profile):
+                self.authenticate(user)
+                with self.assertRaisesMessage(AttributeError, "'NoneType' object has no attribute 'get'"):
+                    self.client.post(reverse("ai:sales-copilot"), {
+                        "customer_code": self.other_customer.customer_code,
+                        "message": "Explain",
+                    }, format="json")
+                self.assertEqual(session.call_args.kwargs["customer"].pk, self.other_customer.pk)
+                self.assertIsNone(session.call_args.kwargs["commercial_context"])
+            self.assertEqual(session.call_count, 2)
+            generate.assert_not_called()
+
+    def test_ai_supplied_invalid_visit_ids_rejected_before_generation(self):
+        self.authenticate()
+        with patch("apps.ai.views.generate_sales_copilot_response") as generate:
+            for visit_id in (0, "", "invalid", 999999):
+                with self.subTest(visit_id=visit_id):
+                    response = self.client.post(reverse("ai:sales-copilot"), {
+                        "customer_code": self.customer.customer_code,
+                        "visit_id": visit_id, "message": "Explain",
+                    }, format="json")
+                    self.assertEqual(response.status_code, 404)
+                    generate.assert_not_called()
+
+    def test_ai_rejects_visit_from_different_customer_before_generation(self):
+        self.authenticate()
+        with patch("apps.ai.views.generate_sales_copilot_response") as generate:
+            response = self.client.post(reverse("ai:sales-copilot"), {
+                "customer_code": self.other_customer.customer_code,
+                "visit_id": self.visits[0].pk, "message": "Explain",
             }, format="json")
             self.assertEqual(response.status_code, 404)
             generate.assert_not_called()

@@ -1,4 +1,5 @@
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -27,6 +28,8 @@ from apps.visits.services import (
 )
 
 class SalesCopilotAPIView(APIView):
+
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
 
@@ -73,6 +76,19 @@ class SalesCopilotAPIView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+        # =========================================
+        # VISIT CALLER AUTHORIZATION
+        # =========================================
+
+        salesperson = None
+        if visit_id is not None:
+            salesperson = getattr(request.user, "salesperson_profile", None)
+            if salesperson is None or not salesperson.is_active:
+                return Response(
+                    {"detail": "Active salesperson profile was not found."},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
 
         # =========================================
         # CUSTOMER
@@ -127,7 +143,7 @@ class SalesCopilotAPIView(APIView):
 
         current_visit = None
 
-        if visit_id:
+        if visit_id is not None:
 
             try:
 
@@ -140,10 +156,11 @@ class SalesCopilotAPIView(APIView):
                     .get(
                         id=visit_id,
                         customer=customer,
+                        salesperson=salesperson,
                     )
                 )
 
-            except Visit.DoesNotExist:
+            except (Visit.DoesNotExist, TypeError, ValueError):
 
                 return Response(
                     {

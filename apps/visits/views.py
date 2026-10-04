@@ -16,6 +16,7 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
 from rest_framework.permissions import IsAuthenticated
 from .services import (
     build_pre_visit_briefs,
@@ -1378,7 +1379,7 @@ class FollowUpTaskListAPIView(APIView):
             None,
         )
 
-        if not salesperson:
+        if salesperson is None or not salesperson.is_active:
 
             return Response(
                 {
@@ -1540,7 +1541,7 @@ class FollowUpTaskStatusAPIView(APIView):
             None,
         )
 
-        if not salesperson:
+        if salesperson is None or not salesperson.is_active:
 
             return Response(
                 {
@@ -1691,15 +1692,8 @@ def follow_up_dashboard(request):
         None,
     )
 
-    if not salesperson:
-
-        return render(
-            request,
-            "core/follow_up_dashboard.html",
-            {
-                "salesperson_missing": True,
-            },
-        )
+    if salesperson is None or not salesperson.is_active:
+        return HttpResponseForbidden("Active salesperson profile was not found.")
 
     open_tasks = (
         FollowUpTask.objects
