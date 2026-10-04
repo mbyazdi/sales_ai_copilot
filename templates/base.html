@@ -1,276 +1,55 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
-        {% block title %}
-            Sales AI Copilot
-        {% endblock %}
-    </title>
-
-    <link
-        rel="stylesheet"
-        href="{% static 'css/app.css' %}"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}سامانه هوشمند فروش{% endblock %}</title>
     {% block extra_css %}{% endblock %}
+    {# Bump this revision when changing shell selectors so old CSS cannot accompany new markup. #}
+    <link rel="stylesheet" href="{% static 'css/app.css' %}?v=002a-top-1">
 </head>
-
-<body>
-
-<div class="app-shell">
-
-    <!-- =========================
-         SIDEBAR
-    ========================== -->
-
-    <aside class="sidebar">
-
-        <div class="brand">
-
-            <div class="brand-icon">
-                ✦
-            </div>
-
-            <div>
-                <div class="brand-name">
-                    Sales AI
-                </div>
-
-                <div class="brand-subtitle">
-                    COPILOT
-                </div>
-            </div>
-
-        </div>
-
-        <div class="sidebar-section">
-
-            <div class="sidebar-label">
-                WORKSPACE
-            </div>
-
-            <nav class="sidebar-nav">
-
-                {% if request.user.is_staff or request.user.is_superuser %}
-
-                        <a
-                            href="{% url 'management-dashboard' %}"
-                            class="nav-item
-                                {% if request.resolver_match.url_name == 'management-dashboard' %}
-                                    active
-                                {% endif %}
-                            "
-                        >
-                        <span class="nav-icon">⌂</span>
-                        <span>Manager Dashboard</span>
-                    </a>
-
-                    <a
-                        href="{% url 'recommendation-performance-dashboard' %}"
-                        class="nav-item"
-                    >
-                        <span class="nav-icon">◇</span>
-                        <span>Recommendation Performance</span>
-                    </a>
-
-                {% elif request.user.salesperson_profile %}
-
-                    <a
-                        href="{% url 'salesperson-dashboard' %}"
-                        class="nav-item
-                            {% if request.resolver_match.url_name == 'salesperson-dashboard' %}
-                                active
-                            {% endif %}
-                        "
-                    >
-                        <span class="nav-icon">⌂</span>
-                        <span>Daily Workspace</span>
-                    </a>
-
-                    <a
-                        href="{% url 'salesperson-dashboard' %}"
-                        class="nav-item"
-                    >
-                        <span class="nav-icon">▷</span>
-                        <span>Today's Visits</span>
-                    </a>
-
-                    <a
-                        href="/customers/"
-                        class="nav-item"
-                    >
-                        <span class="nav-icon">◉</span>
-                        <span>Customers</span>
-                    </a>
-
-                    <a
-                        href="{% url 'follow-up-dashboard' %}"
-                        class="nav-item
-                            {% if request.resolver_match.url_name == 'follow-up-dashboard' %}
-                                active
-                            {% endif %}
-                        "
-                    >
-                        <span class="nav-icon">✓</span>
-                        <span>Follow-ups</span>
-                    </a>
-
+<body class="product-shell">
+    <a class="shell-skip-link" href="#main-content">رفتن به محتوای صفحه</a>
+    <div class="app-shell">
+        <header class="shell-header">
+            <div class="shell-header-inner">
+            <a class="shell-brand" href="{% url 'role-home' %}" aria-label="سامانه هوشمند فروش؛ صفحه اصلی">
+                <span class="shell-brand-mark" aria-hidden="true">ف</span>
+                <span><strong>سامانه هوشمند فروش</strong><small>فضای کار فروش و مدیریت</small></span>
+            </a>
+            <div class="shell-user" aria-label="حساب کاربری">
+                {% if request.user.is_authenticated %}
+                    <strong><bdi>{% if request.user.salesperson_profile %}{{ request.user.salesperson_profile.full_name }}{% else %}{{ request.user.get_full_name|default:request.user.username }}{% endif %}</bdi></strong>
+                    <span>{% if request.user.is_staff %}کاربر مدیریت{% elif request.user.salesperson_profile.is_active %}نماینده فروش{% elif request.user.salesperson_profile %}نماینده فروش غیرفعال{% else %}کاربر بدون دسترسی فروش{% endif %}</span>
+                {% else %}
+                    <span>مهمان</span>
                 {% endif %}
-
+            </div>
+            <nav class="shell-nav" aria-label="ناوبری اصلی">
+                {% if request.user.is_authenticated and request.user.is_active %}
+                    {% if request.user.is_staff %}
+                        <a href="{% url 'management-dashboard' %}" {% if request.resolver_match.url_name == 'management-dashboard' %}aria-current="page"{% endif %}>نمای مدیریت</a>
+                        <a href="{% url 'recommendation-performance-dashboard' %}" {% if request.resolver_match.url_name == 'recommendation-performance-dashboard' %}aria-current="page"{% endif %}>عملکرد پیشنهادها</a>
+                    {% endif %}
+                    {% if request.user.salesperson_profile.is_active %}
+                        <a href="{% url 'salesperson-dashboard' %}" {% if request.resolver_match.url_name == 'salesperson-dashboard' %}aria-current="page"{% endif %}>فضای کار روزانه</a>
+                        <a href="{% url 'follow-up-dashboard' %}" {% if request.resolver_match.url_name == 'follow-up-dashboard' %}aria-current="page"{% endif %}>پیگیری‌های من</a>
+                    {% endif %}
+                    {% if request.user.is_staff or request.user.salesperson_profile.is_active %}
+                        <a href="/customers/" {% if request.resolver_match.url_name == 'customer-search' %}aria-current="page"{% endif %}>مشتریان</a>
+                    {% endif %}
+                {% endif %}
             </nav>
-
-        </div>
-
-
-        <div class="sidebar-section">
-
-            <div class="sidebar-label">
-                ACCOUNT
             </div>
-
-            <nav class="sidebar-nav">
-
-                <a
-                    href="{% url 'role-home' %}"
-                    class="nav-item"
-                >
-                    <span class="nav-icon">↗</span>
-                    <span>My Workspace</span>
-                </a>
-
-            </nav>
-
-        </div>
-
-        <div class="sidebar-bottom">
-
-            <div class="ai-status">
-
-                <span class="status-dot"></span>
-
-                <div>
-                    <div class="status-title">
-                        AI Engine Online
-                    </div>
-
-                    <div class="status-subtitle">
-                        Recommendation Engine v1.0
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-
-    </aside>
-
-
-    <!-- =========================
-         MAIN
-    ========================== -->
-
-    <main class="main-content">
-
-
-        <!-- TOPBAR -->
-
-        <header class="topbar">
-
-            <div class="topbar-left">
-
-                <div class="breadcrumb">
-                    Sales AI Copilot
-                    <span>/</span>
-                    {% block breadcrumb %}
-                        Dashboard
-                    {% endblock %}
-                </div>
-
-            </div>
-
-
-            <div class="topbar-right">
-
-                <button
-                    class="topbar-button"
-                    type="button"
-                >
-                    ⌕
-                </button>
-
-                <button
-                    class="topbar-button notification-button"
-                    type="button"
-                >
-                    ♢
-                    <span class="notification-dot"></span>
-                </button>
-
-
-                <div class="user-profile">
-
-                    <div class="avatar">
-                        MB
-                    </div>
-
-                    <div class="user-info">
-
-                        <div class="user-name">
-                            {% if request.user.salesperson_profile %}
-                                {{ request.user.salesperson_profile.full_name }}
-                            {% else %}
-                                {{ request.user.get_full_name|default:request.user.username }}
-                            {% endif %}
-                        </div>
-
-                        <div class="user-role">
-                            {% if request.user.is_staff or request.user.is_superuser %}
-                                Sales Manager
-                            {% elif request.user.salesperson_profile %}
-                                Sales Representative
-                            {% else %}
-                                User
-                            {% endif %}
-                        </div>
-
-                    </div>
-
-                    <span class="user-arrow">
-                        ▾
-                    </span>
-
-                </div>
-
-            </div>
-
         </header>
-
-
-        <!-- PAGE CONTENT -->
-
-        <section class="page-content">
-
-            {% block content %}
-            {% endblock %}
-
-        </section>
-
-
-    </main>
-
-</div>
-
-
-{% block extra_js %}{% endblock %}
-
+        <main class="shell-content" id="main-content" tabindex="-1">
+            <div class="shell-page-header" aria-label="صفحه جاری">
+                <span class="shell-page-label">{% block breadcrumb %}فضای کار{% endblock %}</span>
+            </div>
+            <div class="shell-page-container">{% block content %}{% endblock %}</div>
+        </main>
+    </div>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

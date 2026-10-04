@@ -1,30 +1,11 @@
+{% extends "base.html" %}
 {% load static %}
-
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
-        Sales AI Copilot
-    </title>
-
-    <link
-        rel="stylesheet"
-        href="{% static 'core/css/customer_360.css' %}"
-    >
-
-</head>
-
-<body>
-
+{% block title %}نمای مشتری{% endblock %}
+{% block breadcrumb %}مشتریان{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/customer_360.css' %}">
+{% endblock %}
+{% block content %}
 <div class="page">
 
     <!-- =====================================================
@@ -74,7 +55,7 @@
         {% if visit_not_found %}
         <p role="alert">ویزیت انتخاب‌شده معتبر نیست یا متعلق به این مشتری نیست؛ اطلاعات مشتری بدون زمینه ویزیت نمایش داده می‌شود.</p>
         {% endif %}
-        <main
+        <section
             class="
                 sales-workspace
                 {% if current_visit %}
@@ -327,7 +308,7 @@
 
             {% endif %}
 
-        </main>
+        </section>
 
     {% endif %}
 
@@ -341,6 +322,8 @@
 {% include "core/customer_360/_outcome_modal.html" %}
 
 
+{% endblock %}
+{% block extra_js %}
 <!-- =========================================================
      PAGE CONTEXT
 ========================================================= -->
@@ -367,6 +350,4 @@
     src="{% static 'core/js/customer_360.js' %}"
 ></script>
 
-</body>
-
-</html>
+{% endblock %}
