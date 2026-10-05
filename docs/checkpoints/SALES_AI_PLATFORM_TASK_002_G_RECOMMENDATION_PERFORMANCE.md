@@ -337,3 +337,20 @@ mutation or database restore was performed. Test mutations use isolated test dat
 Temporary browser artifacts remain outside the repository. Only approved 002-G
 files are eligible for the authorized commit. Development stops after push
 verification; Task 002-H is not started.
+
+## Approved visual patch — 2026-10-05
+
+Final live visual approval granted for the solid muted outcome bars and solid
+evidence-quality distribution. Both use 12px bars, rounded corners and quiet exact
+count summaries. Patterns, hatching and gradients are removed; scoped outcome and
+evidence palettes retain distinct semantics. Zero-count segments have zero width.
+Type/conversion headers and expandable exact details remain available.
+
+Patch scope: recommendation_performance.css and _recommendation_outcomes.html,
+plus this approval note. No business/calculation/classification/API behavior,
+authorization, recommendation ordering/scoring, tuning or database changes.
+Final validation: Django check clean; 55 management tests passed; all three
+Recommendation Performance JS syntax checks and git diff --check passed.
+Database SHA256 before/after remains
+`EF6513572D171A768D4A58C1E3CC3C1655CE48DB7443D82BD6A510BB786F46ED`.
+Its pre-existing local modification is preserved and excluded from the commit.

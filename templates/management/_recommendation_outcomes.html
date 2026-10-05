@@ -1,7 +1,7 @@
 <figure class="rw-outcome-item" data-type="{{ item.recommendation_type }}">
-    <figcaption class="rw-section-header">
-        <div><strong>{% include "core/customer_360/_recommendation_type.html" with recommendation=item %}</strong><span class="ds-caption ds-muted"> · ارزیابی {% include "management/_number.html" with value=item.resolved_recommendations %} · ارائه {% include "management/_number.html" with value=item.presented %}</span></div>
-        {% include "management/_quality.html" with quality=item.data_quality %}
+    <figcaption class="rw-section-header rw-outcome-heading">
+        <div><strong>{% include "core/customer_360/_recommendation_type.html" with recommendation=item %}</strong><p class="ds-caption ds-muted">ارزیابی {% include "management/_number.html" with value=item.resolved_recommendations %} · ارائه {% include "management/_number.html" with value=item.presented %}</p></div>
+        <div class="rw-outcome-meta"><span class="ds-caption">نرخ تبدیل <strong>{% if item.presented %}{% include "management/_number.html" with value=item.conversion_rate %}٪{% else %}—{% endif %}</strong></span>{% include "management/_quality.html" with quality=item.data_quality %}</div>
     </figcaption>
     <div class="rw-outcome-bar" aria-hidden="true">
         <span class="rw-segment rw-segment--purchased" data-outcome="purchased" data-count="{{ item.purchased }}" style="flex-grow:{{ item.purchased }}"></span>
@@ -10,11 +10,11 @@
         <span class="rw-segment rw-segment--rejected" data-outcome="rejected" data-count="{{ item.rejected }}" style="flex-grow:{{ item.rejected }}"></span>
         <span class="rw-segment rw-segment--not-presented" data-outcome="not_presented" data-count="{{ item.not_presented }}" style="flex-grow:{{ item.not_presented }}"></span>
     </div>
-    <ul class="rw-outcome-legend" aria-label="تعداد نتایج ثبت‌شده" role="list">
-        <li><i class="rw-segment--purchased" aria-hidden="true"></i>خرید <strong>{% include "management/_number.html" with value=item.purchased %}</strong></li>
-        <li><i class="rw-segment--interested" aria-hidden="true"></i>علاقه‌مند <strong>{% include "management/_number.html" with value=item.interested %}</strong></li>
-        <li><i class="rw-segment--follow-up" aria-hidden="true"></i>پیگیری <strong>{% include "management/_number.html" with value=item.follow_up %}</strong></li>
-        <li><i class="rw-segment--rejected" aria-hidden="true"></i>رد <strong>{% include "management/_number.html" with value=item.rejected %}</strong></li>
-        <li><i class="rw-segment--not-presented" aria-hidden="true"></i>ارائه نشده <strong>{% include "management/_number.html" with value=item.not_presented %}</strong></li>
+    <ul class="rw-outcome-summary" aria-label="تعداد نتایج ثبت‌شده" role="list">
+        <li><strong>{% include "management/_number.html" with value=item.purchased %}</strong> خرید</li>
+        {% if item.interested %}<li><strong>{% include "management/_number.html" with value=item.interested %}</strong> علاقه‌مند</li>{% endif %}
+        {% if item.follow_up %}<li><strong>{% include "management/_number.html" with value=item.follow_up %}</strong> پیگیری</li>{% endif %}
+        {% if item.rejected %}<li><strong>{% include "management/_number.html" with value=item.rejected %}</strong> رد شده</li>{% endif %}
+        {% if item.not_presented %}<li><strong>{% include "management/_number.html" with value=item.not_presented %}</strong> ارائه نشده</li>{% endif %}
     </ul>
 </figure>
