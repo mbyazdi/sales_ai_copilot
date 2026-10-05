@@ -1,0 +1,69 @@
+{% with brief=visit.pre_visit_brief %}
+<article class="workspace-visit ds-card ds-stack {% if brief.priority_level == 'HIGH' %}workspace-visit--high{% elif brief.priority_level == 'MEDIUM' %}workspace-visit--medium{% endif %}" aria-labelledby="visit-{{ visit.id }}-title" data-visit-id="{{ visit.id }}">
+    <header class="ds-page-header">
+        <div>
+            <h3 id="visit-{{ visit.id }}-title" class="ds-heading">{{ visit.customer.name }}</h3>
+            <p class="ds-caption ds-muted">کد مشتری <bdi>{{ visit.customer.customer_code }}</bdi>{% if visit.customer.city %} · {{ visit.customer.city }}{% endif %}{% if visit.customer.grade %} · رتبه <bdi>{{ visit.customer.grade.code }}</bdi>{% endif %}</p>
+        </div>
+        <div class="ds-row">
+            {% if brief.priority_level == 'HIGH' %}<span class="ds-badge ds-badge--danger">اولویت بالا</span>
+            {% elif brief.priority_level == 'MEDIUM' %}<span class="ds-badge ds-badge--warning">اولویت متوسط</span>
+            {% elif brief.priority_level == 'NORMAL' %}<span class="ds-badge ds-badge--info">اولویت عادی</span>
+            {% else %}<span class="ds-badge">اولویت ثبت نشده</span>{% endif %}
+            {% if visit.status == 'PLANNED' %}<span class="ds-badge">برنامه‌ریزی‌شده</span>
+            {% elif visit.status == 'IN_PROGRESS' %}<span class="ds-badge ds-badge--info">در حال انجام</span>
+            {% elif visit.status == 'COMPLETED' %}<span class="ds-badge ds-badge--success">تکمیل‌شده</span>
+            {% elif visit.status == 'CANCELLED' %}<span class="ds-badge">لغوشده</span>{% endif %}
+        </div>
+    </header>
+    {% if brief %}
+    <div class="workspace-visit-context">
+        <section aria-label="پیشنهاد و اقدام بعدی" class="ds-stack">
+            {% if brief.primary_recommendation %}
+            <div><span class="ds-caption ds-muted">پیشنهاد اصلی</span><p class="workspace-product">{{ brief.primary_recommendation.product_name }}</p></div>
+            {% else %}<p class="ds-state ds-state--empty">پیشنهاد فعال برای این مشتری موجود نیست.</p>{% endif %}
+            <div class="workspace-next-action"><span class="ds-caption ds-muted">اقدام پیشنهادی</span><p>{{ brief.commercial_decision.next_best_action|default:"ابتدا نیاز فعلی مشتری را بررسی کنید." }}</p></div>
+        </section>
+        <section class="workspace-commercial ds-stack" aria-label="آمادگی پیش از ویزیت">
+            <h4 class="ds-caption">پیش از ویزیت</h4>
+            <div class="ds-row">
+                {% if brief.customer.days_since_last_purchase is not None %}<span class="ds-caption">آخرین خرید: {{ brief.customer.days_since_last_purchase }} روز قبل</span>{% endif %}
+                {% if brief.customer.top_category %}<span class="ds-caption">دسته برتر: {{ brief.customer.top_category }}</span>{% endif %}
+                {% if brief.open_follow_up_count %}<span class="ds-badge ds-badge--warning">{{ brief.open_follow_up_count }} پیگیری باز</span>{% endif %}
+                {% if brief.next_follow_up %}<span class="ds-caption">سررسید پیگیری: <time datetime="{{ brief.next_follow_up.due_date|date:'Y-m-d' }}">{{ brief.next_follow_up.due_date|date:"Y/m/d" }}</time></span>{% endif %}
+            </div>
+            {% if brief.commercial_context %}
+            <div class="ds-row">
+                {% if brief.commercial_context.inventory.has_record %}
+                    {% if brief.commercial_context.inventory.is_low_stock %}<span class="ds-badge ds-badge--warning">موجودی کم</span>
+                    {% elif brief.commercial_context.inventory.is_in_stock %}<span class="ds-badge ds-badge--success">موجود</span>
+                    {% else %}<span class="ds-badge ds-badge--danger">ناموجود</span>{% endif %}
+                    <span class="ds-caption">قابل فروش: {{ brief.commercial_context.inventory.sellable_quantity }}</span>
+                {% else %}<span class="ds-badge">اطلاعات موجودی ثبت نشده</span>{% endif %}
+                {% if brief.commercial_context.has_eligible_promotion %}<span class="ds-badge ds-badge--info">پیشنهاد تشویقی مجاز</span>{% else %}<span class="ds-caption ds-muted">پیشنهاد تشویقی مجاز ندارد</span>{% endif %}
+            </div>
+            {% endif %}
+            {% if brief.commercial_decision.commercial_blocked %}<p class="ds-state ds-state--error">پیشنهاد اصلی محدودیت تجاری دارد؛ پیش از ارائه، جزئیات را بررسی کنید.</p>{% endif %}
+        </section>
+    </div>
+    <details class="workspace-visit-details">
+        <summary>دلایل اولویت و جزئیات پیشنهاد</summary>
+        <div class="ds-stack workspace-details-body">
+            <div class="ds-row ds-caption ds-muted"><span>امتیاز اولویت: {{ brief.priority_score }}</span>{% if brief.primary_recommendation %}<span>امتیاز پیشنهاد: {{ brief.primary_recommendation.score|floatformat:0 }}</span><span>اطمینان: {{ brief.primary_recommendation.confidence_score|floatformat:0 }}٪</span>{% endif %}</div>
+            {% if brief.priority_reasons %}<ul>
+            {% for reason in brief.priority_reasons %}<li>{% if reason == 'Strong recommendation score' %}امتیاز بالای پیشنهاد{% elif reason == 'Good recommendation score' %}امتیاز مناسب پیشنهاد{% elif reason == 'Active recommendation' %}پیشنهاد فعال{% elif reason == 'High recommendation confidence' %}اطمینان بالای پیشنهاد{% elif reason == 'Moderate recommendation confidence' %}اطمینان متوسط پیشنهاد{% elif reason == 'High-value customer' %}مشتری با ارزش بالا{% elif reason == 'Growth customer' %}مشتری در حال رشد{% elif reason == 'Open follow-up exists' %}پیگیری باز{% else %}عامل تکمیلی ثبت‌شده در اولویت{% endif %}</li>{% endfor %}
+            </ul>{% endif %}
+            {% if brief.primary_recommendation.reason %}<p>{{ brief.primary_recommendation.reason }}</p>{% endif %}
+            {% if brief.commercial_decision.talking_point %}<p><strong>راهنمای گفتگو:</strong> {{ brief.commercial_decision.talking_point }}</p>{% endif %}
+            {% if brief.commercial_decision.why_now %}<ul>{% for reason in brief.commercial_decision.why_now %}<li>{{ reason }}</li>{% endfor %}</ul>{% endif %}
+            {% if brief.target_relevance %}<div class="ds-stack"><h4 class="ds-caption">ارتباط با هدف فروش</h4>{% for target in brief.target_relevance %}<p class="ds-caption">{{ target.scope_name }} · {{ target.achievement_percent|floatformat:0 }}٪ تحقق · باقیمانده {{ target.remaining_value|floatformat:0 }}</p>{% endfor %}</div>{% endif %}
+            {% if brief.commercial_context.promotions %}<div class="ds-stack"><h4 class="ds-caption">پیشنهادهای تشویقی</h4>{% for promo in brief.commercial_context.promotions %}<p>{{ promo.name }}{% if promo.discount_percent %} · {{ promo.discount_percent|floatformat:0 }}٪ تخفیف{% endif %}{% if promo.discount_amount %} · تخفیف {{ promo.discount_amount|floatformat:0 }}{% endif %}{% if promo.minimum_quantity %} · حداقل خرید {{ promo.minimum_quantity }}{% endif %}</p>{% endfor %}</div>{% endif %}
+        </div>
+    </details>
+    {% else %}<p class="ds-state ds-state--empty">اطلاعات پیش از ویزیت در دسترس نیست؛ جزئیات مشتری را بررسی کنید.</p>{% endif %}
+    <footer class="workspace-visit-actions ds-row">
+        <a class="ds-button" href="/customers/?customer_code={{ visit.customer.customer_code|urlencode }}&visit_id={{ visit.id }}" aria-describedby="visit-{{ visit.id }}-title">{% if visit.status == 'PLANNED' %}آماده‌سازی و شروع ویزیت{% elif visit.status == 'IN_PROGRESS' %}ادامه و ثبت نتیجه{% elif visit.status == 'COMPLETED' %}مشاهده خلاصه ویزیت{% else %}مشاهده اطلاعات مشتری{% endif %}</a>
+        <a class="ds-button ds-button--secondary" href="/customers/?customer_code={{ visit.customer.customer_code|urlencode }}&visit_id={{ visit.id }}" aria-describedby="visit-{{ visit.id }}-title">نمای ۳۶۰ درجه مشتری</a>
+    </footer>
+</article>
+{% endwith %}
