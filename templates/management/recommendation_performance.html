@@ -1,311 +1,81 @@
 {% extends "base.html" %}
 {% load static %}
-
-
-{% block title %}
-    عملکرد پیشنهادها
-{% endblock %}
-
-
-{% block extra_css %}
-
-    <link
-        rel="stylesheet"
-        href="{% static 'management/css/recommendation_performance.css' %}"
-    >
-
-{% endblock %}
-
-
-{% block breadcrumb %}
-    عملکرد پیشنهادها
-{% endblock %}
-
-
+{% block title %}عملکرد پیشنهادها{% endblock %}
+{% block breadcrumb %}عملکرد پیشنهادها{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'management/css/recommendation_performance.css' %}?v=002g-polish-1">{% endblock %}
 {% block content %}
-
-<div class="management-page">
-
-    <header class="dashboard-header">
-
-        <div>
-
-            <div class="dashboard-eyebrow">
-                SALES AI COPILOT
-            </div>
-
-            <h1>
-                عملکرد پیشنهادهای هوشمند فروش
-            </h1>
-
-            <p>
-                ارزیابی عملکرد Recommendation Engine بر اساس
-                نتایج واقعی جلسات فروش
-            </p>
-
-        </div>
-
+<div class="recommendation-workspace ds-stack">
+    <header class="ds-page-header">
+        <div><h1 class="ds-title">عملکرد پیشنهادها</h1><p class="ds-muted">نتایج واقعی فروش و شواهدی که پشت پیشنهادهای سیستم قرار دارند.</p></div>
+        <a class="ds-button ds-button--secondary" href="{% url 'management-dashboard' %}">نمای مدیریت</a>
     </header>
-
-
-    <!-- =========================================
-         SUMMARY
-    ========================================== -->
-
-    <section class="summary-section">
-
-        <div class="section-title">
-            خلاصه عملکرد
+    <section class="ds-surface rw-summary" aria-labelledby="performance-title">
+        <div class="rw-section-header"><div><h2 id="performance-title" class="ds-heading">عملکرد پیشنهادها چگونه است؟</h2><p class="ds-caption ds-muted">تمام تاریخچه نتایج ثبت‌شده · آخرین نتیجه هر پیشنهاد در هر ویزیت</p></div>{% include "management/_quality.html" with quality=summary.data_quality %}</div>
+        {% if not performance.ready %}<div class="ds-state ds-state--empty">هنوز نتیجه‌ای برای ارزیابی پیشنهادها ثبت نشده است. نبود داده به معنی عملکرد ضعیف نیست.</div>{% endif %}
+        <div class="rw-performance-overview">
+        <ol class="rw-flow" aria-label="مسیر نتایج پیشنهاد: ارزیابی، ارائه و خرید">
+            <li data-stage="evaluated" data-count="{{ summary.resolved_recommendations }}"><span>پیشنهادهای ارزیابی‌شده</span><strong>{% include "management/_number.html" with value=summary.resolved_recommendations %}</strong><span class="rw-flow-arrow" aria-hidden="true">←</span></li>
+            <li data-stage="presented" data-count="{{ summary.presented }}"><span>واقعاً ارائه‌شده</span><strong>{% include "management/_number.html" with value=summary.presented %}</strong><span class="rw-flow-arrow" aria-hidden="true">←</span></li>
+            <li data-stage="purchased" data-count="{{ summary.purchased }}"><span>خرید موفق</span><strong>{% include "management/_number.html" with value=summary.purchased %}</strong></li>
+        </ol>
+        <div class="rw-kpis">
+            <article><span>نرخ تبدیل</span><strong>{% if summary.presented %}{% include "management/_number.html" with value=summary.conversion_rate %}٪{% else %}—{% endif %}</strong></article>
+            <article><span>نرخ تعامل</span><strong>{% if summary.presented %}{% include "management/_number.html" with value=summary.engagement_rate %}٪{% else %}—{% endif %}</strong></article>
+            <article><span>مبلغ فروش ثبت‌شده</span><strong>{% include "management/_number.html" with value=summary.total_revenue %}</strong></article>
         </div>
-
-        <div class="summary-grid">
-
-            <article class="summary-card">
-
-                <div class="summary-label">
-                    پیشنهادهای ارائه‌شده
-                </div>
-
-                <div
-                    class="summary-value"
-                    id="summaryPresented"
-                >
-                    —
-                </div>
-
-            </article>
-
-
-            <article class="summary-card success">
-
-                <div class="summary-label">
-                    خرید موفق
-                </div>
-
-                <div
-                    class="summary-value"
-                    id="summaryPurchased"
-                >
-                    —
-                </div>
-
-            </article>
-
-
-            <article class="summary-card warning">
-
-                <div class="summary-label">
-                    مشتریان علاقه‌مند
-                </div>
-
-                <div
-                    class="summary-value"
-                    id="summaryInterested"
-                >
-                    —
-                </div>
-
-            </article>
-
-
-            <article class="summary-card revenue">
-
-                <div class="summary-label">
-                    فروش حاصل
-                </div>
-
-                <div
-                    class="summary-value"
-                    id="summaryRevenue"
-                >
-                    —
-                </div>
-
-            </article>
-
-
-            <article class="summary-card">
-
-                <div class="summary-label">
-                    نرخ تبدیل
-                </div>
-
-                <div
-                    class="summary-value"
-                    id="summaryConversion"
-                >
-                    —
-                </div>
-
-            </article>
-
-
-            <article class="summary-card">
-
-                <div class="summary-label">
-                    نرخ علاقه‌مندی
-                </div>
-
-                <div
-                    class="summary-value"
-                    id="summaryInterest"
-                >
-                    —
-                </div>
-
-            </article>
-
         </div>
-
-    </section>
-
-
-    <!-- =========================================
-         PERFORMANCE TABLE
-    ========================================== -->
-
-    <section class="performance-section">
-
-        <div class="section-header">
-
-            <div>
-
-                <div class="section-eyebrow">
-                    RECOMMENDATION PERFORMANCE
-                </div>
-
-                <h2>
-                    عملکرد انواع پیشنهاد
-                </h2>
-
-                <p>
-                    مقایسه عملکرد انواع مختلف پیشنهادهای هوشمند
-                </p>
-
+        <details class="rw-help" id="performance-methodology">
+            <summary>روش محاسبه و میزان اتکای داده</summary>
+            <div class="ds-stack">
+                <p>هر جفت ویزیت و پیشنهاد، یک نتیجه نهایی دارد. «ارائه‌شده» شامل خرید، علاقه‌مندی، نیاز به پیگیری و رد است؛ «ارائه نشده» از تعداد ارائه و مخرج نرخ تبدیل و تعامل حذف می‌شود.</p>
+                <p>نرخ تبدیل: خرید از میان پیشنهادهای ارائه‌شده. نرخ تعامل: خرید، علاقه‌مندی یا نیاز به پیگیری از میان پیشنهادهای ارائه‌شده. اگر هیچ ارائه‌ای ثبت نشده باشد، نرخ قابل تفسیر نیست و با «—» نمایش داده می‌شود؛ نرخ صفر با ارائه واقعی به معنی نبود خرید یا تعامل است.</p>
+                <p>کیفیت داده بر اساس تعداد ارائه‌هاست: بدون ارائه، داده ناکافی برای ۱ تا ۲، داده محدود برای ۳ تا ۹، و حجم داده کافی از ۱۰ ارائه. این وضعیت، تضمین کیفیت فروش یا رابطه علت و معلولی نیست.</p>
+                <p>مبلغ فروش فقط از نتایج خرید ثبت‌شده استخراج می‌شود و برابر کل سفارش‌های شرکت نیست. واحد پول در قرارداد داده مشخص نشده است. نتایج نیازمند پیگیری نیز تعداد کارهای پیگیری باز نیستند.</p>
+                <p>اطمینان و شواهدِ پیشنهاد فعال با کیفیت داده نتایج فروش تفاوت دارند؛ هر کدام در بخش مربوط به خود نمایش داده می‌شوند.</p>
             </div>
-
-        </div>
-
-
-        <div
-            class="table-loading"
-            id="performanceLoading"
-        >
-            در حال دریافت اطلاعات...
-        </div>
-
-
-        <div
-            class="table-error"
-            id="performanceError"
-        ></div>
-
-
-        <div class="table-wrapper">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-
-                        <th>
-                            نوع پیشنهاد
-                        </th>
-
-                        <th>
-                            ارائه
-                        </th>
-
-                        <th>
-                            خرید
-                        </th>
-
-                        <th>
-                            علاقه‌مند
-                        </th>
-
-                        <th>
-                            رد
-                        </th>
-
-                        <th>
-                            پیگیری
-                        </th>
-
-                        <th>
-                            تبدیل
-                        </th>
-
-                        <th>
-                            علاقه‌مندی
-                        </th>
-
-                        <th>
-                            تعامل
-                        </th>
-
-                        <th>
-                            عملکرد
-                        </th>
-
-                        <th>
-                            سیگنال یادگیری
-                        </th>
-
-                        <th>
-                            کیفیت داده
-                        </th>
-
-                        <th>
-                            فروش
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody
-                    id="performanceTableBody"
-                >
-
-                </tbody>
-
-            </table>
-
-        </div>
-
+        </details>
     </section>
-        {% include "management/_recommendation_explainability.html" %}
-        {% include "management/_recommendation_tuning.html" %}
-    </div>
-
-    {% endblock %}
-
-
-    {% block extra_js %}
-
-    <script>
-
-    window.salesRecommendationPerformance = {
-        apiUrl: "/api/visits/v1/recommendations/performance/"
-    };
-
-    </script>
-
-</script>
-
-
-<script
-    src="{% static 'management/js/recommendation_performance.js' %}"
-></script>
-
-<script
-    src="{% static 'management/js/recommendation_explainability.js' %}"
-></script>
-
-<script
-    src="{% static 'management/js/recommendation_tuning.js' %}"
-></script>
-
+    <section class="ds-surface" aria-labelledby="types-title">
+        <div class="rw-section-header"><div><h2 id="types-title" class="ds-heading">مقایسه انواع پیشنهاد</h2><p class="ds-caption ds-muted">ترتیب موجودِ تحلیل مدیریت: نرخ تبدیل، سپس تعداد ارائه. حجم داده را پیش از قضاوت مقایسه کنید.</p></div></div>
+        {% if performance.items %}
+        <div class="rw-outcome-comparison">
+            {% for item in performance.items %}{% include "management/_recommendation_outcomes.html" %}{% endfor %}
+        </div>
+        <details class="rw-comparison-details" id="comparison-details">
+        <summary>همه اعداد و جزئیات مقایسه</summary>
+        <div class="ds-table-region" tabindex="0" aria-label="مقایسه نتایج انواع پیشنهاد">
+            <table class="ds-table rw-type-table">
+                <caption class="ds-caption">ارزیابی نتیجه نهایی، مستقل از تعداد پیشنهادهای فعال امروز</caption>
+                <thead><tr><th scope="col">نوع پیشنهاد</th><th scope="col">ارزیابی</th><th scope="col">ارائه</th><th scope="col">خرید</th><th scope="col">تبدیل</th><th scope="col">تعامل</th><th scope="col">کیفیت داده</th><th scope="col">جزئیات نتایج</th></tr></thead>
+                <tbody>{% for item in performance.items %}
+                    <tr>
+                        <th scope="row">{% include "core/customer_360/_recommendation_type.html" with recommendation=item %}</th>
+                        <td data-label="ارزیابی">{% include "management/_number.html" with value=item.resolved_recommendations %}</td>
+                        <td data-label="ارائه">{% include "management/_number.html" with value=item.presented %}</td>
+                        <td data-label="خرید">{% include "management/_number.html" with value=item.purchased %}</td>
+                        <td data-label="تبدیل">{% if item.presented %}{% include "management/_number.html" with value=item.conversion_rate %}٪{% else %}—{% endif %}</td>
+                        <td data-label="تعامل">{% if item.presented %}{% include "management/_number.html" with value=item.engagement_rate %}٪{% else %}—{% endif %}</td>
+                        <td data-label="کیفیت داده">{% include "management/_quality.html" with quality=item.data_quality %}</td>
+                        <td data-label="جزئیات"><details><summary>جزئیات نتایج</summary><dl class="rw-facts">
+                            <div><dt>علاقه‌مند</dt><dd>{% include "management/_number.html" with value=item.interested %}</dd></div>
+                            <div><dt>نیاز به پیگیری</dt><dd>{% include "management/_number.html" with value=item.follow_up %}</dd></div>
+                            <div><dt>رد شده</dt><dd>{% include "management/_number.html" with value=item.rejected %}</dd></div>
+                            <div><dt>ارائه نشده</dt><dd>{% include "management/_number.html" with value=item.not_presented %}</dd></div>
+                            <div><dt>مبلغ فروش ثبت‌شده</dt><dd>{% include "management/_number.html" with value=item.total_revenue %}</dd></div>
+                        </dl></details></td>
+                    </tr>
+                {% endfor %}</tbody>
+            </table>
+        </div>
+        </details>
+        {% else %}<div class="ds-state ds-state--empty">هنوز نتیجه‌ای به تفکیک نوع پیشنهاد ثبت نشده است.</div>{% endif %}
+    </section>
+    {% include "management/_recommendation_explainability.html" %}
+    {% include "management/_recommendation_tuning.html" %}
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'management/js/recommendation_performance.js' %}?v=002g-1" defer></script>
+<script src="{% static 'management/js/recommendation_explainability.js' %}?v=002g-polish-1" defer></script>
+<script src="{% static 'management/js/recommendation_tuning.js' %}?v=002g-1" defer></script>
 {% endblock %}

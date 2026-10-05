@@ -1,187 +1,38 @@
-<section
-    class="recommendation-tuning-card"
-    id="recommendationTuningSection"
->
-
-    <div class="section-header">
-
-        <div>
-
-            <div class="section-eyebrow">
-                RECOMMENDATION TUNING
+<details class="ds-surface rw-tuning" id="recommendationTuningSection">
+    <summary class="rw-tuning-title">تنظیمات پیشرفته موتور پیشنهاد <span class="ds-caption ds-muted">پیکربندی و تنظیم کنترل‌شده · ویژه مدیریت</span></summary>
+    <div class="ds-stack rw-tuning-content">
+        <p class="ds-muted">باز کردن این بخش هیچ تنظیمی را تغییر نمی‌دهد. تأیید، اعمال و بازگردانی فقط از طریق عملیات صریح و کنترل‌شده انجام می‌شوند.</p>
+        <section aria-labelledby="active-config-title">
+            <h2 id="active-config-title" class="ds-heading">پیکربندی فعال</h2>
+            {% if active_config %}
+            <p>نام پیکربندی: <bdi>{{ active_config.name }}</bdi> · آخرین تغییر: <bdi>{{ active_config.updated_at|date:"Y/m/d H:i" }}</bdi> <span class="ds-caption">(میلادی)</span></p>
+            <dl class="rw-config-grid">{% for item in config_values %}<div><dt>{{ item.label }}</dt><dd>{% include "management/_number.html" with value=item.value %}</dd></div>{% endfor %}</dl>
+            <p class="ds-caption ds-muted">پارامترهای منتخب پیکربندی فعال در زمان باز شدن صفحه. پس از اعمال یا بازگردانی، صفحه را به‌روزرسانی کنید تا مقادیر جدید را ببینید.</p>
+            {% else %}<p class="ds-state ds-state--empty">پیکربندی فعال ثبت نشده است؛ موتور از مقادیر پیش‌فرض داخلی استفاده می‌کند. هیچ پیکربندی‌ای در این صفحه ساخته نمی‌شود.</p>{% endif %}
+        </section>
+        <section aria-labelledby="tuning-title">
+            <div class="rw-section-header"><h2 id="tuning-title" class="ds-heading">پیشنهادهای تغییر تنظیمات</h2><button class="ds-button ds-button--secondary" id="refreshRecommendationTuning" type="button">به‌روزرسانی پیشنهادهای تنظیم</button></div>
+            <details class="rw-help"><summary>تفاوت پیشنهاد تنظیم با عملکرد امروز</summary><p>مقدار مبنا و کیفیت داده هر پیشنهاد تنظیم، تصویر ذخیره‌شده زمان ایجاد آن است. این تصویر با روش قدیمی تنظیم موتور ساخته شده و با شاخص‌های مدیریت بالای صفحه یکسان نیست؛ در آن، نتیجه «ارائه نشده» نیز ممکن است در مخرج نرخ‌ها باشد. تصاویر قبلی دوباره محاسبه یا تغییر نمی‌کنند. «اعمال» پس از تأیید و با اعتبارسنجی سرور انجام می‌شود؛ «بازگردانی» مقدار ثبت‌شده پیش از اعمال را برمی‌گرداند.</p></details>
+            <div hidden>{% csrf_token %}</div>
+            <div class="tuning-filters">
+                <div class="ds-field"><label class="ds-label" for="tuningStatusFilter">وضعیت</label><select class="ds-control" id="tuningStatusFilter"><option value="">همه وضعیت‌ها</option><option value="PENDING">در انتظار بررسی</option><option value="APPROVED">تأیید شده</option><option value="REJECTED">رد شده</option><option value="APPLIED">اعمال شده</option><option value="ROLLED_BACK">بازگردانی شده</option></select></div>
+                <div class="ds-field"><label class="ds-label" for="tuningTypeFilter">نوع پیشنهاد</label><select class="ds-control" id="tuningTypeFilter"><option value="">همه انواع</option><option value="REPEAT_PURCHASE">خرید مجدد</option><option value="CROSS_SELL">فروش مکمل</option><option value="CATEGORY">پیشنهاد دسته</option><option value="SIMILAR_PRODUCT">محصول مشابه</option><option value="UP_SELL">فروش ارتقایی</option></select></div>
+                <div class="ds-field"><label class="ds-label" for="tuningMetricSearch">پارامتر</label><input class="ds-control" type="search" id="tuningMetricSearch" placeholder="نام پارامتر" autocomplete="off" aria-describedby="tuning-parameter-help"><small class="ds-muted" id="tuning-parameter-help">شناسه فنی پارامتر در جزئیات هر پیشنهاد در دسترس است.</small></div>
+                <button type="button" class="ds-button ds-button--quiet" id="clearTuningFilters">پاک‌کردن فیلترها</button>
             </div>
-
-            <h2>
-                پیشنهادهای تنظیم موتور
-            </h2>
-
-            <p>
-                پیشنهادهای تغییر وزن موتور بر اساس عملکرد واقعی
-                Recommendation Engine در این بخش نمایش داده می‌شوند.
-            </p>
-
-        </div>
-
-        <button
-            class="performance-refresh"
-            id="refreshRecommendationTuning"
-            type="button"
-        >
-            ↻ بروزرسانی
-        </button>
-
+            <noscript><p class="ds-state">دریافت پیشنهادهای تنظیم و عملیات آن‌ها به جاوااسکریپت نیاز دارد.</p></noscript>
+            <div id="tuningRegion" aria-busy="false">
+                <div class="ds-state ds-state--loading" id="tuningLoading" role="status" style="display:none">در حال دریافت پیشنهادهای تنظیم…</div>
+                <div class="ds-state ds-state--error" id="tuningError" role="alert" style="display:none"></div>
+                <div class="ds-state ds-state--empty" id="tuningEmpty" style="display:none">پیشنهاد تنظیمی مطابق این فیلترها وجود ندارد.</div>
+                <div class="ds-table-region" id="tuningTableWrap" style="display:none" tabindex="0" aria-label="پیشنهادهای تغییر تنظیم موتور">
+                    <table class="ds-table rw-tuning-table">
+                        <caption>پیشنهادهای ذخیره‌شده و سابقه کنترل تنظیمات</caption>
+                        <thead><tr><th scope="col">نوع پیشنهاد</th><th scope="col">پارامتر و دلیل</th><th scope="col">مقدار مبنا</th><th scope="col">مقدار پیشنهادی</th><th scope="col">وضعیت</th><th scope="col">سیگنال ثبت‌شده</th><th scope="col">کیفیت داده ثبت‌شده</th><th scope="col">مقدار پیش از اعمال</th><th scope="col">زمان بررسی</th><th scope="col">زمان اعمال</th><th scope="col">زمان بازگردانی</th><th scope="col">عملیات</th></tr></thead>
+                        <tbody id="tuningTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
     </div>
-
-    <div class="tuning-filters">
-
-        <div class="tuning-filter-field">
-
-            <label for="tuningStatusFilter">
-                وضعیت
-            </label>
-
-            <select id="tuningStatusFilter">
-
-                <option value="">
-                    همه وضعیت‌ها
-                </option>
-
-                <option value="PENDING">
-                    در انتظار بررسی
-                </option>
-
-                <option value="APPROVED">
-                    تأیید شده
-                </option>
-
-                <option value="REJECTED">
-                    رد شده
-                </option>
-
-                <option value="APPLIED">
-                    اعمال شده
-                </option>
-
-                <option value="ROLLED_BACK">
-                    بازگردانی شده
-                </option>
-
-            </select>
-
-        </div>
-
-
-        <div class="tuning-filter-field">
-
-            <label for="tuningTypeFilter">
-                نوع پیشنهاد
-            </label>
-
-            <select id="tuningTypeFilter">
-
-                <option value="">
-                    همه انواع
-                </option>
-
-                <option value="REPEAT_PURCHASE">
-                    خرید مجدد
-                </option>
-
-                <option value="CROSS_SELL">
-                    فروش مکمل
-                </option>
-
-                <option value="CATEGORY">
-                    پیشنهاد دسته
-                </option>
-
-                <option value="SIMILAR_PRODUCT">
-                    محصول مشابه
-                </option>
-
-                <option value="UP_SELL">
-                    فروش ارتقایی
-                </option>
-
-            </select>
-
-        </div>
-
-
-        <div class="tuning-filter-field tuning-filter-search">
-
-            <label for="tuningMetricSearch">
-                پارامتر
-            </label>
-
-            <input
-                type="search"
-                id="tuningMetricSearch"
-                placeholder="مثلاً similar_product_score"
-                autocomplete="off"
-            >
-
-        </div>
-
-
-        <button
-            type="button"
-            class="tuning-clear-filters"
-            id="clearTuningFilters"
-        >
-            پاک‌کردن فیلترها
-        </button>
-
-    </div>
-
-    <div
-        class="table-loading"
-        id="tuningLoading"
-    >
-        در حال دریافت پیشنهادهای تنظیم...
-    </div>
-
-    <div
-        class="table-error"
-        id="tuningError"
-    ></div>
-
-    <div
-        class="performance-empty"
-        id="tuningEmpty"
-    >
-        هنوز پیشنهاد تنظیمی ثبت نشده است.
-    </div>
-
-    <div
-        class="table-wrapper"
-        id="tuningTableWrap"
-        style="display:none"
-    >
-
-        <table>
-
-            <thead>
-                <tr>
-                    <th>نوع پیشنهاد</th>
-                    <th>پارامتر</th>
-                    <th>مقدار فعلی</th>
-                    <th>مقدار پیشنهادی</th>
-                    <th>وضعیت</th>
-                    <th>سیگنال</th>
-                    <th>کیفیت داده</th>
-                    <th>مقدار قبل از اعمال</th>
-                    <th>زمان بررسی</th>
-                    <th>زمان اعمال</th>
-                    <th>زمان بازگردانی</th>
-                    <th>عملیات</th>
-                </tr>
-            </thead>
-
-            <tbody id="tuningTableBody"></tbody>
-
-        </table>
-
-    </div>
-
-</section>
+</details>

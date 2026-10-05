@@ -1,6 +1,43 @@
 (function () {
     "use strict";
 
+    const section = document.getElementById("recommendationTuningSection");
+    if (!section) return;
+    let loadRevision = 0;
+
+    function metricLabel(metric) {
+        const labels = {
+            min_recommendation_score: "حداقل امتیاز پیشنهاد", max_recommendations: "حداکثر تعداد پیشنهاد",
+            promotion_score: "امتیاز ترویج فروش", similar_product_score: "امتیاز محصول مشابه",
+            association_max_score: "سقف امتیاز فروش مکمل", association_lift_max_score: "اثر هم‌خریدی",
+            repurchase_no_cycle_score: "خرید مجدد بدون چرخه", repurchase_overdue_30_score: "خرید مجدد با تأخیر تا ۳۰ روز",
+            repurchase_overdue_90_score: "خرید مجدد با تأخیر تا ۹۰ روز", repurchase_overdue_high_score: "خرید مجدد با تأخیر بیشتر",
+            durable_previous_purchase_score: "خرید قبلی کالای بادوام", upsell_10_percent_score: "فروش ارتقایی تا ۱۰ درصد",
+            upsell_25_percent_score: "فروش ارتقایی تا ۲۵ درصد", upsell_50_percent_score: "فروش ارتقایی تا ۵۰ درصد",
+            upsell_high_score: "فروش ارتقایی بیشتر", grade_a_score: "رتبه مشتری A", grade_b_score: "رتبه مشتری B", grade_c_score: "رتبه مشتری C"
+        };
+        const category = /^category_rank_(\d+)_score$/.exec(metric || "");
+        const association = /^association_evidence_(\d+)_score$/.exec(metric || "");
+        return labels[metric] || (category ? "امتیاز دسته با رتبه " + number(category[1]) :
+            association ? "امتیاز شواهد هم‌خریدی " + number(association[1]) : "پارامتر موتور");
+    }
+
+    function failureMessage(data, fallback) {
+        const messages = {
+            "Tuning suggestion must be approved before apply.": "پیشنهاد باید پیش از اعمال تأیید شود.",
+            "Applied tuning suggestion cannot be changed.": "وضعیت پیشنهاد اعمال‌شده قابل تغییر نیست.",
+            "Active RecommendationConfig not found.": "پیکربندی فعال در دسترس نیست.",
+            "RecommendationConfig metric not found.": "پارامتر در پیکربندی فعال وجود ندارد.",
+            "Suggested tuning value is required.": "مقدار پیشنهادی ثبت نشده است.",
+            "Suggested tuning value is outside the allowed range.": "مقدار پیشنهادی خارج از محدوده مجاز است.",
+            "Suggested tuning change exceeds the maximum allowed delta.": "اندازه تغییر از سقف مجاز بیشتر است.",
+            "Tuning suggestion is stale because the active configuration value has changed.": "مقدار پیکربندی تغییر کرده و پیشنهاد تنظیم قدیمی شده است.",
+            "Only applied tuning suggestions can be rolled back.": "فقط پیشنهاد اعمال‌شده قابل بازگردانی است.",
+            "Previous applied value is not available for rollback.": "مقدار پیش از اعمال برای بازگردانی موجود نیست."
+        };
+        return messages[data.detail] || fallback;
+    }
+
     const tableWrap =
         document.getElementById(
             "tuningTableWrap"
@@ -107,6 +144,8 @@
 
     function number(value) {
 
+        if (value === null || value === undefined || value === "" || !Number.isFinite(Number(value))) return "—";
+
         return new Intl.NumberFormat(
             "fa-IR",
             {
@@ -173,6 +212,8 @@
         state,
         message = ""
     ) {
+
+        document.getElementById("tuningRegion").setAttribute("aria-busy", String(state === "loading"));
 
         if (loading) {
 
@@ -258,11 +299,7 @@
         if (!response.ok) {
 
             throw new Error(
-                data.detail
-                ||
-                data.error
-                ||
-                "تغییر وضعیت پیشنهاد تنظیم ناموفق بود."
+                failureMessage(data, "تغییر وضعیت پیشنهاد تنظیم ناموفق بود. دسترسی و اتصال را بررسی کنید.")
             );
         }
 
@@ -311,11 +348,7 @@
         if (!response.ok) {
 
             throw new Error(
-                data.detail
-                ||
-                data.error
-                ||
-                "اعمال پیشنهاد تنظیم ناموفق بود."
+                failureMessage(data, "اعمال پیشنهاد تنظیم ناموفق بود. دسترسی و اتصال را بررسی کنید.")
             );
         }
 
@@ -363,11 +396,7 @@
         if (!response.ok) {
 
             throw new Error(
-                data.detail
-                ||
-                data.error
-                ||
-                "بازگردانی پیشنهاد تنظیم ناموفق بود."
+                failureMessage(data, "بازگردانی پیشنهاد تنظیم ناموفق بود. دسترسی و اتصال را بررسی کنید.")
             );
         }
 
@@ -578,10 +607,8 @@
                     </td>
 
                     <td>
-                        ${escapeHtml(
-                            item.metric
-                            || "—"
-                        )}
+                        ${escapeHtml(metricLabel(item.metric))}
+                        <details><summary>شناسه فنی و دلیل</summary><bdi dir="ltr">${escapeHtml(item.metric || "—")}</bdi><p>${escapeHtml(item.reason || "دلیل ثبت نشده است.")}</p></details>
                     </td>
 
                     <td>
@@ -668,6 +695,10 @@
                 `;
 
 
+                const headings = section.querySelectorAll("thead th");
+                row.querySelectorAll("td").forEach((cell, index) => {
+                    cell.dataset.label = headings[index].textContent;
+                });
                 tableBody.appendChild(
                     row
                 );
@@ -823,10 +854,11 @@
 
                                 setState(
                                     "error",
-                                    error.message
-                                    ||
-                                    "خطا در عملیات پیشنهاد تنظیم."
+                                    error instanceof SyntaxError || error instanceof TypeError ?
+                                        "عملیات پیشنهاد تنظیم ناموفق بود. دوباره تلاش کنید." : error.message
                                 );
+                            } finally {
+                                setButtonBusy(button, false);
                             }
                         }
                     );
@@ -836,6 +868,8 @@
 
 
     async function loadTuningSuggestions() {
+
+        const revision = ++loadRevision;
 
         setState(
             "loading"
@@ -872,15 +906,13 @@
             if (!response.ok) {
 
                 throw new Error(
-                    data.detail
-                    ||
-                    data.error
-                    ||
-                    `خطا در دریافت پیشنهادهای تنظیم (${response.status})`
+                    "دریافت پیشنهادهای تنظیم ناموفق بود. دسترسی و اتصال را بررسی کنید."
                 );
             }
 
 
+            if (revision !== loadRevision) return;
+            if (!Array.isArray(data.results)) throw new Error("پاسخ پیشنهادهای تنظیم معتبر نیست.");
             renderTable(
                 data.results
                 || []
@@ -890,11 +922,12 @@
 
         catch (error) {
 
+            if (revision !== loadRevision) return;
+
             setState(
                 "error",
-                error.message
-                ||
-                "خطا در دریافت پیشنهادهای تنظیم."
+                error instanceof SyntaxError || error instanceof TypeError ?
+                    "دریافت پیشنهادهای تنظیم ناموفق بود. به‌روزرسانی را دوباره بزنید." : error.message
             );
         }
     }
@@ -961,6 +994,10 @@
     }
 
 
-    loadTuningSuggestions();
+    // The secondary admin area loads only when explicitly expanded.
+    section.addEventListener("toggle", () => {
+        if (section.open) loadTuningSuggestions();
+    });
+    if (section.open) loadTuningSuggestions();
 
 })();
