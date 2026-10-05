@@ -114,7 +114,7 @@ class ProductShellTests(TestCase):
         href = re.search(r'href="([^\"]*css/app\.css[^\"]*)"', html).group(1)
         url = urlsplit(href)
         self.assertEqual(url.path, "/static/css/app.css")
-        self.assertEqual(url.query, "v=002a-top-1")
+        self.assertEqual(url.query, "v=002b-1")
         response = serve(RequestFactory().get(href), "css/app.css")
         try:
             self.assertEqual(response.status_code, 200)
@@ -125,3 +125,23 @@ class ProductShellTests(TestCase):
         for selector in (".shell-header-inner", ".shell-nav", ".shell-brand", ".shell-content"):
             self.assertIn(selector, css)
         self.assertNotIn('class="shell-sidebar"', html)
+
+    @override_settings(DEBUG=True)
+    def test_design_foundation_loads_before_shell_and_help_search_matches_access(self):
+        from django.contrib.staticfiles.views import serve
+
+        html = self.render_shell(self.rep_user)
+        self.assertLess(html.index("css/design-system.css"), html.index("css/app.css"))
+        response = serve(RequestFactory().get("/static/css/design-system.css?v=002b-1"),
+                         "css/design-system.css")
+        try:
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response["Content-Type"], "text/css")
+        finally:
+            response.close()
+        for user in (self.rep_user, self.staff):
+            html = self.render_shell(user)
+            self.assertIn('label class="ds-label" for="shell-customer-search"', html)
+            self.assertIn('action="/customers/" method="get"', html)
+        for user in (AnonymousUser(), self.inactive, self.missing):
+            self.assertNotIn('id="shell-customer-search"', self.render_shell(user))

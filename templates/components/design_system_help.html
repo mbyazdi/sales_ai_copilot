@@ -1,0 +1,32 @@
+<details class="ds-help">
+    <summary class="ds-button ds-button--quiet">
+        <svg class="ds-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6M12 7h.01"></path></svg>
+        راهنمای رابط کاربری
+    </summary>
+    <div class="ds-help-content ds-card ds-stack">
+        <h2 class="ds-heading">راهنمای نمایش و استفاده</h2>
+        <p class="ds-muted">برچسب‌ها با متن و رنگ نمایش داده می‌شوند؛ وضعیت‌های زیر نمونه راهنما هستند و وضعیت واقعی مشتری یا فروش را نشان نمی‌دهند.</p>
+        <div class="ds-row" aria-label="نمونه برچسب‌های وضعیت">
+            <span class="ds-badge ds-badge--success">موفق</span>
+            <span class="ds-badge ds-badge--warning">نیازمند توجه</span>
+            <span class="ds-badge ds-badge--danger">خطا</span>
+            <span class="ds-badge ds-badge--info">اطلاعات</span>
+        </div>
+        {% if request.user.is_authenticated and request.user.is_active %}
+        {% if request.user.is_staff or request.user.salesperson_profile.is_active %}
+        <form class="ds-search" action="/customers/" method="get">
+            <div class="ds-field">
+                <label class="ds-label" for="shell-customer-search">جستجوی مشتری مجاز</label>
+                <input class="ds-control" id="shell-customer-search" name="customer_code" placeholder="کد مشتری" required aria-describedby="shell-search-help">
+                <span id="shell-search-help" class="ds-caption ds-muted">جستجو فقط در محدوده دسترسی فعلی شما انجام می‌شود.</span>
+            </div>
+            <button class="ds-button" type="submit">
+                <svg class="ds-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m16 16 4 4"></path></svg>
+                جستجوی مشتری
+            </button>
+        </form>
+        {% endif %}
+        {% endif %}
+        <p class="ds-caption ds-muted">برای حرکت میان کنترل‌ها از کلید تب استفاده کنید. کادر مشخص دور کنترل، محل تمرکز صفحه‌کلید را نشان می‌دهد.</p>
+    </div>
+</details>

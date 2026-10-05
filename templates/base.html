@@ -7,7 +7,8 @@
     <title>{% block title %}سامانه هوشمند فروش{% endblock %}</title>
     {% block extra_css %}{% endblock %}
     {# Bump this revision when changing shell selectors so old CSS cannot accompany new markup. #}
-    <link rel="stylesheet" href="{% static 'css/app.css' %}?v=002a-top-1">
+    <link rel="stylesheet" href="{% static 'css/design-system.css' %}?v=002b-1">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}?v=002b-1">
 </head>
 <body class="product-shell">
     <a class="shell-skip-link" href="#main-content">رفتن به محتوای صفحه</a>
@@ -47,7 +48,10 @@
             <div class="shell-page-header" aria-label="صفحه جاری">
                 <span class="shell-page-label">{% block breadcrumb %}فضای کار{% endblock %}</span>
             </div>
-            <div class="shell-page-container">{% block content %}{% endblock %}</div>
+            <div class="shell-page-container">
+                {% include "components/design_system_help.html" %}
+                {% block content %}{% endblock %}
+            </div>
         </main>
     </div>
     {% block extra_js %}{% endblock %}
