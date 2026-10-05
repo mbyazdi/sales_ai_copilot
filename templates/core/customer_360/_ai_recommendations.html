@@ -6,6 +6,7 @@
             <div><h3 class="recommendation-product-name ds-heading">{{ recommendation.product.name }}</h3><p class="ds-caption ds-muted"><bdi>{{ recommendation.product.product_code }}</bdi> · {{ recommendation.product.category }}</p></div>
             <div class="ds-row"><span class="ds-badge">{% if forloop.first %}پیشنهاد اصلی{% else %}گزینه جایگزین · رتبه {{ recommendation.rank }}{% endif %}</span><span class="ds-badge">امتیاز {{ recommendation.score|floatformat:0 }}</span><span class="ds-badge">{% include "core/customer_360/_recommendation_type.html" %}</span></div>
         </div>
+        {% if recommendation.product.is_active %}<div class="ds-row"><a class="ds-button ds-button--secondary" href="{% url 'product-commercial-brief' recommendation.product.product_code %}?customer_code={{ customer.customer_code|urlencode }}{% if current_visit and not manager_inspection and current_visit.salesperson.user_id == request.user.id and current_visit.salesperson.is_active %}&amp;visit_id={{ current_visit.id }}{% endif %}" aria-label="بررسی محصول و شرایط فعلی {{ recommendation.product.name }} برای این مشتری">بررسی محصول و شرایط فعلی</a></div>{% endif %}
         <details><summary>{% if manager_inspection %}دلیل پیشنهاد{% else %}دلیل پیشنهاد و ثبت نتیجه{% endif %}</summary><div class="ds-stack c360-detail-content">
             {% if recommendation.reason %}<p>{{ recommendation.reason }}</p>{% else %}<p class="ds-caption ds-muted">دلیل تفصیلی ثبت نشده است.</p>{% endif %}
             {% if not manager_inspection %}

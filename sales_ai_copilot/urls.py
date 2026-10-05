@@ -4,6 +4,8 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = [
 
+    path("products/", include("apps.products.urls")),
+
     path(
         "admin/",
         admin.site.urls,

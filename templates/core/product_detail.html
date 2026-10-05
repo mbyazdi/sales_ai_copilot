@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ product.name }} · بررسی محصول برای مشتری{% endblock %}
+{% block breadcrumb %}نمای محصول در زمینه مشتری{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/product_brief.css' %}?v=002h-2">{% endblock %}
+{% block content %}
+<div class="pb-workspace ds-stack">
+    <header class="ds-page-header">
+        <div><p class="pb-eyebrow">بررسی پیش از ارائه محصول</p><h1 class="ds-title">نمای محصول برای این مشتری</h1><p class="ds-muted">موجودی و طرح‌های فعلی را کنار دلیل ثبت‌شده پیشنهاد بررسی کنید.</p></div>
+        <a class="ds-button ds-button--secondary" href="{{ return_url }}">بازگشت به نمای مشتری</a>
+    </header>
+
+    <section class="pb-identity ds-card" aria-labelledby="product-title">
+        <div class="pb-product-mark" aria-hidden="true">{{ product.product_code|slice:":1" }}</div>
+        <div class="ds-stack">
+            <div class="ds-row"><span class="ds-badge"><bdi>{{ product.product_code }}</bdi></span>{% if product.brand %}<span class="ds-caption ds-muted"><bdi>{{ product.brand.name }}</bdi></span>{% endif %}</div>
+            <h2 id="product-title" class="pb-product-title"><bdi>{{ product.name }}</bdi></h2>
+            <p class="ds-caption ds-muted">{% if product.category %}{{ product.category }}{% else %}دسته محصول ثبت نشده است.{% endif %}</p>
+            {% if show_product_description %}<p class="pb-description">{{ product.description|linebreaksbr }}</p>{% elif not product.description %}<p class="pb-description ds-muted">توضیحات محصول ثبت نشده است.</p>{% endif %}
+            <dl class="pb-facts pb-facts--inline">
+                <div><dt>واحد ثبت‌شده</dt><dd><bdi>{{ product.unit|default:"ثبت نشده" }}</bdi></dd></div>
+                <div><dt>بسته‌بندی ثبت‌شده</dt><dd><bdi>{{ product.package_size|default:"ثبت نشده" }}</bdi></dd></div>
+            </dl>
+        </div>
+        <aside class="pb-customer ds-stack" aria-label="زمینه مشتری">
+            <span class="ds-caption ds-muted">برای مشتری</span>
+            <strong>{{ customer.name }}</strong><span class="ds-caption"><bdi>{{ customer.customer_code }}</bdi></span>
+            {% if manager_inspection %}<span class="ds-badge ds-badge--info">بررسی مدیریتی · فقط مشاهده</span>{% elif visit %}<span class="ds-badge">بازگشت به ویزیت {{ visit.visit_date|date:"Y/m/d" }}</span>{% else %}<span class="ds-caption ds-muted">بدون ویزیت انتخاب‌شده</span>{% endif %}
+        </aside>
+    </section>
+
+    <section class="ds-stack" aria-labelledby="commercial-title">
+        <div class="ds-page-header"><div><h2 id="commercial-title" class="ds-heading">شرایط تجاری فعلی</h2><p class="ds-caption ds-muted">بررسی در {{ as_of_date|date:"Y/m/d" }} · موجودی و طرح‌ها مربوط به وضعیت فعلی‌اند، نه تصویر تاریخی ویزیت.</p></div><span class="ds-badge">وضعیت فعلی</span></div>
+        <div class="pb-commercial-grid">
+            <article class="ds-card ds-stack" aria-labelledby="inventory-title">
+                <div class="ds-page-header"><h3 id="inventory-title" class="ds-heading">موجودی محصول</h3>
+                {% if not commercial.inventory.has_record %}<span class="ds-badge">داده موجود نیست</span>{% elif not commercial.inventory.is_in_stock %}<span class="ds-badge ds-badge--danger">ناموجود برای فروش</span>{% elif commercial.inventory.is_low_stock %}<span class="ds-badge ds-badge--warning">موجودی کم</span>{% else %}<span class="ds-badge ds-badge--success">موجود برای فروش</span>{% endif %}</div>
+                {% if commercial.inventory.has_record %}
+                <div class="pb-stock"><strong class="ds-number">{{ commercial.inventory.sellable_quantity }}</strong><span>قابل فروش <bdi>{{ product.unit }}</bdi></span></div>
+                <dl class="pb-facts">
+                    <div><dt>موجودی ثبت‌شده</dt><dd>{{ commercial.inventory.available_quantity }}</dd></div>
+                    <div><dt>رزروشده</dt><dd>{{ commercial.inventory.reserved_quantity }}</dd></div>
+                    <div><dt>حداقل موجودی ثبت‌شده</dt><dd>{{ commercial.inventory.minimum_stock }}</dd></div>
+                </dl>
+                <p class="ds-caption ds-muted">آخرین به‌روزرسانی موجودی: {% if commercial.inventory.last_updated %}<bdi>{{ commercial.inventory.last_updated|date:"Y/m/d H:i" }}</bdi>{% else %}ثبت نشده{% endif %}</p>
+                {% else %}<p class="ds-state ds-state--empty">اطلاعات موجودی این محصول در دسترس نیست؛ نبود داده به معنی موجودی صفر نیست.</p>{% endif %}
+            </article>
+            <article class="ds-card ds-stack" aria-labelledby="promotions-title">
+                <div class="ds-page-header"><h3 id="promotions-title" class="ds-heading">طرح‌های فعلی برای این مشتری</h3><span class="ds-badge">{{ commercial.promotions|length }} طرح</span></div>
+                {% for promotion in commercial.promotions %}
+                <div class="pb-promotion ds-stack">
+                    <div class="ds-row"><strong>{{ promotion.name }}</strong><span class="ds-caption ds-muted"><bdi>{{ promotion.code }}</bdi></span></div>
+                    <p class="ds-caption">{% if promotion.promotion_type == 'PERCENTAGE' %}تخفیف درصدی{% elif promotion.promotion_type == 'FIXED_AMOUNT' %}تخفیف مبلغی{% elif promotion.promotion_type == 'BUY_X_GET_Y' %}طرح خرید و هدیه{% else %}طرح فروش{% endif %}{% if promotion.discount_percent != None %} · {{ promotion.discount_percent|floatformat:"-2" }}٪{% endif %}</p>
+                    {% if promotion.description %}<p>{{ promotion.description|linebreaksbr }}</p>{% endif %}
+                    <dl class="pb-facts">
+                        <div><dt>حداقل تعداد</dt><dd>{{ promotion.minimum_quantity }}</dd></div>
+                        {% if promotion.maximum_quantity != None %}<div><dt>حداکثر تعداد</dt><dd>{{ promotion.maximum_quantity }}</dd></div>{% endif %}
+                        {% if promotion.discount_amount != None %}<div><dt>مبلغ تخفیف ثبت‌شده</dt><dd>{{ promotion.discount_amount|floatformat:"-2" }} <small class="ds-muted">واحد پول مشخص نشده</small></dd></div>{% endif %}
+                    </dl>
+                    <p class="ds-caption ds-muted">اعتبار طرح: <bdi>{{ promotion.start_date|date:"Y/m/d" }} — {{ promotion.end_date|date:"Y/m/d" }}</bdi></p>
+                </div>
+                {% empty %}<p class="ds-state ds-state--empty">در تاریخ بررسی، طرح واجد شرایطی برای این محصول و مشتری موجود نیست.</p>{% endfor %}
+                <p class="ds-caption ds-muted">نمایش طرح بر اساس تاریخ و شرایط رتبه مشتری است؛ تأیید اعتبار مالی مشتری محسوب نمی‌شود.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="pb-evidence ds-card ds-stack" aria-labelledby="evidence-title">
+        <div class="ds-page-header"><div><p class="pb-eyebrow">دلیل انتخاب محصول</p><h2 id="evidence-title" class="ds-heading">چرا این محصول برای این مشتری؟</h2></div><span class="ds-badge">شواهد ذخیره‌شده</span></div>
+        {% if recommendation %}
+        <div class="pb-evidence-preview ds-stack">
+        <div class="ds-row"><span class="ds-badge ds-badge--info">{% include "core/customer_360/_recommendation_type.html" %}</span><span class="ds-badge">{{ evidence_label }}</span><span class="ds-caption">اطمینان ثبت‌شده <strong>{{ recommendation.confidence_score|floatformat:"-2" }}٪</strong></span></div>
+        <p class="pb-reason">{% if recommendation.reason %}{{ recommendation.reason|linebreaksbr }}{% else %}دلیل متنی برای این پیشنهاد ثبت نشده است.{% endif %}</p>
+        </div>
+        <p class="ds-caption ds-muted">این دلیل و شواهد هنگام تولید پیشنهاد ذخیره شده‌اند؛ با موجودی و طرح‌های فعلی دوباره محاسبه نشده‌اند.</p>
+        <details class="pb-disclosure pb-business-disclosure">
+            <summary>مشاهده شواهد و جزئیات پیشنهاد</summary>
+            <div class="ds-stack pb-details pb-business-content">
+                <div class="ds-row"><span class="ds-badge ds-badge--info">{% include "core/customer_360/_recommendation_type.html" %}</span><span class="ds-badge">{{ evidence_label }}</span></div>
+                <p class="pb-reason">{% if recommendation.reason %}{{ recommendation.reason|linebreaksbr }}{% else %}دلیل متنی برای این پیشنهاد ثبت نشده است.{% endif %}</p>
+                <dl class="pb-facts">
+                    <div><dt>اطمینان ثبت‌شده</dt><dd>{{ recommendation.confidence_score|floatformat:"-2" }}٪</dd></div>
+                    <div><dt>رتبه ثبت‌شده پیشنهاد</dt><dd>{{ recommendation.rank }}</dd></div>
+                    <div class="pb-business-score"><dt>امتیاز نهایی ثبت‌شده</dt><dd>{{ recommendation.score|floatformat:"-4" }}</dd></div>
+                </dl>
+                <div class="pb-signal-summary ds-stack" aria-labelledby="business-signals-title">
+                    <h3 id="business-signals-title" class="ds-heading">شواهد فعال در این پیشنهاد</h3>
+                    <ul class="pb-signal-cards">{% for signal in active_signals %}<li><span>{{ signal.label }}</span><strong><bdi>{{ signal.score|floatformat:"-4" }}</bdi><small>اثر ثبت‌شده</small></strong></li>{% empty %}<li class="pb-signal-empty ds-muted">سیگنال فعال با اثر غیرصفر در شواهد ثبت‌شده موجود نیست.</li>{% endfor %}</ul>
+                </div>
+                <details class="pb-disclosure pb-technical-disclosure">
+                    <summary>جزئیات فنی امتیازدهی</summary>
+                    <div class="ds-stack pb-details pb-technical-content">
+                        <dl class="pb-facts">
+                            <div><dt>آخرین ثبت پیشنهاد</dt><dd><bdi>{{ recommendation.updated_at|date:"Y/m/d H:i" }}</bdi></dd></div>
+                            {% if active_signal_count != None %}<div><dt>تعداد سیگنال فعال ثبت‌شده</dt><dd>{{ active_signal_count }}</dd></div>{% endif %}
+                        </dl>
+                        <div class="pb-technical-signals ds-stack"><h3 class="ds-heading">فهرست کامل شواهد ثبت‌شده</h3><ul class="pb-signals">
+                            {% for signal in signals %}<li><span>{{ signal.label }} <small class="ds-muted">· {{ signal.state }}</small></span><strong>{% if signal.score != None %}{{ signal.score|floatformat:"-4" }}{% else %}ثبت نشده{% endif %}</strong></li>{% empty %}<li class="ds-muted">شواهد تفصیلی برای این پیشنهاد ثبت نشده است.</li>{% endfor %}
+                        </ul></div>
+                        {% if components %}<details class="pb-disclosure pb-score-composition"><summary>ترکیب امتیاز ثبت‌شده</summary><ul class="pb-signals pb-details">{% for component in components %}<li><span>{{ component.label }}</span><strong>{% if component.value != None %}{{ component.value|floatformat:"-4" }}{% else %}ثبت نشده{% endif %}</strong></li>{% endfor %}</ul></details>{% endif %}
+                    </div>
+                </details>
+            </div>
+        </details>
+        {% else %}<p class="ds-state ds-state--empty">پیشنهاد فعالی برای این محصول و مشتری ثبت نشده است؛ دلیل یا شواهدی برای آن ساخته نمی‌شود.</p>{% endif %}
+    </section>
+    <footer class="pb-return ds-surface ds-page-header"><p class="ds-caption ds-muted">{% if manager_inspection %}این نما برای بررسی اطلاعات است. برای ادامه بررسی به نمای مشتری بازگردید.{% else %}برای ادامه تعامل یا ثبت نتیجه در ویزیت، به پیشنهادهای مشتری بازگردید.{% endif %}</p><a class="ds-button" href="{{ return_url }}">بازگشت به پیشنهادهای مشتری</a></footer>
+</div>
+{% endblock %}
