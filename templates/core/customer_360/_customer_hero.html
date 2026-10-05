@@ -1,90 +1,17 @@
-<section class="customer-hero customer-hero-compact">
-
-    <div class="customer-identity">
-
-        <div class="customer-avatar">
-            {{ customer.name|first }}
+<header class="ds-page-header c360-identity">
+    <div class="ds-stack">
+        <h1 class="ds-title">{{ customer.name }}</h1>
+        <div class="ds-row ds-caption ds-muted">
+            <span>کد مشتری <bdi>{{ customer.customer_code }}</bdi></span>
+            {% if customer.city %}<span>{{ customer.city }}</span>{% endif %}
+            {% if customer.grade %}<span>رتبه <bdi>{{ customer.grade.code }}</bdi></span>{% endif %}
+            {% if customer.phone %}<span>تلفن <bdi>{{ customer.phone }}</bdi></span>{% endif %}
         </div>
-
-        <div class="customer-info">
-
-            <div class="eyebrow">
-                CUSTOMER 360
-            </div>
-
-            <div class="customer-name">
-                {{ customer.name }}
-            </div>
-
-            <div class="customer-code">
-                {{ customer.customer_code }}
-            </div>
-
-            <div class="customer-tags">
-
-                {% if customer.grade %}
-                    <span class="tag grade">
-                        {{ customer.grade.name }}
-                    </span>
-                {% endif %}
-
-                <span class="tag">
-                    {{ customer.customer_type }}
-                </span>
-
-                <span class="tag">
-                    {{ customer.city }}
-                </span>
-
-            </div>
-
-        </div>
-
+        {% if customer_360 %}<div class="ds-row">
+            {% if customer_360.segment == 'HIGH_VALUE' %}<span class="ds-badge">مشتری با ارزش بالا</span>{% elif customer_360.segment == 'GROWTH' %}<span class="ds-badge">مشتری در حال رشد</span>{% elif customer_360.segment %}<span class="ds-badge">گروه مشتری: <bdi>{{ customer_360.segment }}</bdi></span>{% endif %}
+            {% if customer_360.top_category %}<span class="ds-caption ds-muted">دسته برتر: {{ customer_360.top_category }}</span>{% endif %}
+            {% if customer_360.days_since_last_purchase is not None %}<span class="ds-caption ds-muted">آخرین خرید: {{ customer_360.days_since_last_purchase }} روز قبل</span>{% endif %}
+        </div>{% endif %}
     </div>
-
-
-    {% if customer_360 %}
-
-        <div class="customer-hero-metrics">
-
-            <div class="hero-metric">
-
-                <span class="hero-metric-label">
-                    روز از آخرین خرید
-                </span>
-
-                <strong class="hero-metric-value">
-                    {{ customer_360.days_since_last_purchase }}
-                </strong>
-
-            </div>
-
-            <div class="hero-metric">
-
-                <span class="hero-metric-label">
-                    سگمنت
-                </span>
-
-                <strong class="hero-metric-value hero-metric-text">
-                    {{ customer_360.segment }}
-                </strong>
-
-            </div>
-
-            <div class="hero-metric">
-
-                <span class="hero-metric-label">
-                    سفارش‌ها
-                </span>
-
-                <strong class="hero-metric-value">
-                    {{ customer_360.total_orders }}
-                </strong>
-
-            </div>
-
-        </div>
-
-    {% endif %}
-
-</section>
+    <a class="ds-button ds-button--secondary" href="{% url 'salesperson-dashboard' %}">برنامه ویزیت امروز</a>
+</header>

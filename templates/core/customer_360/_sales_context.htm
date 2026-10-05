@@ -1,234 +1,27 @@
-<section class="sales-context-card sales-context-compact">
-
-    {% if current_visit %}
-
-        <div class="sales-context-main">
-
-            <div class="sales-context-identity">
-
-                <div>
-
-                    <div class="section-eyebrow">
-                        CURRENT VISIT
-                    </div>
-
-                    <div class="sales-context-title-row">
-
-                        <h2 class="sales-context-title">
-                            ویزیت #{{ current_visit.id }}
-                        </h2>
-
-                        <div
-                            id="currentVisitStatus"
-                            class="
-                                visit-status-badge
-                                visit-status-{{ current_visit.status|lower }}
-                            "
-                            data-status="{{ current_visit.status }}"
-                        >
-
-                            {% if current_visit.status == "PLANNED" %}
-                                برنامه‌ریزی‌شده
-
-                            {% elif current_visit.status == "IN_PROGRESS" %}
-                                در حال انجام
-
-                            {% elif current_visit.status == "COMPLETED" %}
-                                تکمیل‌شده
-
-                            {% elif current_visit.status == "CANCELLED" %}
-                                لغوشده
-
-                            {% else %}
-                                {{ current_visit.status }}
-                            {% endif %}
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="sales-context-inline-meta">
-
-                    <span>
-                        {{ current_visit.visit_date }}
-                    </span>
-
-                    <span class="meta-separator">
-                        •
-                    </span>
-
-                    <span>
-                        {{ current_visit.salesperson.full_name }}
-                    </span>
-
-                    <span class="meta-separator">
-                        •
-                    </span>
-
-                    <span>
-                        {{ current_visit.salesperson.employee_code }}
-                    </span>
-
-                </div>
-
+<section class="ds-surface ds-stack" aria-label="زمینه ویزیت">
+{% if current_visit %}
+    <div class="ds-page-header">
+        <div class="ds-stack">
+            <div class="ds-row"><h2 class="ds-heading">ویزیت {{ current_visit.id }}</h2>
+                <span id="currentVisitStatus" class="ds-badge visit-status-badge visit-status-{{ current_visit.status|lower }}" data-status="{{ current_visit.status }}">{% if current_visit.status == 'PLANNED' %}برنامه‌ریزی‌شده{% elif current_visit.status == 'IN_PROGRESS' %}در حال انجام{% elif current_visit.status == 'COMPLETED' %}تکمیل‌شده{% elif current_visit.status == 'CANCELLED' %}لغوشده{% endif %}</span>
             </div>
-
-
-            <div class="visit-execution-guidance">
-
-                <div
-                    class="
-                        visit-execution-state
-                        visit-execution-state-planned
-                    "
-                >
-                    <div class="visit-execution-label">
-                        PRE-VISIT PREPARATION
-                    </div>
-
-                    <div class="visit-execution-title">
-                        آماده برای شروع جلسه
-                    </div>
-
-                    <div class="visit-execution-text">
-                        قبل از شروع، اقدام پیشنهادی،
-                        نکته گفتگو و اطلاعات مشتری را مرور کنید.
-                    </div>
-                </div>
-
-
-                <div
-                    class="
-                        visit-execution-state
-                        visit-execution-state-in-progress
-                    "
-                >
-                    <div class="visit-execution-label">
-                        LIVE VISIT
-                    </div>
-
-                    <div class="visit-execution-title">
-                        جلسه در حال اجراست
-                    </div>
-
-                    <div class="visit-execution-text">
-                        پیشنهادها را مطرح کنید و نتیجه هر تعامل
-                        را در همین Workspace ثبت کنید.
-                    </div>
-                </div>
-
-
-                <div
-                    class="
-                        visit-execution-state
-                        visit-execution-state-completed
-                    "
-                >
-                    <div class="visit-execution-label">
-                        VISIT REVIEW
-                    </div>
-
-                    <div class="visit-execution-title">
-                        جلسه تکمیل شده است
-                    </div>
-
-                    <div class="visit-execution-text">
-                        Workspace اکنون در حالت مرور است و
-                        نتیجه‌ها و پیگیری‌های ثبت‌شده قابل مشاهده‌اند.
-                    </div>
-                </div>
-
-
-                <div
-                    class="
-                        visit-execution-state
-                        visit-execution-state-cancelled
-                    "
-                >
-                    <div class="visit-execution-label">
-                        VISIT CLOSED
-                    </div>
-
-                    <div class="visit-execution-title">
-                        جلسه لغو شده است
-                    </div>
-
-                    <div class="visit-execution-text">
-                        عملیات اجرایی این Visit غیرفعال است.
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="visit-workflow-actions">
-
-                {% if current_visit.status == "PLANNED" %}
-
-                    <button
-                        type="button"
-                        id="startVisitButton"
-                        class="visit-action-btn visit-start-btn"
-                        data-visit-id="{{ current_visit.id }}"
-                    >
-                        شروع ویزیت
-                    </button>
-
-                {% elif current_visit.status == "IN_PROGRESS" %}
-
-                    <button
-                        type="button"
-                        id="completeVisitButton"
-                        class="visit-action-btn visit-complete-btn"
-                        data-visit-id="{{ current_visit.id }}"
-                    >
-                        پایان ویزیت
-                    </button>
-
-                {% elif current_visit.status == "COMPLETED" %}
-
-                    <div class="visit-completed-message">
-                        ✓ این ویزیت تکمیل شده است
-                    </div>
-
-                {% elif current_visit.status == "CANCELLED" %}
-
-                    <div class="visit-cancelled-message">
-                        این ویزیت لغو شده است
-                    </div>
-
-                {% endif %}
-
-            </div>
-
+            <p class="ds-caption ds-muted"><time datetime="{{ current_visit.visit_date|date:'Y-m-d' }}">{{ current_visit.visit_date|date:"Y/m/d" }}</time> · {{ current_visit.salesperson.full_name }} · <bdi>{{ current_visit.salesperson.employee_code }}</bdi></p>
         </div>
-
-
-        <div
-            id="visitWorkflowMessage"
-            class="visit-workflow-message"
-        ></div>
-
-
-        <div class="visit-navigation">
-
-            <a
-                href="/api/visits/"
-                class="visit-back-link"
-            >
-                بازگشت به برنامه ویزیت امروز
-            </a>
-
+        <div class="visit-workflow-actions ds-row">
+            {% if current_visit.status == 'PLANNED' %}<button type="button" id="startVisitButton" class="ds-button visit-action-btn visit-start-btn" data-visit-id="{{ current_visit.id }}">شروع ویزیت</button>
+            {% elif current_visit.status == 'IN_PROGRESS' %}<button type="button" id="completeVisitButton" class="ds-button visit-action-btn visit-complete-btn" data-visit-id="{{ current_visit.id }}">پایان ویزیت</button>
+            {% elif current_visit.status == 'COMPLETED' %}<span class="ds-badge ds-badge--success">این ویزیت تکمیل شده است</span>
+            {% elif current_visit.status == 'CANCELLED' %}<span class="ds-badge">این ویزیت لغو شده است</span>{% endif %}
         </div>
-
-    {% else %}
-
-        <div class="sales-context-no-visit">
-            این صفحه خارج از برنامه ویزیت روزانه باز شده است.
-        </div>
-
-    {% endif %}
-
+    </div>
+    <div class="visit-state-banner" role="status">
+        <span class="visit-state-banner-icon" hidden aria-hidden="true"></span>
+        <div><strong class="visit-state-banner-title">{% if current_visit.status == 'PLANNED' %}آماده‌سازی پیش از شروع{% elif current_visit.status == 'IN_PROGRESS' %}تعامل و ثبت نتیجه{% elif current_visit.status == 'COMPLETED' %}مرور ویزیت تکمیل‌شده{% else %}ویزیت لغو شده است{% endif %}</strong>
+        <p class="visit-state-banner-text ds-caption ds-muted">{% if current_visit.status == 'PLANNED' %}پیشنهادها را مرور کنید؛ ثبت نتیجه پس از شروع ویزیت فعال می‌شود.{% elif current_visit.status == 'IN_PROGRESS' %}پیشنهاد را مطرح کنید، از دستیار کمک بگیرید و نتیجه یا پیگیری را ثبت کنید.{% else %}اطلاعات و نتایج موجود را مرور کنید؛ ثبت نتیجه جدید فعال نیست.{% endif %}</p></div>
+    </div>
+    <div id="visitWorkflowMessage" class="visit-workflow-message" role="status"></div>
+{% else %}
+    <h2 class="ds-heading">بررسی مشتری، بدون ویزیت انتخاب‌شده</h2>
+    <p class="ds-caption ds-muted">اطلاعات و پیشنهادها را بررسی کنید. این صفحه ویزیت جدیدی ایجاد نمی‌کند؛ برای اجرای ویزیت از برنامه روزانه وارد شوید.</p>
+{% endif %}
 </section>

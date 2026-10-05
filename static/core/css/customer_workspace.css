@@ -1,0 +1,37 @@
+/* Customer360 layout and compatibility styling; values come from ds tokens. */
+.customer-decision-workspace.ds-stack { gap: var(--ds-space-4); }
+.customer-decision-workspace p { margin: 0; }
+.customer-decision-workspace .sales-workspace { display: flex; flex-direction: column; gap: var(--ds-space-4); }
+.customer-decision-workspace .search-bar { margin: 0; padding: 0; background: none; border: 0; box-shadow: none; }
+.customer-decision-workspace .search-bar .ds-field { flex: 0 1 340px; }
+.c360-identity { padding-block: var(--ds-space-2); }
+.c360-identity .ds-stack { gap: var(--ds-space-2); }
+.c360-links a { color: var(--ds-brand); padding: var(--ds-space-2); text-decoration: none; border-radius: var(--ds-radius-sm); }
+.c360-links a:hover { background: var(--ds-brand-soft); }
+.c360-decision-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--ds-space-4); }
+.customer-decision-workspace .c360-decision { border-inline-start: 3px solid var(--ds-brand); }
+.c360-next-action { font-size: var(--ds-font-lg); font-weight: var(--ds-weight-medium); }
+.c360-talk { background: var(--ds-surface-soft); border-inline-start: 2px solid var(--ds-brand); padding: var(--ds-space-3); }
+.c360-copilot-response { white-space: pre-wrap; overflow-wrap: anywhere; }
+.customer-decision-workspace .visit-state-banner { margin: 0; padding: var(--ds-space-2) 0; background: none; border: 0; box-shadow: none; }
+.customer-decision-workspace .visit-state-banner-title { font-size: var(--ds-font-sm); }
+.customer-decision-workspace #currentVisitStatus { padding: 2px var(--ds-space-2); background: var(--ds-brand-soft); color: var(--ds-brand); border: 1px solid var(--ds-border); border-radius: var(--ds-radius-pill); font-size: var(--ds-font-xs); }
+.customer-decision-workspace .visit-workflow-actions { padding: 0; margin: 0; }
+.customer-decision-workspace .visit-action-btn { min-height: var(--ds-control-size); padding: var(--ds-space-2) var(--ds-space-4); border-radius: var(--ds-radius-md); background: var(--ds-brand); color: var(--ds-surface); border: 1px solid var(--ds-brand); box-shadow: none; font-size: var(--ds-font-base); }
+.customer-decision-workspace .visit-action-btn:hover { background: var(--ds-brand-hover); transform: none; }
+.customer-decision-workspace .recommendation-outcome-card { padding: var(--ds-space-4); margin: 0; background: var(--ds-surface); border: 1px solid var(--ds-border); border-radius: var(--ds-radius-md); box-shadow: none; }
+.customer-decision-workspace .recommendation-outcome-card.is-primary { border-inline-start: 3px solid var(--ds-brand); }
+.customer-decision-workspace .recommendation-product-name { margin: 0; font-size: var(--ds-font-lg); }
+.customer-decision-workspace .outcome-actions { display: flex; flex-wrap: wrap; gap: var(--ds-space-2); }
+.customer-decision-workspace .outcome-btn { min-height: var(--ds-control-size); padding: var(--ds-space-2) var(--ds-space-3); background: var(--ds-surface); color: var(--ds-brand); border: 1px solid var(--ds-border-strong); border-radius: var(--ds-radius-md); box-shadow: none; font-size: var(--ds-font-sm); }
+.customer-decision-workspace .outcome-btn:hover { background: var(--ds-brand-soft); transform: none; }
+.customer-decision-workspace .outcome-btn:disabled { background: var(--ds-surface-soft); color: var(--ds-muted); border-color: var(--ds-border); }
+.customer-decision-workspace .recommendation-outcome-status { margin-block-start: var(--ds-space-2); background: var(--ds-surface-soft); border: 0; padding: var(--ds-space-2); font-size: var(--ds-font-xs); }
+.customer-decision-workspace summary { cursor: pointer; min-height: var(--ds-control-size); padding-block: var(--ds-space-2); color: var(--ds-brand); }
+.c360-detail-content { padding-block-start: var(--ds-space-3); }
+.c360-signals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--ds-space-4); margin: 0; }
+.c360-signals dt { color: var(--ds-muted); font-size: var(--ds-font-sm); }
+.c360-signals dd { margin: 0; font-weight: var(--ds-weight-medium); font-size: var(--ds-font-lg); font-variant-numeric: tabular-nums; }
+.customer-decision-workspace { overflow-wrap: anywhere; }
+@media (max-width: 850px) { .c360-decision-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 600px) { .c360-signals { grid-template-columns: repeat(2, minmax(0, 1fr)); } .customer-decision-workspace .search-bar .ds-field { flex-basis: 100%; } }
