@@ -1,0 +1,8 @@
+<section class="follow-up-group ds-stack" aria-labelledby="follow-up-{{ group }}">
+    <header class="ds-row"><h2 class="ds-heading" id="follow-up-{{ group }}">{{ title }}</h2><span class="ds-badge ds-badge--{{ tone }}">{{ count }} مورد</span></header>
+    {% for task in tasks %}
+        {% include "core/partials/follow_up_card.html" %}
+    {% empty %}
+        <p class="ds-state ds-muted">{{ empty_text }}</p>
+    {% endfor %}
+</section>

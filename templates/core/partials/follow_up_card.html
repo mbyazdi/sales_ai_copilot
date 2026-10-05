@@ -1,0 +1,22 @@
+<article class="follow-up-task-card ds-surface is-{{ group }}" aria-labelledby="follow-up-task-{{ task.id }}" data-follow-up-task-id="{{ task.id }}">
+    <div class="follow-up-card-heading ds-row">
+        <h3 class="ds-heading" id="follow-up-task-{{ task.id }}">{{ task.customer.name }}</h3>
+        <bdi class="ds-caption ds-muted">{{ task.customer.customer_code }}</bdi>
+        <span class="ds-badge">باز</span>
+        <span class="ds-badge ds-badge--{{ tone }}">سررسید: <time datetime="{{ task.due_date|date:'Y-m-d' }}">{{ task.due_date|date:"Y/m/d" }}</time></span>
+    </div>
+    {% if task.notes %}<p class="follow-up-task-notes">{{ task.notes }}</p>{% else %}<p class="ds-muted">مشتری و زمینه ویزیت را مرور کنید و اقدام پیگیری را انجام دهید.</p>{% endif %}
+    <div class="ds-row follow-up-task-actions">
+        <a class="ds-button" href="/customers/?customer_code={{ task.customer.customer_code|urlencode }}&visit_id={{ task.visit.id }}">مشتری و زمینه ویزیت</a>
+        <button type="button" class="ds-button ds-button--secondary follow-up-action-btn" data-task-id="{{ task.id }}" data-status="DONE" aria-label="پیگیری {{ task.customer.name }} انجام شد">انجام شد</button>
+        <button type="button" class="ds-button ds-button--quiet follow-up-action-btn" data-task-id="{{ task.id }}" data-status="CANCELLED" aria-label="لغو پیگیری {{ task.customer.name }}">لغو پیگیری</button>
+    </div>
+    <details class="follow-up-details"><summary>زمینه ویزیت و جزئیات</summary>
+        <dl class="follow-up-metadata">
+            <div><dt>ویزیت مرتبط</dt><dd>#{{ task.visit.id }} · {{ task.visit.visit_date|date:"Y/m/d" }}</dd></div>
+            <div><dt>وضعیت ویزیت</dt><dd>{{ task.visit.get_status_display }}</dd></div>
+            <div><dt>ایجاد پیگیری</dt><dd>{{ task.created_at|date:"Y/m/d" }}</dd></div>
+        </dl>
+        <p class="ds-caption ds-muted">برای مرور اطلاعات مشتری و ادامه اقدام، از دکمه «مشتری و زمینه ویزیت» استفاده کنید.</p>
+    </details>
+</article>
