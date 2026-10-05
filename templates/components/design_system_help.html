@@ -17,7 +17,7 @@
         <form class="ds-search" action="/customers/" method="get">
             <div class="ds-field">
                 <label class="ds-label" for="shell-customer-search">جستجوی مشتری مجاز</label>
-                <input class="ds-control" id="shell-customer-search" name="customer_code" placeholder="کد مشتری" required aria-describedby="shell-search-help">
+                <input class="ds-control" id="shell-customer-search" name="{% if request.user.is_staff %}q{% else %}customer_code{% endif %}" placeholder="{% if request.user.is_staff %}نام یا کد مشتری{% else %}کد مشتری{% endif %}" required aria-describedby="shell-search-help">
                 <span id="shell-search-help" class="ds-caption ds-muted">جستجو فقط در محدوده دسترسی فعلی شما انجام می‌شود.</span>
             </div>
             <button class="ds-button" type="submit">

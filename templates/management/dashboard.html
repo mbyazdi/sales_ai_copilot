@@ -1,558 +1,95 @@
 {% extends "base.html" %}
 {% load static %}
-
-
-{% block title %}
-    نمای مدیریت
-{% endblock %}
-
-
-{% block extra_css %}
-
-    <link
-        rel="stylesheet"
-        href="{% static 'management/css/dashboard.css' %}"
-    >
-
-{% endblock %}
-
-
-{% block breadcrumb %}
-    نمای مدیریت
-{% endblock %}
-
-
+{% block title %}نمای مدیریت | سامانه هوشمند فروش{% endblock %}
+{% block breadcrumb %}نمای مدیریت{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'management/css/dashboard.css' %}?v=002f-1">{% endblock %}
 {% block content %}
-
-<div
-    class="management-dashboard"
-    id="managementDashboard"
->
-
-    <!-- =========================================
-         PAGE HEADER
-    ========================================== -->
-
-    <header class="management-dashboard-header">
-
-        <div>
-
-            <div class="dashboard-eyebrow">
-                SALES AI COPILOT
-            </div>
-
-            <h1>
-                داشبورد هوشمند مدیریت فروش
-            </h1>
-
-            <p>
-                نمای یکپارچه عملکرد فروش،
-                پیشنهادهای هوشمند و تیم فروش
-            </p>
-
-        </div>
-
-
-        <div
-            class="dashboard-quality"
-            id="dashboardQuality"
-        >
-            <span class="quality-label">
-                کیفیت داده
-            </span>
-
-            <span
-                class="quality-value"
-                id="dashboardQualityValue"
-            >
-                —
-            </span>
-        </div>
-
+<div class="manager-workspace ds-stack" id="managementDashboard">
+    <header class="ds-page-header">
+        <div><h1 class="ds-title">نمای مدیریت فروش</h1><p class="ds-muted">نتایج ثبت‌شده پیشنهادها · کل تاریخچه موجود، نه فقط امروز</p></div>
+        <a class="ds-button ds-button--secondary" href="{% url 'recommendation-performance-dashboard' %}">بررسی عملکرد پیشنهادها</a>
     </header>
-
-
-    <!-- =========================================
-         LOADING / ERROR
-    ========================================== -->
-
-    <div
-        class="dashboard-loading"
-        id="dashboardLoading"
-    >
-        در حال دریافت اطلاعات داشبورد...
-    </div>
-
-
-    <div
-        class="dashboard-error"
-        id="dashboardError"
-        hidden
-    ></div>
-
-
-    <!-- =========================================
-         KPI CARDS
-    ========================================== -->
-
-    <section class="dashboard-section">
-
-        <div class="section-heading">
-
-            <div>
-
-                <div class="section-eyebrow">
-                    EXECUTIVE SUMMARY
-                </div>
-
-                <h2>
-                    شاخص‌های کلیدی عملکرد
-                </h2>
-
-            </div>
-
-        </div>
-
-
-        <div
-            class="kpi-grid"
-            id="dashboardKpiGrid"
-        ></div>
-
+    <section aria-labelledby="pulse-title" class="ds-stack">
+        <div class="ds-row"><h2 class="ds-heading" id="pulse-title">وضعیت کلی</h2>{% include "management/_quality.html" with quality=summary.data_quality %}</div>
+        <dl class="manager-kpis ds-surface">
+            <div><dt>فروش حاصل از پیشنهادها</dt><dd>{% include "management/_number.html" with value=summary.total_revenue %}</dd><small class="ds-muted">مبلغ ثبت‌شده؛ واحد پول مشخص نشده</small></div>
+            <div><dt>نرخ تبدیل</dt><dd>{% include "management/_number.html" with value=summary.conversion_rate %}٪</dd><small class="ds-muted">خرید از پیشنهادهای ارائه‌شده</small></div>
+            <div><dt>نرخ تعامل</dt><dd>{% include "management/_number.html" with value=summary.engagement_rate %}٪</dd><small class="ds-muted">خرید، علاقه‌مندی یا نیاز به پیگیری</small></div>
+            <div><dt>خرید موفق</dt><dd>{% include "management/_number.html" with value=summary.purchased %}</dd><small class="ds-muted">نتیجه خرید، نه تعداد سفارش</small></div>
+            <div><dt>پیشنهادهای ارزیابی‌شده</dt><dd>{% include "management/_number.html" with value=summary.resolved_recommendations %}</dd><small class="ds-muted">{{ summary.presented }} ارائه‌شده</small></div>
+        </dl>
+        {% if not dashboard.ready %}<p class="ds-state" role="status">هنوز نتیجه‌ای برای تحلیل مدیریت ثبت نشده است. شاخص‌های صفر، نشانه عملکرد ضعیف نیستند.</p>{% endif %}
     </section>
-
-    <!-- =========================================
-         V3.0.8.5 EXECUTIVE INTELLIGENCE
-    ========================================== -->
-
-    <section
-        class="dashboard-section executive-intelligence-section"
-        id="executiveIntelligenceSection"
-        hidden
-    >
-
-        <div class="section-heading">
-
-            <div>
-
-                <div class="section-eyebrow">
-                    EXECUTIVE INTELLIGENCE
-                </div>
-
-                <h2>
-                    جمع‌بندی هوشمند مدیریتی
-                </h2>
-
-            </div>
-
-            <div
-                class="executive-ai-status"
-                id="executiveAiStatus"
-            >
-                <span
-                    class="executive-ai-status-dot"
-                    id="executiveAiStatusDot"
-                ></span>
-
-                <span
-                    id="executiveAiStatusText"
-                >
-                    —
-                </span>
-            </div>
-
-        </div>
-
-
-        <article class="dashboard-panel executive-intelligence-panel">
-
-            <div class="executive-intelligence-header">
-
-                <div>
-
-                    <div class="panel-eyebrow">
-                        MANAGEMENT BRIEF
-                    </div>
-
-                    <h3>
-                        تحلیل مدیریتی مبتنی بر داده‌های تأییدشده
-                    </h3>
-
-                </div>
-
-                <span
-                    class="data-quality-badge"
-                    id="executiveDataQuality"
-                >
-                    —
-                </span>
-
-            </div>
-
-
-            <div
-                class="executive-narrative"
-                id="executiveNarrative"
-            ></div>
-
-
-            <div class="executive-intelligence-footer">
-
-                <span>
-                    این گزارش از قراردادهای تأییدشده Backend تولید شده است.
-                </span>
-
-                <span
-                    class="executive-model"
-                    id="executiveModel"
-                ></span>
-
-            </div>
-
-        </article>
-
-    </section>
-
-    <!-- =========================================
-         V3.0.9.3 MANAGEMENT DECISION SUPPORT
-    ========================================== -->
-
-    <section
-        class="dashboard-section decision-support-section"
-        id="decisionSupportSection"
-        hidden
-    >
-
-        <div class="section-heading">
-
-            <div>
-
-                <div class="section-eyebrow">
-                    MANAGEMENT DECISION SUPPORT
-                </div>
-
-                <h2>
-                    مرکز توجه مدیریتی
-                </h2>
-
-                <p class="decision-support-description">
-                    موارد قابل بررسی و نکات برجسته بر اساس داده‌های
-                    تأییدشده Backend
-                </p>
-
-            </div>
-
-            <div
-                class="decision-support-count"
-                id="decisionSupportCount"
-            >
-                —
-            </div>
-
-        </div>
-
-
-        <!-- =====================================
-             ATTENTION ITEMS
-        ====================================== -->
-
-        <div
-            class="decision-attention-grid"
-            id="decisionAttentionGrid"
-        ></div>
-
-
-        <!-- =====================================
-             PERFORMANCE HIGHLIGHTS
-        ====================================== -->
-
-        <article class="dashboard-panel decision-highlights-panel">
-
-            <div class="panel-header">
-
-                <div>
-
-                    <div class="panel-eyebrow">
-                        PERFORMANCE HIGHLIGHTS
-                    </div>
-
-                    <h3>
-                        نکات برجسته عملکرد
-                    </h3>
-
-                </div>
-
-                <span class="decision-source-badge">
-                    Backend Ranking
-                </span>
-
-            </div>
-
-
-            <div
-                class="decision-highlight-grid"
-                id="decisionHighlightGrid"
-            ></div>
-
-        </article>
-
-    </section>
-
-    <!-- =========================================
-         TRENDS
-    ========================================== -->
-
-    <section class="dashboard-section">
-
-        <div class="section-heading">
-
-            <div>
-
-                <div class="section-eyebrow">
-                    PERFORMANCE TREND
-                </div>
-
-                <h2>
-                    روند عملکرد فروش
-                </h2>
-
-            </div>
-
-
-            <div
-                class="trend-period-selector"
-                id="trendPeriodSelector"
-            >
-
-                <button
-                    type="button"
-                    data-period="day"
-                    class="active"
-                >
-                    روزانه
-                </button>
-
-                <button
-                    type="button"
-                    data-period="week"
-                >
-                    هفتگی
-                </button>
-
-                <button
-                    type="button"
-                    data-period="month"
-                >
-                    ماهانه
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <div class="trend-grid">
-
-            <article class="dashboard-panel">
-
-                <div class="panel-header">
-
-                    <div>
-
-                        <div class="panel-eyebrow">
-                            CONVERSION
-                        </div>
-
-                        <h3>
-                            نرخ تبدیل
-                        </h3>
-
-                    </div>
-
-                </div>
-
-                <div
-                    class="trend-chart"
-                    id="conversionTrend"
-                ></div>
-
+    <section aria-labelledby="attention-title" class="ds-stack">
+        <h2 class="ds-heading" id="attention-title">نیازمند توجه</h2>
+        <div class="manager-attention">
+        {% for item in decisions.attention_items %}
+            <article class="ds-surface manager-attention-card">
+                {% if item.key == "FOLLOW_UP_ATTENTION" %}
+                <h3 class="ds-heading">{{ item.value }} نتیجه نیازمند پیگیری</h3>
+                <p>نتیجه این پیشنهادها در وضعیت «نیاز به پیگیری» ثبت شده است. مسیر ادامه تعامل را بررسی کنید.</p>
+                <p class="ds-caption ds-muted">این عدد، تعداد کارهای پیگیری باز یا عقب‌افتاده نیست.</p>
+                <a class="ds-button ds-button--secondary" href="{% url 'recommendation-performance-dashboard' %}">بررسی نتایج پیشنهادها</a>
+                {% elif item.key == "LIMITED_DATA_ATTENTION" or item.key == "INSUFFICIENT_DATA_ATTENTION" %}
+                <h3 class="ds-heading">داده برای تفسیر عملکرد محدود است</h3>
+                <p>نرخ‌ها و رتبه‌ها توصیف داده‌های موجودند؛ برای قضاوت قطعی درباره عملکرد کافی نیستند.</p>
+                <a class="ds-button ds-button--secondary" href="#management-methodology">مشاهده مبنای محاسبه</a>
+                {% endif %}
             </article>
-
-
-            <article class="dashboard-panel">
-
-                <div class="panel-header">
-
-                    <div>
-
-                        <div class="panel-eyebrow">
-                            REVENUE
-                        </div>
-
-                        <h3>
-                            روند فروش
-                        </h3>
-
-                    </div>
-
-                </div>
-
-                <div
-                    class="trend-chart"
-                    id="revenueTrend"
-                ></div>
-
-            </article>
-
+        {% empty %}
+            <p class="ds-state ds-muted">{% if dashboard.ready %}در قواعد فعلی، مورد نیازمند توجه ثبت نشده است؛ این به معنای نبود همه ریسک‌های فروش نیست.{% else %}برای شناسایی موارد قابل بررسی، ابتدا نتایج واقعی پیشنهادها باید ثبت شوند.{% endif %}</p>
+        {% endfor %}
         </div>
-
     </section>
-
-
-    <!-- =========================================
-         PERFORMANCE SECTIONS
-    ========================================== -->
-
-    <section class="dashboard-section">
-
-        <div class="section-heading">
-
-            <div>
-
-                <div class="section-eyebrow">
-                    SALES INTELLIGENCE
-                </div>
-
-                <h2>
-                    تحلیل عملکرد
-                </h2>
-
-            </div>
-
+    <section class="ds-surface ds-stack" aria-labelledby="brief-title">
+        <div class="ds-row"><h2 class="ds-heading" id="brief-title">جمع‌بندی مدیریتی</h2><span class="ds-badge">مبتنی بر داده‌های ثبت‌شده</span></div>
+        <p class="ds-muted">این جمع‌بندی از نتایج و رتبه‌های محاسبه‌شده تهیه شده است؛ پیش‌بینی یا تحلیل علّی نیست.</p>
+        <ul class="manager-observations">
+        {% for item in decisions.performance_highlights %}
+            {% if item.key != "BEST_CONVERSION_SALESPERSON" or dashboard.performance.salesperson.items|length > 1 %}
+            <li>{% if item.key == "BEST_CONVERSION_PRODUCT" %}بیشترین نرخ تبدیل محصول:{% elif item.key == "BEST_ENGAGEMENT_PRODUCT" %}بیشترین نرخ تعامل محصول:{% elif item.key == "BEST_REVENUE_BRAND" %}بیشترین فروش برند:{% elif item.key == "BEST_CONVERSION_SALESPERSON" %}بیشترین نرخ تبدیل فروشنده:{% endif %}
+                <strong>{{ item.entity_name|default:item.entity_code }}</strong> · {% include "management/_number.html" with value=item.value %}{% if item.unit == "PERCENT" %}٪{% endif %}
+            </li>
+            {% endif %}
+        {% empty %}<li class="ds-muted">داده کافی برای نکات برجسته عملکرد موجود نیست.</li>{% endfor %}
+        </ul>
+        {% if summary.data_quality != "SUFFICIENT_DATA" %}<p class="ds-caption ds-muted">حجم داده محدود است؛ تعداد نتایج هر گروه را همراه نرخ‌ها بررسی کنید.</p>{% endif %}
+    </section>
+    <section class="ds-stack" aria-labelledby="trend-title">
+        <div class="ds-page-header"><div><h2 class="ds-heading" id="trend-title">عملکرد و روند</h2><p class="ds-caption ds-muted">بر اساس تاریخ ویزیت · فقط دوره‌های دارای نتیجه ثبت‌شده؛ فاصله‌های بدون داده صفر محسوب نمی‌شوند.</p></div>
+        <label class="ds-field" for="trend-period">گروه‌بندی زمانی<select class="ds-control" id="trend-period"><option value="day">روزانه</option><option value="week">هفتگی</option><option value="month">ماهانه</option></select></label></div>
+        <div class="manager-trends">
+            <article class="ds-surface"><h3 class="ds-heading">روند نرخ تبدیل</h3><div id="conversionTrend" class="manager-chart" role="region" aria-label="روند نرخ تبدیل"><p class="ds-muted">مقادیر دقیق در جدول دوره‌ها در دسترس است.</p></div></article>
+            <article class="ds-surface"><h3 class="ds-heading">روند فروش حاصل</h3><div id="revenueTrend" class="manager-chart" role="region" aria-label="روند فروش حاصل"><p class="ds-muted">مقادیر دقیق در جدول دوره‌ها در دسترس است.</p></div></article>
         </div>
-
-
-        <div
-            class="performance-tabs"
-            id="performanceTabs"
-        ></div>
-
-
-        <article class="dashboard-panel">
-
-            <div
-                class="performance-content"
-                id="performanceContent"
-            ></div>
-
-        </article>
-
+        <details class="manager-details"><summary>مقادیر دقیق دوره‌ها</summary>
+        {% include "management/_period_table.html" with points=trend.trends.day label="روزانه" %}
+        {% include "management/_period_table.html" with points=trend.trends.week label="هفتگی، دوشنبه تا یکشنبه" %}
+        {% include "management/_period_table.html" with points=trend.trends.month label="ماهانه" %}
+        </details>
     </section>
-
-
-    <!-- =========================================
-         SALES TEAM
-    ========================================== -->
-
-    <section class="dashboard-section">
-
-        <div class="section-heading">
-
-            <div>
-
-                <div class="section-eyebrow">
-                    SALES TEAM
-                </div>
-
-                <h2>
-                    عملکرد تیم فروش
-                </h2>
-
-            </div>
-
-        </div>
-
-
-        <div
-            class="team-summary-grid"
-            id="teamSummaryGrid"
-        ></div>
-
-
-        <article class="dashboard-panel">
-
-            <div class="table-wrapper">
-
-                <table class="sales-team-table">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                فروشنده
-                            </th>
-
-                            <th>
-                                پیشنهاد ارائه‌شده
-                            </th>
-
-                            <th>
-                                خرید
-                            </th>
-
-                            <th>
-                                نرخ تبدیل
-                            </th>
-
-                            <th>
-                                نرخ تعامل
-                            </th>
-
-                            <th>
-                                فروش
-                            </th>
-
-                            <th>
-                                کیفیت داده
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody
-                        id="salesTeamTableBody"
-                    ></tbody>
-
-                </table>
-
-            </div>
-
-        </article>
-
+    <section class="ds-stack" aria-labelledby="team-title">
+        <h2 class="ds-heading" id="team-title">عملکرد تیم فروش</h2>
+        <p class="ds-caption ds-muted">{% if not dashboard.performance.salesperson.items %}هنوز نتیجه‌ای برای هیچ فروشنده‌ای ثبت نشده است.{% elif dashboard.performance.salesperson.items|length == 1 %}فقط یک فروشنده دارای نتیجه ثبت‌شده است؛ مقایسه بین فروشندگان ممکن نیست.{% else %}فروشندگان دارای نتیجه ثبت‌شده؛ ترتیب موجود بر اساس نرخ تبدیل، سپس تعداد ارائه‌هاست. رتبه‌ها توصیفی‌اند.{% endif %}</p>
+        {% include "management/_performance_table.html" with items=dashboard.performance.salesperson.items dimension="salesperson" caption="نتایج ثبت‌شده فروشندگان" %}
     </section>
-
+    <section class="ds-stack" aria-labelledby="recommendation-title">
+        <div class="ds-page-header"><div><h2 class="ds-heading" id="recommendation-title">تحلیل پیشنهادها</h2><p class="ds-caption ds-muted">برای بررسی عمیق‌تر، عملکرد پیشنهادها را باز کنید.</p></div><a class="ds-button ds-button--secondary" href="{% url 'recommendation-performance-dashboard' %}">جزئیات عملکرد پیشنهادها</a></div>
+        <details class="manager-details"><summary>نتایج به تفکیک نوع پیشنهاد</summary>{% include "management/_performance_table.html" with items=dashboard.performance.recommendation_type.items dimension="recommendation_type" caption="عملکرد انواع پیشنهاد" %}</details>
+        <details class="manager-details"><summary>جزئیات محصول، دسته و برند</summary>
+        {% include "management/_performance_table.html" with items=dashboard.performance.product.items dimension="product" caption="محصول‌ها" %}
+        {% include "management/_performance_table.html" with items=dashboard.performance.category.items dimension="category" caption="دسته‌ها" %}
+        {% include "management/_performance_table.html" with items=dashboard.performance.brand.items dimension="brand" caption="برندها" %}
+        </details>
+    </section>
+    <details class="manager-details ds-surface" id="management-methodology"><summary>راهنمای شاخص‌ها و کیفیت داده</summary>
+        <p>هر جفت ویزیت و پیشنهاد، یک نتیجه نهایی دارد. آخرین نتیجه ثبت‌شده تعیین‌کننده است؛ رویدادهای تکراری به‌عنوان پیشنهاد جداگانه شمرده نمی‌شوند.</p>
+        <p>نرخ تبدیل = خرید ÷ ارائه‌شده. نرخ تعامل = (خرید + علاقه‌مندی + نیاز به پیگیری) ÷ ارائه‌شده. «ارائه نشده» از مخرج این نرخ‌ها خارج است.</p>
+        <p>فروش حاصل فقط مبلغ ثبت‌شده نتایج خرید پیشنهادهاست؛ فروش کل شرکت، هدف فروش یا سود نیست. واحد پول در داده‌های این گزارش مشخص نشده است.</p>
+        <p>کیفیت داده بر اساس تعداد ارائه‌ها: صفر بدون داده، ۱ تا ۲ ناکافی، ۳ تا ۹ محدود، و ۱۰ یا بیشتر کافی. کافی بودن حجم داده به معنی صحت قطعی یا رابطه علّی نیست.</p>
+        <p>همه شاخص‌ها کل تاریخچه را پوشش می‌دهند. نمودارها بر اساس تاریخ ویزیت‌اند؛ مقایسه با دوره قبل، رشد یا پیش‌بینی ارائه نمی‌شود. تاریخ‌ها میلادی هستند.</p>
+    </details>
 </div>
-
+{{ trend.trends|json_script:"management-trends" }}
 {% endblock %}
-
-
-{% block extra_js %}
-
-<script>
-
-    window.managementDashboardConfig = {
-        apiUrl:
-            "/api/management/v1/dashboard/"
-    };
-
-</script>
-
-
-<script
-    src="{% static 'management/js/dashboard.js' %}"
-></script>
-
-{% endblock %}
+{% block extra_js %}<script src="{% static 'management/js/dashboard.js' %}?v=002f-1" defer></script>{% endblock %}

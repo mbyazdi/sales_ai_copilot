@@ -17,7 +17,7 @@
         <div>
 
             <div class="section-eyebrow">
-                FOLLOW-UP
+                {% if manager_inspection %}پیگیری{% else %}FOLLOW-UP{% endif %}
             </div>
 
             <h3 class="customer-follow-up-title">
@@ -96,7 +96,7 @@
     {% endif %}
 
 
-    <div class="customer-follow-up-actions">
+    {% if not manager_inspection %}<div class="customer-follow-up-actions">
 
         <button
             type="button"
@@ -106,7 +106,7 @@
             آماده‌سازی پیگیری با Copilot
         </button>
 
-    </div>
+    </div>{% endif %}
 
 </section>
 

@@ -1,0 +1,10 @@
+<div class="ds-table-region" tabindex="0" role="region" aria-label="{{ caption }}">
+<table class="ds-table"><caption>{{ caption }}</caption>
+<thead><tr><th scope="col">نام</th><th scope="col">ارزیابی‌شده / ارائه‌شده</th><th scope="col">خرید</th>{% if dimension == "recommendation_type" %}<th scope="col">علاقه‌مندی</th><th scope="col">نیاز به پیگیری</th><th scope="col">رد شده</th><th scope="col">ارائه نشده</th>{% endif %}<th scope="col">تبدیل</th><th scope="col">تعامل</th><th scope="col">فروش حاصل</th><th scope="col">کیفیت داده</th></tr></thead>
+<tbody>{% for item in items %}<tr>
+<th scope="row">{% if dimension == "salesperson" %}{{ item.full_name }} <bdi class="ds-caption ds-muted">{{ item.employee_code }}</bdi>{% elif dimension == "recommendation_type" %}{% include "core/customer_360/_recommendation_type.html" with recommendation=item %}{% elif dimension == "product" %}{{ item.product_name }} <bdi class="ds-caption ds-muted">{{ item.product_code }}</bdi>{% elif dimension == "category" %}{{ item.category_name|default:item.category_code }}{% else %}{{ item.brand_name|default:item.brand_code }}{% endif %}</th>
+<td>{{ item.resolved_recommendations }} / {{ item.presented }}</td><td>{{ item.purchased }}</td>
+{% if dimension == "recommendation_type" %}<td>{{ item.interested }}</td><td>{{ item.follow_up }}</td><td>{{ item.rejected }}</td><td>{{ item.not_presented }}</td>{% endif %}
+<td>{% include "management/_number.html" with value=item.conversion_rate %}٪</td><td>{% include "management/_number.html" with value=item.engagement_rate %}٪</td><td>{% include "management/_number.html" with value=item.total_revenue %}</td>
+<td>{% include "management/_quality.html" with quality=item.data_quality %}</td>
+</tr>{% empty %}<tr><td colspan="{% if dimension == 'recommendation_type' %}11{% else %}7{% endif %}">نتیجه‌ای برای این بخش ثبت نشده است.</td></tr>{% endfor %}</tbody></table></div>

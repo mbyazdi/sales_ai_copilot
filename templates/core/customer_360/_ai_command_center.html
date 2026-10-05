@@ -1,6 +1,6 @@
 <div class="c360-decision-grid">
     <section id="workspace-decision" class="ds-card ds-stack c360-decision" aria-labelledby="decision-title">
-        <h2 id="decision-title" class="ds-heading">اقدام پیشنهادی برای این مشتری</h2>
+        <h2 id="decision-title" class="ds-heading">{% if manager_inspection %}پیشنهاد اصلی مشتری{% else %}اقدام پیشنهادی برای این مشتری{% endif %}</h2>
         {% if recommendations %}
         {% with primary=recommendations.0 %}
             <h3 class="ds-title">{{ primary.product.name }}</h3>
@@ -19,17 +19,17 @@
             {% else %}<p class="ds-caption ds-muted">اطلاعات موجودی این پیشنهاد ثبت نشده است.</p>{% endif %}
             {% if sales_session.promotion_context %}<details><summary>شرایط پیشنهادهای تشویقی</summary>{% for promo in sales_session.promotion_context %}<p>{{ promo.name }}{% if promo.discount_percent %} · {{ promo.discount_percent|floatformat:0 }}٪ تخفیف{% endif %}{% if promo.minimum_quantity %} · حداقل خرید {{ promo.minimum_quantity }}{% endif %}</p>{% endfor %}</details>{% endif %}
             {% if sales_session.why_now %}<details><summary>چرا اکنون؟</summary><ul>{% for reason in sales_session.why_now %}<li>{{ reason }}</li>{% endfor %}</ul></details>{% endif %}
-            <a class="ds-button ds-button--secondary" href="#workspace-recommendations">بررسی پیشنهادها و ثبت نتیجه</a>
+            <a class="ds-button ds-button--secondary" href="#workspace-recommendations">{% if manager_inspection %}بررسی پیشنهادها{% else %}بررسی پیشنهادها و ثبت نتیجه{% endif %}</a>
         {% endwith %}
-        {% else %}<p class="ds-state ds-state--empty" role="status">پیشنهاد فعال برای این مشتری موجود نیست. ابتدا نیاز فعلی مشتری را بررسی کنید.</p>{% endif %}
+        {% else %}<p class="ds-state ds-state--empty" role="status">پیشنهاد فعال برای این مشتری موجود نیست.{% if not manager_inspection %} ابتدا نیاز فعلی مشتری را بررسی کنید.{% endif %}</p>{% endif %}
     </section>
     <section id="workspace-copilot" class="ds-surface ds-stack" aria-labelledby="copilot-title">
-        <h2 id="copilot-title" class="ds-heading">دستیار فروش</h2>
-        <p class="ds-caption ds-muted">برای اجرای اقدام پیشنهادی و بیان روشن آن کمک بگیرید؛ تصمیم تجاری از اطلاعات سامانه می‌آید.</p>
-        {% if sales_session.talking_point %}<div class="c360-talk"><strong class="ds-caption">چه بگویم؟</strong><p>{{ sales_session.talking_point }}</p></div>{% endif %}
+        <h2 id="copilot-title" class="ds-heading">{% if manager_inspection %}دستیار بررسی مشتری{% else %}دستیار فروش{% endif %}</h2>
+        <p class="ds-caption ds-muted">{% if manager_inspection %}درباره اطلاعات مشتری و مبنای پیشنهادها توضیح بگیرید؛ پاسخ دستیار مجوز اجرای عملیات فروش نیست.{% else %}برای اجرای اقدام پیشنهادی و بیان روشن آن کمک بگیرید؛ تصمیم تجاری از اطلاعات سامانه می‌آید.{% endif %}</p>
+        {% if sales_session.talking_point %}<div class="c360-talk"><strong class="ds-caption">{% if manager_inspection %}متن پیشنهادی برای گفت‌وگوی فروش{% else %}چه بگویم؟{% endif %}</strong><p>{{ sales_session.talking_point }}</p></div>{% endif %}
         {% if sales_ai_context %}
-            <label class="ds-label" for="salesCopilotMessage">پرسش درباره این مشتری و اقدام پیشنهادی</label>
-            <textarea id="salesCopilotMessage" class="ds-control" rows="3" placeholder="مثلاً: پیشنهاد اصلی را چگونه مطرح کنم؟"></textarea>
+            <label class="ds-label" for="salesCopilotMessage">{% if manager_inspection %}پرسش درباره اطلاعات و پیشنهادهای مشتری{% else %}پرسش درباره این مشتری و اقدام پیشنهادی{% endif %}</label>
+            <textarea id="salesCopilotMessage" class="ds-control" rows="3" placeholder="{% if manager_inspection %}مثلاً: دلیل پیشنهاد اصلی برای این مشتری چیست؟{% else %}مثلاً: پیشنهاد اصلی را چگونه مطرح کنم؟{% endif %}"></textarea>
             <button type="button" id="salesCopilotSubmit" class="ds-button">از دستیار بپرس</button>
             <div id="salesCopilotLoading" class="ds-state ds-state--loading" role="status" style="display:none;">در حال دریافت پاسخ...</div>
             <div id="salesCopilotError" class="ds-state ds-state--error" role="alert" style="display:none;"></div>

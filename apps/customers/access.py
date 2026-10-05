@@ -16,7 +16,9 @@ def customer_access_queryset(user, queryset=None):
     if queryset is None:
         queryset = Customer.objects.all()
     if user.is_staff:
-        return queryset
+        # Existing temporary staff inspection override; no manager/team relation
+        # exists yet. Current customer reads exclude inactive master records.
+        return queryset.filter(is_active=True)
     salesperson = getattr(user, "salesperson_profile", None)
     if salesperson is None or not salesperson.is_active:
         raise PermissionDenied("دسترسی به اطلاعات مشتری مجاز نیست.")

@@ -8,15 +8,17 @@
 {% endblock %}
 {% block content %}
 <div class="customer-decision-workspace ds-stack">
-    {% include "core/customer_360/_search.html" %}
+    {% if manager_inspection %}
+    <header class="ds-page-header"><div><h1 class="ds-title">بررسی مدیریتی مشتری</h1><p class="ds-muted">مشاهده اطلاعات و پیشنهادهای ثبت‌شده مشتری؛ عملیات ویزیت و ثبت نتیجه از این نما انجام نمی‌شود.</p></div><a class="ds-button ds-button--secondary" href="/customers/">بازگشت به مشتریان</a></header>
+    {% else %}{% include "core/customer_360/_search.html" %}{% endif %}
     {% if not_found %}<p class="ds-state ds-state--error" role="alert">مشتری موردنظر پیدا نشد.</p>{% endif %}
     {% if customer %}
         {% include "core/customer_360/_customer_hero.html" %}
         {% if visit_not_found %}<p class="ds-state ds-state--error" role="alert">ویزیت انتخاب‌شده معتبر نیست یا متعلق به این مشتری نیست؛ اطلاعات مشتری بدون زمینه ویزیت نمایش داده می‌شود.</p>{% endif %}
         <div class="sales-workspace visit-state-{% if current_visit %}{{ current_visit.status|lower }}{% else %}none{% endif %}">
-            {% include "core/customer_360/_sales_context.htm" %}
-            <nav class="c360-links ds-row" aria-label="ناوبری فضای کاری فروش">
-                <a href="#workspace-decision">اقدام پیشنهادی</a><a href="#workspace-copilot">دستیار فروش</a><a href="#workspace-recommendations">پیشنهادها و نتیجه</a><a href="#workspace-kpis">شاخص‌ها</a><a href="#workspace-details">جزئیات</a>
+            {% if not manager_inspection %}{% include "core/customer_360/_sales_context.htm" %}{% endif %}
+            <nav class="c360-links ds-row" aria-label="{% if manager_inspection %}ناوبری بررسی مشتری{% else %}ناوبری فضای کاری فروش{% endif %}">
+                <a href="#workspace-decision">{% if manager_inspection %}پیشنهاد اصلی{% else %}اقدام پیشنهادی{% endif %}</a><a href="#workspace-copilot">{% if manager_inspection %}دستیار بررسی{% else %}دستیار فروش{% endif %}</a><a href="#workspace-recommendations">{% if manager_inspection %}پیشنهادها{% else %}پیشنهادها و نتیجه{% endif %}</a><a href="#workspace-kpis">شاخص‌ها</a><a href="#workspace-details">جزئیات</a>
             </nav>
             {% include "core/customer_360/_ai_command_center.html" %}
             {% include "core/customer_360/_ai_recommendations.html" %}
@@ -35,12 +37,12 @@
                 <details class="ds-surface"><summary>اطلاعات و تحلیل تکمیلی مشتری</summary><div class="c360-detail-content">{% if customer.customer_type %}<p>نوع مشتری: {{ customer.customer_type }}</p>{% endif %}{% if customer.grade %}<p>رتبه مشتری: {{ customer.grade.name }}</p>{% endif %}{% include "core/customer_360/_customer_insights.html" %}{% include "core/customer_360/_ai_explainability.html" %}{% include "core/customer_360/_recommendation_performance.html" %}</div></details>
                 <details class="ds-surface"><summary>سابقه خرید</summary><div class="c360-detail-content">{% include "core/customer_360/_sales_history.html" %}</div></details>
                 <details class="ds-surface"><summary>نتایج جلسات فروش</summary><div class="c360-detail-content">{% include "core/customer_360/_sales_outcomes.html" %}{% include "core/customer_360/_visit_summary.html" %}</div></details>
-                <details class="ds-surface"><summary>پیگیری و اقدام بعد از تعامل</summary><div class="c360-detail-content">{% include "core/customer_360/_follow_up_card.html" %}</div></details>
+                <details class="ds-surface"><summary>{% if manager_inspection %}پیگیری ثبت‌شده مشتری{% else %}پیگیری و اقدام بعد از تعامل{% endif %}</summary><div class="c360-detail-content">{% include "core/customer_360/_follow_up_card.html" %}{% if manager_inspection and not current_follow_up_task %}<p class="ds-state ds-state--empty">پیگیری بازی برای این مشتری ثبت نشده است.</p>{% endif %}</div></details>
             </section>
         </div>
     {% else %}<p class="ds-state ds-state--empty">برای مشاهده اطلاعات، کد یک مشتری مجاز را جستجو کنید.</p>{% endif %}
 </div>
-{% include "core/customer_360/_outcome_modal.html" %}
+{% if not manager_inspection %}{% include "core/customer_360/_outcome_modal.html" %}{% endif %}
 {% endblock %}
 {% block extra_js %}
 <script>

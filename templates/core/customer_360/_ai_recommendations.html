@@ -1,13 +1,14 @@
 <section id="workspace-recommendations" class="ds-stack" data-visit-id="{% if current_visit %}{{ current_visit.id }}{% endif %}" aria-labelledby="recommendations-title">
-    <div class="ds-page-header"><div><h2 id="recommendations-title" class="ds-heading">پیشنهادها و نتیجه تعامل</h2><p class="ds-caption ds-muted">ترتیب پیشنهادها از موتور پیشنهاددهی است؛ ثبت نتیجه تنها در ویزیت در حال انجام فعال می‌شود.</p></div><span class="ds-badge">{{ recommendations|length }} پیشنهاد</span></div>
+    <div class="ds-page-header"><div><h2 id="recommendations-title" class="ds-heading">{% if manager_inspection %}بررسی پیشنهادهای مشتری{% else %}پیشنهادها و نتیجه تعامل{% endif %}</h2><p class="ds-caption ds-muted">{% if manager_inspection %}مرور پیشنهادهای فعلی مشتری به ترتیب موتور پیشنهاددهی.{% else %}ترتیب پیشنهادها از موتور پیشنهاددهی است؛ ثبت نتیجه تنها در ویزیت در حال انجام فعال می‌شود.{% endif %}</p></div><span class="ds-badge">{{ recommendations|length }} پیشنهاد</span></div>
     {% for recommendation in recommendations %}
     <article class="recommendation-outcome-card ds-surface {% if forloop.first %}is-primary{% endif %}" data-recommendation-id="{{ recommendation.id }}" data-product-code="{{ recommendation.product.product_code }}">
         <div class="ds-page-header">
             <div><h3 class="recommendation-product-name ds-heading">{{ recommendation.product.name }}</h3><p class="ds-caption ds-muted"><bdi>{{ recommendation.product.product_code }}</bdi> · {{ recommendation.product.category }}</p></div>
             <div class="ds-row"><span class="ds-badge">{% if forloop.first %}پیشنهاد اصلی{% else %}گزینه جایگزین · رتبه {{ recommendation.rank }}{% endif %}</span><span class="ds-badge">امتیاز {{ recommendation.score|floatformat:0 }}</span><span class="ds-badge">{% include "core/customer_360/_recommendation_type.html" %}</span></div>
         </div>
-        <details><summary>دلیل پیشنهاد و ثبت نتیجه</summary><div class="ds-stack c360-detail-content">
+        <details><summary>{% if manager_inspection %}دلیل پیشنهاد{% else %}دلیل پیشنهاد و ثبت نتیجه{% endif %}</summary><div class="ds-stack c360-detail-content">
             {% if recommendation.reason %}<p>{{ recommendation.reason }}</p>{% else %}<p class="ds-caption ds-muted">دلیل تفصیلی ثبت نشده است.</p>{% endif %}
+            {% if not manager_inspection %}
             <p class="ds-caption ds-muted">ثبت نتیجه مربوط به همین پیشنهاد است؛ گزینه جایگزین، محصول اصلی تصمیم تجاری را تغییر نمی‌دهد.</p>
             <div class="outcome-actions ds-row">
                 <button type="button" {% if current_visit.status != 'IN_PROGRESS' %}disabled{% endif %} class="outcome-btn ds-button ds-button--secondary" data-outcome="PURCHASED" data-recommendation-id="{{ recommendation.id }}" data-product-name="{{ recommendation.product.name }}" data-product-code="{{ recommendation.product.product_code }}">خرید شد</button>
@@ -16,8 +17,9 @@
                 <button type="button" {% if current_visit.status != 'IN_PROGRESS' %}disabled{% endif %} class="outcome-btn ds-button ds-button--secondary" data-outcome="REJECTED" data-recommendation-id="{{ recommendation.id }}" data-product-name="{{ recommendation.product.name }}" data-product-code="{{ recommendation.product.product_code }}">رد شد</button>
                 <button type="button" {% if current_visit.status != 'IN_PROGRESS' %}disabled{% endif %} class="outcome-btn ds-button ds-button--secondary" data-outcome="NOT_PRESENTED" data-recommendation-id="{{ recommendation.id }}" data-product-name="{{ recommendation.product.name }}" data-product-code="{{ recommendation.product.product_code }}">مطرح نشد</button>
             </div>
+            {% endif %}
         </div></details>
-        <div class="recommendation-outcome-status" data-outcome-status="{{ recommendation.id }}"><span class="status-label">وضعیت:</span> <span class="status-value">هنوز ثبت نشده</span></div>
+        {% if not manager_inspection %}<div class="recommendation-outcome-status" data-outcome-status="{{ recommendation.id }}"><span class="status-label">وضعیت:</span> <span class="status-value">هنوز ثبت نشده</span></div>{% endif %}
     </article>
-    {% empty %}<p class="ds-state ds-state--empty">پیشنهادی برای ثبت نتیجه موجود نیست؛ اطلاعات مشتری و پیگیری‌ها را مرور کنید.</p>{% endfor %}
+    {% empty %}<p class="ds-state ds-state--empty">{% if manager_inspection %}پیشنهاد فعالی برای بررسی موجود نیست؛ اطلاعات مشتری و پیگیری‌ها را مرور کنید.{% else %}پیشنهادی برای ثبت نتیجه موجود نیست؛ اطلاعات مشتری و پیگیری‌ها را مرور کنید.{% endif %}</p>{% endfor %}
 </section>

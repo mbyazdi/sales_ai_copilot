@@ -8,10 +8,11 @@
             {% if customer.phone %}<span>تلفن <bdi>{{ customer.phone }}</bdi></span>{% endif %}
         </div>
         {% if customer_360 %}<div class="ds-row">
-            {% if customer_360.segment == 'HIGH_VALUE' %}<span class="ds-badge">مشتری با ارزش بالا</span>{% elif customer_360.segment == 'GROWTH' %}<span class="ds-badge">مشتری در حال رشد</span>{% elif customer_360.segment %}<span class="ds-badge">گروه مشتری: <bdi>{{ customer_360.segment }}</bdi></span>{% endif %}
+            {% if manager_inspection and customer_360.segment %}<span class="ds-caption ds-muted">گروه مشتری:</span>{% endif %}
+            {% if customer_360.segment == 'HIGH_VALUE' %}<span class="ds-badge">مشتری با ارزش بالا</span>{% elif customer_360.segment == 'GROWTH' %}<span class="ds-badge">مشتری در حال رشد</span>{% elif manager_inspection %}{% if customer_360.segment == 'STABLE' %}<span class="ds-badge">مشتری پایدار</span>{% elif customer_360.segment == 'AT_RISK' %}<span class="ds-badge">مشتری در معرض ریسک</span>{% elif customer_360.segment == 'INACTIVE' %}<span class="ds-badge">بدون خرید اخیر</span>{% elif customer_360.segment == 'NEW' %}<span class="ds-badge">مشتری جدید</span>{% endif %}{% elif customer_360.segment %}<span class="ds-badge">گروه مشتری: <bdi>{{ customer_360.segment }}</bdi></span>{% endif %}
             {% if customer_360.top_category %}<span class="ds-caption ds-muted">دسته برتر: {{ customer_360.top_category }}</span>{% endif %}
             {% if customer_360.days_since_last_purchase is not None %}<span class="ds-caption ds-muted">آخرین خرید: {{ customer_360.days_since_last_purchase }} روز قبل</span>{% endif %}
         </div>{% endif %}
     </div>
-    <a class="ds-button ds-button--secondary" href="{% url 'salesperson-dashboard' %}">برنامه ویزیت امروز</a>
+    {% if not manager_inspection %}<a class="ds-button ds-button--secondary" href="{% url 'salesperson-dashboard' %}">برنامه ویزیت امروز</a>{% endif %}
 </header>

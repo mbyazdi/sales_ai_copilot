@@ -1,4 +1,6 @@
 from django.shortcuts import get_object_or_404, render
+from django.core.paginator import Paginator
+from django.db.models import Prefetch, Q
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -31,6 +33,33 @@ from apps.core.commercial_decision import (
 )
 from apps.core.commercial_context import build_product_commercial_context
 
+
+def _manager_customer_workspace(request, accessible_customers):
+    """Present the existing staff read scope, without inventing a team relation."""
+    query = request.GET.get("q", "").strip()
+    customers = accessible_customers.filter(is_active=True)
+    if query:
+        customers = customers.filter(
+            Q(customer_code__icontains=query) | Q(name__icontains=query)
+        )
+    customers = customers.select_related("grade", "customer_360").prefetch_related(
+        Prefetch(
+            "salesperson_assignments",
+            queryset=CustomerAssignment.objects.filter(is_active=True).select_related("salesperson"),
+            to_attr="active_assignments",
+        ),
+        Prefetch(
+            "follow_up_tasks",
+            queryset=FollowUpTask.objects.filter(status=FollowUpTask.Status.OPEN).order_by("due_date", "id"),
+            to_attr="open_follow_ups",
+        ),
+    ).order_by("name", "customer_code")
+    return render(request, "customers/manager_workspace.html", {
+        "query": query,
+        "page_obj": Paginator(customers, 20).get_page(request.GET.get("page")),
+    })
+
+
 def customer_search(request):
 
     accessible_customers = customer_access_queryset(request.user)
@@ -39,13 +68,21 @@ def customer_search(request):
         "customer_code",
         ""
     ).strip()
+
+    manager_inspection = request.user.is_staff
+    if manager_inspection and not customer_code:
+        return _manager_customer_workspace(request, accessible_customers)
         
     visit_id = request.GET.get(
         "visit_id",
         ""
     ).strip()
+    if manager_inspection:
+        # Inspection never selects an operational visit, even via a crafted URL.
+        visit_id = ""
 
     context = {
+        "manager_inspection": manager_inspection,
         "customer_code": customer_code,
         "visit_id": "",
 
@@ -79,12 +116,14 @@ def customer_search(request):
 
     if customer_code:
 
-        get_object_or_404(accessible_customers, customer_code=customer_code, is_active=True)
+        if not accessible_customers.filter(customer_code=customer_code, is_active=True).exists():
+            return render(request, "customers/unavailable.html", status=404)
 
         try:
 
             result = get_customer_360(
-                customer_code
+                customer_code,
+                queryset=accessible_customers,
             )
 
             customer = result["customer"]

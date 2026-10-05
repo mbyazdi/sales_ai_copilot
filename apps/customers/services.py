@@ -8,13 +8,17 @@ from .models import Customer, Customer360
 from apps.sales.models import Sale, SaleItem
 
 
-def get_customer_by_code(customer_code):
+def get_customer_by_code(customer_code, *, queryset=None):
     """
     Get an active customer by customer code.
+    Optional queryset retains an HTTP caller's authorized customer scope.
     """
 
+    if queryset is None:
+        queryset = Customer.objects.all()
+
     return (
-        Customer.objects
+        queryset
         .select_related(
             "grade",
             "customer_360",
@@ -26,7 +30,7 @@ def get_customer_by_code(customer_code):
     )
 
 
-def get_customer_360(customer_code):
+def get_customer_360(customer_code, *, queryset=None):
     """
     Return customer, Customer360 snapshot,
     salesperson assignment and latest visit.
@@ -37,7 +41,7 @@ def get_customer_360(customer_code):
         Visit,
     )
 
-    customer = get_customer_by_code(customer_code)
+    customer = get_customer_by_code(customer_code, queryset=queryset)
 
     customer_360 = getattr(
         customer,

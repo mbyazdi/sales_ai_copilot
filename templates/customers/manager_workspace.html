@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}مشتریان | سامانه هوشمند فروش{% endblock %}
+{% block breadcrumb %}مشتریان{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'management/css/customers.css' %}?v=002f-3">{% endblock %}
+{% block content %}
+<div class="manager-customers ds-stack">
+    <header class="ds-page-header">
+        <div><h1 class="ds-title">مشتریان</h1><p class="ds-muted">مرور مدیریتی مشتریان فعال شرکت و اطلاعات ثبت‌شده آن‌ها</p></div>
+        <a class="ds-button ds-button--secondary" href="{% url 'management-dashboard' %}">نمای مدیریت</a>
+    </header>
+    <section class="ds-surface ds-stack" aria-label="جستجوی مشتریان">
+        <form class="ds-search" action="/customers/" method="get" role="search">
+            <div class="ds-field">
+                <label class="ds-label" for="manager-customer-query">نام یا کد مشتری</label>
+                <input class="ds-control" id="manager-customer-query" type="search" name="q" value="{{ query }}" placeholder="جستجو با نام یا کد مشتری" aria-describedby="manager-search-help">
+                <span class="ds-caption ds-muted" id="manager-search-help">جستجو در مشتریان فعالِ محدوده دسترسی مدیریتی فعلی انجام می‌شود.</span>
+            </div>
+            <button class="ds-button" type="submit">جستجو</button>
+            {% if query %}<a class="ds-button ds-button--quiet" href="/customers/">پاک کردن جستجو</a>{% endif %}
+        </form>
+        <details class="manager-customers-help">
+            <summary>مبنای نمایش اطلاعات</summary>
+            <p class="ds-caption ds-muted">در این مرحله، دسترسی مدیریتی شامل همه مشتریان فعال شرکت است و به تیم خاصی محدود نشده است. بازاریاب، خرید و پیگیری از اطلاعات موجود نمایش داده می‌شوند؛ نبود اطلاعات به معنای نبود فعالیت نیست.</p>
+        </details>
+    </section>
+    <div class="ds-row" role="status"><span class="ds-badge">{{ page_obj.paginator.count }} {% if query %}نتیجه جستجو{% else %}مشتری فعال{% endif %}</span></div>
+    <section aria-label="فهرست مشتریان">
+    {% if page_obj %}
+    <table class="ds-table manager-customer-table" role="table" aria-label="فهرست مشتریان">
+        <colgroup><col class="manager-customer-col-identity"><col class="manager-customer-col-salesperson"><col class="manager-customer-col-grade"><col class="manager-customer-col-segment"><col class="manager-customer-col-purchase"><col class="manager-customer-col-follow-up"><col class="manager-customer-col-action"></colgroup>
+        <thead role="rowgroup"><tr role="row">
+            <th scope="col" role="columnheader">مشتری</th>
+            <th scope="col" role="columnheader">بازاریاب تخصیص‌یافته</th>
+            <th scope="col" role="columnheader">رتبه</th>
+            <th scope="col" role="columnheader">گروه مشتری</th>
+            <th scope="col" role="columnheader">آخرین خرید <span class="manager-customer-secondary ds-caption ds-muted">(میلادی)</span></th>
+            <th scope="col" role="columnheader">پیگیری ثبت‌شده</th>
+            <th scope="col" role="columnheader">بررسی</th>
+        </tr></thead>
+        <tbody role="rowgroup">
+    {% for customer in page_obj %}
+        {% with snapshot=customer.customer_360 %}
+        <tr class="manager-customer-row" role="row">
+            <th class="manager-customer-identity" scope="row" role="rowheader"><span class="manager-customer-name">{{ customer.name }}</span><span class="manager-customer-secondary ds-caption ds-muted">کد مشتری <bdi>{{ customer.customer_code }}</bdi>{% if customer.city %} · {{ customer.city }}{% endif %}</span></th>
+            <td class="manager-customer-salesperson" role="cell" data-label="بازاریاب تخصیص‌یافته">{% for assignment in customer.active_assignments %}<span class="manager-customer-secondary">{{ assignment.salesperson.full_name }} <bdi class="ds-caption ds-muted">{{ assignment.salesperson.employee_code }}</bdi></span>{% empty %}<span class="ds-muted">تخصیص فعال ثبت نشده است</span>{% endfor %}</td>
+            <td class="manager-customer-grade" role="cell" data-label="رتبه">{% if customer.grade %}<span class="ds-badge"><bdi>{{ customer.grade.code }}</bdi></span>{% else %}<span class="ds-muted">رتبه ثبت نشده</span>{% endif %}</td>
+            <td class="manager-customer-segment" role="cell" data-label="گروه مشتری">{% if snapshot.segment == "HIGH_VALUE" %}با ارزش بالا{% elif snapshot.segment == "GROWTH" %}در حال رشد{% elif snapshot.segment == "STABLE" %}پایدار{% elif snapshot.segment == "AT_RISK" %}در معرض ریسک{% elif snapshot.segment == "INACTIVE" %}بدون خرید اخیر{% elif snapshot.segment == "NEW" %}جدید{% else %}<span class="ds-muted">گروه ثبت نشده</span>{% endif %}</td>
+            <td class="manager-customer-purchase" role="cell" data-label="آخرین خرید (میلادی)">{% if snapshot.last_purchase_date %}<bdi>{{ snapshot.last_purchase_date|date:"Y/m/d" }}</bdi>{% else %}<span class="ds-muted">تاریخ خرید ثبت نشده است</span>{% endif %}</td>
+            <td class="manager-customer-follow-up" role="cell" data-label="پیگیری ثبت‌شده">{% if customer.open_follow_ups %}{{ customer.open_follow_ups|length }} پیگیری باز<span class="manager-customer-secondary ds-caption ds-muted">نزدیک‌ترین موعد (میلادی): <bdi>{{ customer.open_follow_ups.0.due_date|date:"Y/m/d" }}</bdi></span>{% else %}<span class="ds-muted">پیگیری بازی ثبت نشده است</span>{% endif %}</td>
+            <td class="manager-customer-action" role="cell"><a class="ds-button ds-button--secondary" href="/customers/?customer_code={{ customer.customer_code|urlencode }}" aria-label="بررسی مشتری {{ customer.name }}">بررسی مشتری</a></td>
+        </tr>
+        {% endwith %}
+    {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p class="ds-state ds-state--empty" role="status">{% if query %}مشتری مطابق جستجو در محدوده دسترسی فعلی پیدا نشد.{% else %}مشتری فعالی برای نمایش وجود ندارد.{% endif %}</p>
+    {% endif %}
+    </section>
+    {% if page_obj.has_other_pages %}
+    <nav class="ds-row manager-customers-pagination" aria-label="صفحه‌بندی مشتریان">
+        {% if page_obj.has_previous %}<a class="ds-button ds-button--secondary" href="?q={{ query|urlencode }}&amp;page={{ page_obj.previous_page_number }}">صفحه قبل</a>{% endif %}
+        <span class="ds-caption ds-muted">صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}<a class="ds-button ds-button--secondary" href="?q={{ query|urlencode }}&amp;page={{ page_obj.next_page_number }}">صفحه بعد</a>{% endif %}
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}
