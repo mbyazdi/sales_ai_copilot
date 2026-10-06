@@ -18,7 +18,7 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
+from django.http import Http404, HttpResponseForbidden
 from rest_framework.permissions import IsAuthenticated
 from .services import (
     build_pre_visit_briefs,
@@ -1232,14 +1232,27 @@ class VisitCompleteAPIView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        visit = get_object_or_404(
-            Visit.objects.select_related(
-                "customer",
-                "salesperson",
-            ),
-            id=visit_id,
-            salesperson=salesperson,
-        )
+        # New review callers opt into current-customer scope. Legacy historical
+        # callers omitting customer_code retain the existing ownership contract.
+        visit_lookup = {"id": visit_id, "salesperson": salesperson}
+        if "customer_code" in request.data:
+            if request.user.is_staff:
+                return Response({"detail": "دسترسی به زمینه عملیاتی ویزیت مجاز نیست."}, status=403)
+            code = request.data.get("customer_code")
+            customer = customer_access_queryset(request.user).filter(
+                customer_code=code.strip() if isinstance(code, str) else "", is_active=True,
+            ).first()
+            if customer is None:
+                return Response({"detail": "زمینه ویزیت در دسترس نیست."}, status=404)
+            visit_lookup["customer"] = customer
+        try:
+            visit = get_object_or_404(
+                Visit.objects.select_related("customer", "salesperson"), **visit_lookup,
+            )
+        except Http404:
+            if "customer_code" in request.data:
+                return Response({"detail": "زمینه ویزیت در دسترس نیست."}, status=404)
+            raise
 
         if (
             visit.status

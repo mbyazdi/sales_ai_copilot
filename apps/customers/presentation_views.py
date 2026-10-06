@@ -45,6 +45,11 @@ def recommendation_presentation(request, customer_code):
     if visit:
         params["visit_id"] = visit.pk
     customer_url = "/customers/?" + urlencode(params)
+    end_url = customer_url
+    if visit:
+        end_url = reverse("visit-completion-review", args=[customer.customer_code, visit.pk])
+        if selected:
+            end_url += "?" + urlencode({"recommendation_id": selected.pk})
     base = reverse("recommendation-presentation", args=[customer.customer_code])
 
     def presentation_url(index):
@@ -74,7 +79,7 @@ def recommendation_presentation(request, customer_code):
         "previous_url": presentation_url(position - 1) if selected and position > 0 else None,
         "next_url": presentation_url(position + 1) if selected and position + 1 < len(recommendations) else None,
         "group_next_url": presentation_url(group_next) if group_next is not None else None,
-        "customer_url": customer_url, "brief_url": brief_url,
+        "customer_url": customer_url, "brief_url": brief_url, "end_url": end_url,
         "image_url": None,  # Reserved presentation adapter; no canonical media source exists yet.
     })
     response["Cache-Control"] = "no-store, private"

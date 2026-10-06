@@ -1,0 +1,42 @@
+{% load static %}
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>مرور ویزیت · {{ customer.name }}</title>
+<link rel="stylesheet" href="{% static 'css/design-system.css' %}?v=002b-1"><link rel="stylesheet" href="{% static 'visits/css/completion_review.css' %}?v=002j-1"></head>
+<body class="vr-page"><a class="vr-skip" href="#main-content">رفتن به مرور ویزیت</a>
+<main id="main-content" class="vr-container" tabindex="-1">
+    <header class="ds-page-header"><div><p class="vr-eyebrow">مرور پیش از پایان</p><h1 class="ds-title">مرور ویزیت مشتری</h1></div><a class="ds-button ds-button--quiet" href="{% url 'salesperson-dashboard' %}">فضای کار روزانه</a></header>
+    <section class="vr-context ds-surface" aria-label="مشتری و وضعیت ویزیت"><div><strong><bdi>{{ customer.name }}</bdi></strong><span class="ds-caption ds-muted"><bdi>{{ customer.customer_code }}</bdi> · ویزیت {{ visit.id }} · <bdi>{{ visit.visit_date|date:"Y/m/d" }}</bdi></span></div><span id="reviewVisitStatus" class="ds-badge">{% if visit.status == 'IN_PROGRESS' %}در حال انجام{% elif visit.status == 'COMPLETED' %}تکمیل‌شده{% elif visit.status == 'PLANNED' %}برنامه‌ریزی‌شده{% else %}لغوشده{% endif %}</span></section>
+    <div id="visitReview" data-visit-id="{{ visit.id }}" data-customer-code="{{ customer.customer_code }}" data-status="{{ visit.status }}" data-read-url="{% url 'visit-recommendation-outcomes' visit.id %}?customer_code={{ customer.customer_code|urlencode }}" data-complete-url="{% url 'visit-complete' visit.id %}">
+        <section id="reviewPanel" class="ds-stack" {% if completed %}hidden{% endif %}>
+            <section class="vr-results ds-surface ds-stack" aria-labelledby="results-title">
+                <h2 id="results-title" class="ds-heading">نتیجه‌های ثبت‌شده این ویزیت</h2>
+                <div class="vr-total"><span>پیشنهادهای دارای نتیجه ثبت‌شده</span><strong>{{ summary.resolved_recommendations }}</strong></div>
+                <dl class="vr-counts">
+                    <div><dt>خرید شد</dt><dd>{{ summary.purchased }}</dd></div><div><dt>علاقه‌مند شد</dt><dd>{{ summary.interested }}</dd></div><div><dt>نیاز به پیگیری</dt><dd>{{ summary.follow_up }}</dd></div><div><dt>رد شد</dt><dd>{{ summary.rejected }}</dd></div><div><dt>مطرح نشد</dt><dd>{{ summary.not_presented }}</dd></div>
+                </dl>
+                {% if not summary.resolved_recommendations %}<p class="ds-caption ds-muted">هنوز نتیجه‌ای برای پیشنهادهای این ویزیت ثبت نشده است. ثبت نتیجه شرط پایان ویزیت نیست.</p>{% endif %}
+                {% if summary.purchased %}<p class="ds-caption ds-muted">«خرید شد» نتیجه تعامل است؛ ثبت آن به معنی ایجاد سفارش، فاکتور یا پرداخت نیست.</p>{% endif %}
+                {% if unattributed_events %}<p class="ds-caption ds-muted">{{ unattributed_events }} رویداد بدون ارتباط با پیشنهاد در سابقه این ویزیت وجود دارد.</p>{% endif %}
+            </section>
+            <section class="vr-followup ds-surface ds-stack" aria-labelledby="followup-title">
+                <h2 id="followup-title" class="ds-heading">پیگیری بعد از ویزیت</h2>
+                {% if follow_up.open %}<p><strong>{{ follow_up.open }} پیگیری باز</strong>{% if follow_up.next_open_task %} · نزدیک‌ترین سررسید: <bdi>{{ follow_up.next_open_task.due_date|date:"Y/m/d" }}</bdi>{% endif %}</p>
+                {% elif summary.follow_up %}<p>نتیجه «نیاز به پیگیری» ثبت شده است؛ پیگیری زمان‌بندی‌شده بازی در داده‌های این ویزیت موجود نیست.</p>
+                {% else %}<p class="ds-muted">پیگیری بازی برای این ویزیت ثبت نشده است.</p>{% endif %}
+                {% if follow_up.done or follow_up.cancelled %}<p class="ds-caption ds-muted">انجام‌شده: {{ follow_up.done }} · لغوشده: {{ follow_up.cancelled }}</p>{% endif %}
+                {% if follow_up.open or summary.follow_up %}<a class="ds-button ds-button--quiet" href="{% url 'follow-up-dashboard' %}">مشاهده پیگیری‌های من</a>{% endif %}
+                {% if summary.follow_up %}<p class="ds-caption ds-muted">تعداد نتیجه‌های «نیاز به پیگیری» با تعداد کارهای پیگیری باز یکسان نیست.</p>{% endif %}
+            </section>
+            <p id="reviewReadStatus" class="ds-caption ds-muted" role="status">در حال بررسی وضعیت فعلی ویزیت…</p>
+            <p id="reviewError" class="ds-state ds-state--error" role="alert" hidden></p>
+            <button id="reviewRefresh" class="ds-button ds-button--quiet" type="button" hidden>دریافت دوباره وضعیت ویزیت</button>
+            {% if not can_finish %}<p class="ds-state ds-state--empty">این ویزیت در حال انجام نیست؛ پایان ویزیت از این وضعیت مجاز نیست.</p>{% endif %}
+            <div class="vr-actions"><button id="finishVisitButton" class="ds-button" type="button" disabled>پایان ویزیت</button><a class="ds-button ds-button--secondary" href="{{ guided_url }}">بازگشت به پیشنهادها</a></div>
+        </section>
+        <section id="completionAcknowledgement" class="vr-ack ds-surface ds-stack" role="status" {% if not completed %}hidden{% endif %}><h2 id="completionTitle" class="ds-title">ویزیت پایان‌یافته است</h2><p>ثبت نتیجه جدید از مسیر عملیاتی این ویزیت فعال نیست. پیگیری‌های موجود همچنان از فضای پیگیری‌ها قابل اقدام‌اند.</p><a class="ds-button" href="{% url 'salesperson-dashboard' %}">بازگشت به فضای کار روزانه</a>{% if follow_up.open %}<a class="ds-button ds-button--secondary" href="{% url 'follow-up-dashboard' %}">مشاهده پیگیری‌های من</a>{% endif %}</section>
+        <form id="visitCompletionForm">{% csrf_token %}</form>
+        <dialog id="finishVisitDialog" class="vr-confirm" aria-labelledby="finishVisitTitle"><h2 id="finishVisitTitle" class="ds-heading">ویزیت پایان یابد؟</h2><p>ویزیت تکمیل می‌شود و ثبت نتیجه جدید از مسیر عملیاتی این ویزیت فعال نخواهد بود. پیگیری‌های موجود همچنان قابل اقدام‌اند.</p><p id="finishPendingStatus" role="status" class="ds-caption ds-muted" hidden>در حال پایان ویزیت…</p><p id="finishDialogError" role="alert" class="ds-state ds-state--error" hidden></p><div class="ds-row"><button id="cancelFinishVisit" class="ds-button ds-button--secondary" type="button">ادامه مرور</button><button id="confirmFinishVisit" class="ds-button" type="button">تأیید پایان ویزیت</button></div></dialog>
+    </div>
+</main><script src="{% static 'visits/js/completion_review.js' %}?v=002j-1"></script></body>
+</html>

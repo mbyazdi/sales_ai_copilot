@@ -1,0 +1,32 @@
+/* Sparse visit review. No diagrams, financial assumptions or dashboard layout. */
+.vr-page { margin: 0; background: var(--ds-background); color: var(--ds-text); font: var(--ds-font-base)/var(--ds-line-height) var(--ds-font-family); }
+.vr-page *, .vr-page *::before { box-sizing: border-box; }
+.vr-page [hidden] { display: none !important; }
+.vr-page p, .vr-page dl { margin: 0; }
+.vr-page bdi, .vr-page strong, .vr-page p { overflow-wrap: anywhere; }
+.vr-container { width: min(720px, 100%); margin-inline: auto; padding: 16px 14px max(24px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 16px; }
+.vr-eyebrow { color: var(--ds-brand); font-size: var(--ds-font-xs); }
+.vr-context { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.vr-context > div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.vr-total { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 14px; background: var(--ds-brand-soft); border-radius: var(--ds-radius-md); }
+.vr-total strong { font-size: 2rem; color: var(--ds-brand); font-variant-numeric: tabular-nums; }
+.vr-counts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.vr-counts > div { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; background: var(--ds-surface-soft); border-radius: var(--ds-radius-md); }
+.vr-counts dt { font-size: var(--ds-font-sm); }
+.vr-counts dd { margin: 0; font-size: 1.25rem; font-weight: bold; font-variant-numeric: tabular-nums; }
+.vr-actions { display: flex; flex-direction: column; gap: 8px; }
+.vr-actions .ds-button { min-height: 48px; }
+.vr-ack { padding: 24px; }
+.vr-confirm { width: min(460px, calc(100% - 28px)); max-height: calc(100dvh - 28px); overflow-y: auto; border: 1px solid var(--ds-border); border-radius: var(--ds-radius-lg); padding: 22px; font-family: var(--ds-font-family); color: var(--ds-text); }
+.vr-confirm::backdrop { background: rgb(24 40 59 / 45%); }
+.vr-confirm p { margin-block: 14px; }
+.vr-confirm .ds-row { justify-content: flex-end; }
+.vr-page button { font-family: inherit; }
+.vr-page button:focus-visible, .vr-page a:focus-visible { outline: 3px solid var(--ds-focus); outline-offset: 3px; }
+.vr-skip { position: absolute; top: -60px; padding: 10px; background: var(--ds-surface); }
+.vr-skip:focus { top: 8px; }
+@media (min-width: 650px) {
+    .vr-container { padding: 28px; gap: 20px; }
+    .vr-actions { flex-direction: row; }
+    .vr-actions .ds-button { flex: 1; }
+}
