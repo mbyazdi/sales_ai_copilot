@@ -1,16 +1,25 @@
 <section id="workspace-recommendations" class="ds-stack" data-visit-id="{% if current_visit %}{{ current_visit.id }}{% endif %}" aria-labelledby="recommendations-title">
     <div class="ds-page-header"><div><h2 id="recommendations-title" class="ds-heading">{% if manager_inspection %}بررسی پیشنهادهای مشتری{% else %}پیشنهادها و نتیجه تعامل{% endif %}</h2><p class="ds-caption ds-muted">{% if manager_inspection %}مرور پیشنهادهای فعلی مشتری به ترتیب موتور پیشنهاددهی.{% else %}ترتیب پیشنهادها از موتور پیشنهاددهی است؛ ثبت نتیجه تنها در ویزیت در حال انجام فعال می‌شود.{% endif %}</p></div><span class="ds-badge">{{ recommendations|length }} پیشنهاد</span></div>
+    {% if not manager_inspection %}
+    <div class="ds-surface ds-page-header"><div><h3 class="ds-heading">نمایش ساده پیشنهادها</h3><p class="ds-caption ds-muted">در هر مرحله یک محصول را بررسی کنید و نتیجه تعامل را صریحاً ثبت کنید.</p></div><a class="ds-button" href="{% url 'recommendation-presentation' customer.customer_code %}{% if current_visit %}?visit_id={{ current_visit.id }}{% endif %}">شروع نمایش پیشنهادها</a></div>
+    <div id="visitOutcomeRegion" class="ds-stack" data-visit-id="{% if current_visit %}{{ current_visit.id }}{% endif %}" data-customer-code="{{ customer.customer_code }}" {% if current_visit %}data-read-url="{% url 'visit-recommendation-outcomes' current_visit.id %}?customer_code={{ customer.customer_code|urlencode }}"{% endif %} aria-busy="false">
+        <p class="ds-caption ds-muted">{% if current_visit %}نتیجه‌های این ویزیت · شماره {{ current_visit.id }} · <bdi>{{ current_visit.visit_date|date:"Y/m/d" }}</bdi>{% else %}ویزیتی انتخاب نشده است؛ نتیجه فعلی و امکان ثبت نتیجه در دسترس نیست.{% endif %}</p>
+        <p id="visitOutcomeReadStatus" class="ds-state" role="status">{% if current_visit %}در حال دریافت نتیجه‌های همین ویزیت…{% else %}برای ثبت نتیجه، ویزیت مجاز خود را از فضای کار روزانه یا پیگیری‌ها باز کنید.{% endif %}</p>
+        <button id="visitOutcomeRefresh" type="button" class="ds-button ds-button--quiet" {% if not current_visit %}hidden{% endif %}>دریافت دوباره نتیجه همین ویزیت</button>
+    </div>
+    {% endif %}
+    {% if not manager_inspection %}<details class="ds-surface"><summary>مرور فهرست پیشنهادها و نتیجه‌های ویزیت</summary><div class="ds-stack c360-detail-content">{% endif %}
     {% for recommendation in recommendations %}
-    <article class="recommendation-outcome-card ds-surface {% if forloop.first %}is-primary{% endif %}" data-recommendation-id="{{ recommendation.id }}" data-product-code="{{ recommendation.product.product_code }}">
+    <article id="recommendation-{{ recommendation.id }}" tabindex="-1" class="recommendation-outcome-card ds-surface {% if forloop.first %}is-primary{% endif %}" data-recommendation-id="{{ recommendation.id }}" data-product-code="{{ recommendation.product.product_code }}" aria-labelledby="recommendation-title-{{ recommendation.id }}">
         <div class="ds-page-header">
-            <div><h3 class="recommendation-product-name ds-heading">{{ recommendation.product.name }}</h3><p class="ds-caption ds-muted"><bdi>{{ recommendation.product.product_code }}</bdi> · {{ recommendation.product.category }}</p></div>
+            <div><h3 id="recommendation-title-{{ recommendation.id }}" class="recommendation-product-name ds-heading">{{ recommendation.product.name }}</h3><p class="ds-caption ds-muted"><bdi>{{ recommendation.product.product_code }}</bdi> · {{ recommendation.product.category }}</p></div>
             <div class="ds-row"><span class="ds-badge">{% if forloop.first %}پیشنهاد اصلی{% else %}گزینه جایگزین · رتبه {{ recommendation.rank }}{% endif %}</span><span class="ds-badge">امتیاز {{ recommendation.score|floatformat:0 }}</span><span class="ds-badge">{% include "core/customer_360/_recommendation_type.html" %}</span></div>
         </div>
         {% if recommendation.product.is_active %}<div class="ds-row"><a class="ds-button ds-button--secondary" href="{% url 'product-commercial-brief' recommendation.product.product_code %}?customer_code={{ customer.customer_code|urlencode }}{% if current_visit and not manager_inspection and current_visit.salesperson.user_id == request.user.id and current_visit.salesperson.is_active %}&amp;visit_id={{ current_visit.id }}{% endif %}" aria-label="بررسی محصول و شرایط فعلی {{ recommendation.product.name }} برای این مشتری">بررسی محصول و شرایط فعلی</a></div>{% endif %}
         <details><summary>{% if manager_inspection %}دلیل پیشنهاد{% else %}دلیل پیشنهاد و ثبت نتیجه{% endif %}</summary><div class="ds-stack c360-detail-content">
             {% if recommendation.reason %}<p>{{ recommendation.reason }}</p>{% else %}<p class="ds-caption ds-muted">دلیل تفصیلی ثبت نشده است.</p>{% endif %}
             {% if not manager_inspection %}
-            <p class="ds-caption ds-muted">ثبت نتیجه مربوط به همین پیشنهاد است؛ گزینه جایگزین، محصول اصلی تصمیم تجاری را تغییر نمی‌دهد.</p>
+            <p class="ds-caption ds-muted">برای ثبت یا به‌روزرسانی تعامل با همین پیشنهاد، نتیجه را صریحاً انتخاب کنید. «خرید شد» یک نتیجه ثبت‌شده است و سفارش یا فاکتور ایجاد نمی‌کند.</p>
             <div class="outcome-actions ds-row">
                 <button type="button" {% if current_visit.status != 'IN_PROGRESS' %}disabled{% endif %} class="outcome-btn ds-button ds-button--secondary" data-outcome="PURCHASED" data-recommendation-id="{{ recommendation.id }}" data-product-name="{{ recommendation.product.name }}" data-product-code="{{ recommendation.product.product_code }}">خرید شد</button>
                 <button type="button" {% if current_visit.status != 'IN_PROGRESS' %}disabled{% endif %} class="outcome-btn ds-button ds-button--secondary" data-outcome="INTERESTED" data-recommendation-id="{{ recommendation.id }}" data-product-name="{{ recommendation.product.name }}" data-product-code="{{ recommendation.product.product_code }}">علاقه‌مند شد</button>
@@ -20,7 +29,8 @@
             </div>
             {% endif %}
         </div></details>
-        {% if not manager_inspection %}<div class="recommendation-outcome-status" data-outcome-status="{{ recommendation.id }}"><span class="status-label">وضعیت:</span> <span class="status-value">هنوز ثبت نشده</span></div>{% endif %}
+        {% if not manager_inspection %}<div class="recommendation-outcome-status" data-outcome-status="{{ recommendation.id }}" aria-live="polite"><span class="status-label">نتیجه همین ویزیت:</span> <span class="status-value">{% if current_visit %}در حال دریافت…{% else %}بدون ویزیت انتخاب‌شده{% endif %}</span></div>{% endif %}
     </article>
     {% empty %}<p class="ds-state ds-state--empty">{% if manager_inspection %}پیشنهاد فعالی برای بررسی موجود نیست؛ اطلاعات مشتری و پیگیری‌ها را مرور کنید.{% else %}پیشنهادی برای ثبت نتیجه موجود نیست؛ اطلاعات مشتری و پیگیری‌ها را مرور کنید.{% endif %}</p>{% endfor %}
+    {% if not manager_inspection %}</div></details>{% endif %}
 </section>

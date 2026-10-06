@@ -1,0 +1,114 @@
+/* Focused in-visit leaf screen; the global dashboard/navigation shell is unchanged. */
+.gs-page { margin: 0; background: var(--ds-background); color: var(--ds-text); font: var(--ds-font-base)/var(--ds-line-height) var(--ds-font-family); }
+.gs-page *, .gs-page *::before, .gs-page *::after { box-sizing: border-box; }
+.gs-container { width: min(1140px, 100%); margin-inline: auto; padding: 12px 14px calc(90px + env(safe-area-inset-bottom)); }
+html:has(.gs-page) { scroll-padding-block-end: 100px; }
+.gs-page p, .gs-page h1, .gs-page h2 { margin: 0; }
+.gs-page [hidden] { display: none !important; }
+.gs-page bdi, .gs-page strong, .gs-page p { overflow-wrap: anywhere; }
+.gs-page a, .gs-page button { touch-action: manipulation; }
+.gs-page button { font-family: inherit; cursor: pointer; }
+.gs-skip { position: absolute; inset-inline-start: 12px; top: -60px; padding: 10px; background: var(--ds-surface); z-index: 1100; }
+.gs-skip:focus { top: 10px; }
+.gs-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-block-end: 12px; }
+.gs-salesperson { display: flex; align-items: center; gap: 10px; font-size: var(--ds-font-sm); }
+.gs-salesperson small { display: block; color: var(--ds-muted); }
+.gs-avatar { display: grid; place-items: center; width: 38px; height: 38px; flex-shrink: 0; border-radius: var(--ds-radius-md); background: var(--ds-brand); color: white; font-weight: bold; }
+.gs-customer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 14px 16px; background: var(--ds-surface); border-radius: var(--ds-radius-lg); }
+.gs-customer > div:first-child { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+.gs-customer > div:first-child > span { color: var(--ds-muted); font-size: var(--ds-font-xs); }
+.gs-visit { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: var(--ds-font-sm); }
+.gs-progress { padding: 14px 4px; }
+.gs-progress > div { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: var(--ds-font-sm); }
+.gs-progress progress { display: block; width: 100%; height: 5px; margin-block-start: 8px; accent-color: var(--ds-brand); border: 0; border-radius: var(--ds-radius-pill); }
+.gs-progress progress::-webkit-progress-bar { background: var(--ds-border); border-radius: var(--ds-radius-pill); }
+.gs-progress progress::-webkit-progress-value { background: var(--ds-brand); border-radius: var(--ds-radius-pill); }
+.gs-product { background: var(--ds-surface); border-radius: var(--ds-radius-lg); padding: 16px; display: grid; gap: 16px; box-shadow: var(--ds-shadow-sm); outline-offset: 3px; }
+.gs-product:focus { outline: 2px solid var(--ds-focus); }
+.gs-product > * { min-width: 0; }
+.gs-visual { position: relative; display: flex; align-items: center; justify-content: center; min-height: 170px; background: var(--ds-surface-soft); border-radius: var(--ds-radius-lg); overflow: hidden; }
+.gs-primary-badge { position: absolute; inset-inline-start: 12px; top: 12px; background: var(--ds-success-soft); color: var(--ds-success); z-index: 1; }
+.gs-image-fallback { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 20px; color: var(--ds-muted); text-align: center; font-size: var(--ds-font-sm); }
+.gs-image-fallback svg { width: 90px; height: 90px; fill: none; stroke: var(--ds-border-strong); stroke-width: 3; }
+.gs-product-image { display: block; width: 100%; height: 250px; object-fit: contain; padding: 20px; }
+.gs-product-copy { display: flex; flex-direction: column; gap: 12px; }
+.gs-brand { font-size: var(--ds-font-xs); color: var(--ds-brand); font-weight: var(--ds-weight-medium); }
+.gs-brand-row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; }
+.gs-current-type { font-size: var(--ds-font-sm); color: var(--ds-brand); }
+.gs-product h1 { font-size: 1.2rem; line-height: 1.5; }
+.gs-product-meta { font-size: var(--ds-font-sm); color: var(--ds-muted); }
+.gs-selling-message { background: var(--ds-brand-soft); padding: 12px 14px; border-radius: var(--ds-radius-md); }
+.gs-selling-message small { display: block; color: var(--ds-muted); font-size: var(--ds-font-xs); margin-block-end: 4px; }
+.gs-stock { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; padding: 12px 14px; background: var(--ds-surface-soft); border-radius: var(--ds-radius-md); }
+.gs-stock--positive { background: var(--ds-success-soft); color: var(--ds-success); }
+.gs-stock > div { display: flex; flex-direction: column; gap: 2px; }
+.gs-stock strong { font-size: var(--ds-font-lg); }
+.gs-stock small, .gs-no-offer { font-size: var(--ds-font-sm); }
+.gs-offer { padding: 12px 14px; border-radius: var(--ds-radius-md); background: var(--ds-warning-soft); font-size: var(--ds-font-sm); }
+.gs-offer small { color: var(--ds-muted); }
+.gs-explanation summary { cursor: pointer; min-height: 44px; display: list-item; padding: 9px 0; color: var(--ds-brand); font-size: var(--ds-font-sm); }
+.gs-explanation p { padding-block-end: 10px; }
+.gs-more { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: start; }
+.gs-more .gs-explanation[open] { grid-column: 1 / -1; }
+.gs-product-copy:has(.gs-explanation[open]) .gs-selling-message { display: none; }
+.gs-interaction { display: flex; flex-direction: column; gap: 10px; }
+.gs-interaction #visitOutcomeReadStatus { margin: 0; color: var(--ds-muted); font-size: var(--ds-font-sm); }
+.gs-interaction #visitOutcomeReadStatus.ds-state--error { color: var(--ds-danger); padding: 8px; }
+.gs-interaction #visitOutcomeRefresh { font-size: var(--ds-font-xs); min-height: 44px; padding: 4px 8px; }
+.gs-interaction #visitOutcomeRegion { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+.gs-interaction #visitOutcomeRegion[data-state="ready"], .gs-interaction #visitOutcomeRegion[data-state="empty"] { display: none; }
+.gs-interaction .recommendation-outcome-status { font-size: var(--ds-font-sm); padding: 6px 0; }
+.gs-outcomes { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.gs-outcome { display: flex; align-items: center; justify-content: center; min-height: 56px; padding: 8px 4px; border: 1px solid var(--ds-border); border-radius: var(--ds-radius-md); background: var(--ds-surface-soft); color: var(--ds-text); font-size: .75rem; font-weight: var(--ds-weight-medium); line-height: 1.65; }
+.gs-outcome--purchase { color: var(--ds-success); background: var(--ds-success-soft); }
+.gs-outcome--interest { color: var(--ds-info); background: var(--ds-info-soft); }
+.gs-outcome--follow { color: var(--ds-warning); background: var(--ds-warning-soft); }
+.gs-outcome--reject { color: var(--ds-danger); background: var(--ds-danger-soft); }
+.gs-outcome:disabled { color: var(--ds-muted); background: var(--ds-surface-soft); cursor: not-allowed; }
+.gs-product-link { width: 100%; }
+.gs-navigation { position: static; width: min(1140px, 100%); margin-inline: auto; display: grid; grid-template-columns: minmax(80px, 1fr) minmax(0, 1.2fr) minmax(80px, 1fr); align-items: center; gap: 8px; padding: 10px 14px max(10px, env(safe-area-inset-bottom)); background: var(--ds-background); border-block-start: 1px solid var(--ds-border); }
+.gs-navigation > span { text-align: center; font-size: var(--ds-font-sm); }
+.gs-navigation .ds-button { padding-inline: 10px; }
+.gs-completion { display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding-block-start: 8px; border-block-start: 1px solid var(--ds-border); }
+.gs-completion button { font-size: var(--ds-font-sm); }
+.gs-completion small { color: var(--ds-muted); font-size: var(--ds-font-xs); text-align: center; }
+.gs-confirm { max-width: min(460px, calc(100% - 32px)); padding: 24px; border: 1px solid var(--ds-border); border-radius: var(--ds-radius-lg); font-family: inherit; color: var(--ds-text); }
+.gs-confirm::backdrop { background: rgb(24 40 59 / 45%); }
+.gs-confirm p { margin-block: 14px; }
+.gs-confirm .ds-row { justify-content: flex-end; }
+.gs-empty { padding: 28px 16px; background: var(--ds-surface); border-radius: var(--ds-radius-lg); margin-block-start: 20px; }
+.gs-page button:focus-visible, .gs-page a:focus-visible, .gs-page summary:focus-visible { outline: 3px solid var(--ds-focus); outline-offset: 3px; }
+@media (max-width: 649px) {
+    /* Pagination owns its document row. It never overlays scrolling product content. */
+    .gs-container { padding: 8px 12px max(16px, env(safe-area-inset-bottom)); }
+    html:has(.gs-page) { scroll-padding-block-end: 12px; }
+    .gs-header { margin-block-end: 8px; gap: 8px; }
+    .gs-salesperson { gap: 8px; }
+    .gs-avatar { width: 34px; height: 34px; }
+    .gs-customer { padding: 10px 12px; gap: 8px; }
+    .gs-progress { padding: 10px 2px; }
+    .gs-progress progress { margin-block-start: 6px; }
+    .gs-product { padding: 14px; gap: 10px; }
+    .gs-visual { min-height: 130px; }
+    .gs-image-fallback { padding: 16px; gap: 8px; }
+    .gs-image-fallback svg { width: 70px; height: 70px; }
+    .gs-product-image { height: 180px; padding: 12px; }
+    .gs-product-copy { gap: 10px; }
+    .gs-selling-message { padding: 10px 12px; }
+    .gs-navigation { position: static; width: 100%; margin-block-start: 12px; padding: 10px 0 max(10px, env(safe-area-inset-bottom)); }
+}
+@media (min-width: 650px) {
+    .gs-container { padding: 20px 28px; }
+    .gs-customer { padding: 16px 20px; }
+    .gs-product { grid-template-columns: minmax(0, 1.2fr) minmax(220px, .9fr); gap: 20px; padding: 22px; }
+    .gs-visual { grid-column: 2; grid-row: 1; min-height: 300px; }
+    .gs-product-copy { grid-column: 1; grid-row: 1; }
+    .gs-interaction { grid-column: 1 / -1; }
+    .gs-product-image { height: 340px; }
+    .gs-outcomes { max-width: 660px; width: 100%; align-self: center; }
+    .gs-product-link { width: 100%; }
+    .gs-completion { flex-direction: row; justify-content: center; flex-wrap: wrap; }
+    .gs-completion small { flex-basis: 100%; }
+    .gs-navigation { position: static; margin-block-start: 14px; padding-inline: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .gs-page * { scroll-behavior: auto; } }

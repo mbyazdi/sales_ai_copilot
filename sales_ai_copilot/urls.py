@@ -1,8 +1,11 @@
 from django.contrib import admin
 from django.urls import include, path
 from django.contrib.auth import views as auth_views
+from apps.customers.presentation_views import recommendation_presentation
 
 urlpatterns = [
+
+    path("customers/<str:customer_code>/recommendations/presentation/", recommendation_presentation, name="recommendation-presentation"),
 
     path("products/", include("apps.products.urls")),
 

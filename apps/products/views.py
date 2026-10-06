@@ -6,6 +6,7 @@ from decimal import Decimal, InvalidOperation
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_safe
 
@@ -107,6 +108,14 @@ def product_commercial_brief(request, product_code):
     return_query = {"customer_code": customer.customer_code}
     if visit:
         return_query["visit_id"] = visit.pk
+    return_url = "/customers/?" + urlencode(return_query) + (
+        f"#recommendation-{recommendation.pk}" if recommendation else "#workspace-recommendations"
+    )
+    if request.GET.get("return_to") == "presentation" and not request.user.is_staff and recommendation:
+        query = {"recommendation_id": recommendation.pk}
+        if visit:
+            query["visit_id"] = visit.pk
+        return_url = reverse("recommendation-presentation", args=[customer.customer_code]) + "?" + urlencode(query) + f"#recommendation-{recommendation.pk}"
     return render(request, "core/product_detail.html", {
         "product": product, "customer": customer, "commercial": commercial,
         "as_of_date": today, "recommendation": recommendation,
@@ -122,5 +131,5 @@ def product_commercial_brief(request, product_code):
         "visit": visit, "manager_inspection": request.user.is_staff,
         # The legacy customer URL name is included under both HTML and API
         # prefixes; use the canonical HTML entry rather than its ambiguous reverse.
-        "return_url": "/customers/?" + urlencode(return_query) + "#workspace-recommendations",
+        "return_url": return_url,
     })

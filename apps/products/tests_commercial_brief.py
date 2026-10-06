@@ -164,7 +164,7 @@ class ProductCommercialBriefTests(TestCase):
         self.assertEqual(response.context["visit"].pk, self.visits[0].pk)
         url = urlsplit(response.context["return_url"])
         self.assertEqual(url.path, "/customers/")
-        self.assertEqual(url.fragment, "workspace-recommendations")
+        self.assertEqual(url.fragment, f"recommendation-{self.recommendation.pk}")
         self.assertEqual(parse_qs(url.query), {
             "customer_code": [self.customer.customer_code], "visit_id": [str(self.visits[0].pk)],
         })

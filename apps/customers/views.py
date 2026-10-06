@@ -142,7 +142,7 @@ def customer_search(request):
 
                     current_visit_id = int(
                         visit_id
-                    )
+                    ) if visit_id.isascii() and visit_id.isdecimal() and len(visit_id) <= 18 else None
 
                 except (
                     TypeError,
@@ -159,6 +159,8 @@ def customer_search(request):
                         .filter(
                             id=current_visit_id,
                             customer=customer,
+                            salesperson__user=request.user,
+                            salesperson__is_active=True,
                         )
                         .select_related(
                             "salesperson",

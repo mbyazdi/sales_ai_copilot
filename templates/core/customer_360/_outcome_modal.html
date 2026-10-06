@@ -1,10 +1,11 @@
 <div
     id="outcomeModal"
-    class="outcome-modal"
+    class="outcome-modal ri-modal"
     aria-hidden="true"
+    hidden
 >
     <div
-        class="outcome-modal-card"
+        class="outcome-modal-card ds-stack"
         role="dialog"
         aria-modal="true"
         aria-labelledby="outcomeModalTitle"
@@ -18,7 +19,7 @@
                     id="outcomeModalTitle"
                     class="outcome-modal-title"
                 >
-                    ثبت نتیجه جلسه فروش
+                    ثبت نتیجه تعامل با پیشنهاد
                 </div>
 
                 <div
@@ -44,8 +45,17 @@
 
         </div>
 
+        <div class="ri-context ds-surface ds-stack">
+            <p class="ds-caption">مشتری: <strong>{{ customer.name }}</strong> · <bdi>{{ customer.customer_code }}</bdi></p>
+            <p id="outcomeModalVisit" class="ds-caption"></p>
+            <p id="outcomeModalCurrent" class="ds-caption ds-muted"></p>
+        </div>
 
-        <form id="outcomeForm">
+
+        <form id="outcomeForm" class="ds-stack">
+            {% csrf_token %}
+            <div class="ri-value-fields ds-stack">
+            <p class="ds-caption ds-muted">تعداد و مبلغ را مطابق نتیجه تعامل وارد کنید؛ مبلغ از قیمت محصول محاسبه نمی‌شود و واحد پول در داده‌ها مشخص نشده است.</p>
 
             <div class="outcome-form-group">
 
@@ -58,7 +68,7 @@
 
                 <input
                     id="outcomeQuantity"
-                    class="outcome-form-input"
+                    class="outcome-form-input ds-control"
                     type="number"
                     min="0"
                     step="1"
@@ -79,12 +89,14 @@
 
                 <input
                     id="outcomeSalesAmount"
-                    class="outcome-form-input"
+                    class="outcome-form-input ds-control"
                     type="number"
                     min="0"
                     step="0.01"
                     value="0"
                 >
+
+            </div>
 
             </div>
 
@@ -103,7 +115,7 @@
 
                 <input
                     id="outcomeFollowUpDate"
-                    class="outcome-form-input"
+                    class="outcome-form-input ds-control"
                     type="date"
                 >
 
@@ -120,7 +132,7 @@
 
                 <textarea
                     id="outcomeNotes"
-                    class="outcome-form-textarea"
+                    class="outcome-form-textarea ds-control"
                     placeholder="توضیح کوتاه درباره نتیجه جلسه..."
                 ></textarea>
 
@@ -130,11 +142,15 @@
             <div
                 id="outcomeError"
                 class="outcome-error"
+                role="alert"
+                hidden
             ></div>
 
             <div
                 id="outcomeSuccess"
                 class="outcome-success"
+                role="status"
+                hidden
             ></div>
 
 
@@ -143,7 +159,7 @@
                 <button
                     type="button"
                     id="outcomeCancel"
-                    class="outcome-cancel-btn"
+                    class="outcome-cancel-btn ds-button ds-button--secondary"
                 >
                     انصراف
                 </button>
@@ -151,9 +167,9 @@
                 <button
                     type="submit"
                     id="outcomeSubmit"
-                    class="outcome-submit-btn"
+                    class="outcome-submit-btn ds-button"
                 >
-                    ثبت نتیجه جلسه
+                    ثبت نتیجه تعامل
                 </button>
 
             </div>

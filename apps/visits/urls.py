@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import salesperson_dashboard
+from .outcome_views import VisitRecommendationOutcomesAPIView
 
 from .views import (
     SalesOutcomeCreateAPIView,
@@ -16,6 +17,11 @@ from .views import (
 
 
 urlpatterns = [
+    path(
+        "v1/visits/<int:visit_id>/recommendation-outcomes/",
+        VisitRecommendationOutcomesAPIView.as_view(),
+        name="visit-recommendation-outcomes",
+    ),
     path(
         "",
         salesperson_dashboard,

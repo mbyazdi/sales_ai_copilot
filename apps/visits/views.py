@@ -481,6 +481,21 @@ class SalesOutcomeCreateAPIView(APIView):
         # GET VISIT
         # =========================================
 
+        # Optional current-customer context for the Customer360 interaction.
+        # Historical owned-visit callers omitting this field retain their existing
+        # contract. Re-check assignment at write time, not just in page JavaScript.
+        visit_lookup = {"id": visit_id, "salesperson": salesperson}
+        if "customer_code" in request.data:
+            if request.user.is_staff:
+                return Response({"detail": "دسترسی به زمینه عملیاتی ویزیت مجاز نیست."}, status=403)
+            code = request.data.get("customer_code")
+            scoped_customer = customer_access_queryset(request.user).filter(
+                customer_code=code.strip() if isinstance(code, str) else "", is_active=True,
+            ).first()
+            if scoped_customer is None:
+                return Response({"detail": "Visit not found."}, status=status.HTTP_404_NOT_FOUND)
+            visit_lookup["customer"] = scoped_customer
+
         try:
 
             visit = (
@@ -490,8 +505,7 @@ class SalesOutcomeCreateAPIView(APIView):
                     "salesperson",
                 )
                 .get(
-                    id=visit_id,
-                    salesperson=salesperson,
+                    **visit_lookup,
                 )
             )
 
