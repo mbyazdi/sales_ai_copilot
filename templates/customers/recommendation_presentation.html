@@ -3,59 +3,80 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>نمایش پیشنهادها · {{ customer.name }}</title>
+    <title>فروش هوشمند · {{ customer.name }}</title>
     <link rel="stylesheet" href="{% static 'css/design-system.css' %}?v=002b-1">
-    <link rel="stylesheet" href="{% static 'core/css/recommendation_outcome.css' %}?v=002p-1">
     <link rel="stylesheet" href="{% static 'core/css/recommendation_presentation.css' %}?v=002i-1">
     <link rel="stylesheet" href="{% static 'css/salesperson_journey.css' %}?v=002p-1">
+    <link rel="stylesheet" href="{% static 'core/css/guided_catalog.css' %}?v=2b-final-1">
 </head>
-<body class="gs-page">
-<a class="gs-skip" href="#main-content">رفتن به پیشنهاد محصول</a>
+<body class="gs-page gc-page">
+<a class="gs-skip" href="#main-content">رفتن به فهرست محصولات</a>
 <div class="gs-container">
-    {% include "components/salesperson_context.html" with salesperson=salesperson back_url=customer_url back_label="خروج و بازگشت" only %}
-    <section class="gs-customer" aria-label="زمینه مشتری و ویزیت"><div><strong><bdi>{{ customer.name }}</bdi></strong><span><bdi>{{ customer.customer_code }}</bdi></span></div><div class="gs-visit">{% if current_visit %}<span>ویزیت <bdi>{{ current_visit.id }}</bdi> · <bdi>{{ current_visit.visit_date|date:"Y/m/d" }}</bdi></span><span class="ds-badge" data-status="{{ current_visit.status }}">{% if current_visit.status == 'IN_PROGRESS' %}در حال انجام{% elif current_visit.status == 'PLANNED' %}برنامه‌ریزی‌شده{% elif current_visit.status == 'COMPLETED' %}تکمیل‌شده{% else %}لغوشده{% endif %}</span>{% else %}<span class="ds-muted">بدون ویزیت انتخاب‌شده · فقط مشاهده</span>{% endif %}</div></section>
+    <header class="gc-appbar">
+        <h1 class="ds-title">فروش هوشمند</h1>
+        {% include "components/salesperson_context.html" with salesperson=salesperson back_url=customer_url back_label="نمای مشتری" only %}
+    </header>
+    <section class="gc-context" aria-label="مشتری و ویزیت انتخاب‌شده">
+        <div class="gc-customer">
+            {% if customer.grade %}<span class="gc-grade" aria-label="رتبه مشتری"><bdi>{{ customer.grade.code }}</bdi></span>{% endif %}
+            <div class="gc-customer-copy"><strong><bdi>{{ customer.name }}</bdi></strong><span class="gc-customer-code"><bdi>{{ customer.customer_code }}</bdi></span></div>
+        </div>
+        <div class="gc-customer-image" aria-label="تصویر مشتری ثبت نشده است"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M10 26h44v28H10zM7 26l6-15h38l6 15M7 26c0 6 10 6 10 0 0 6 10 6 10 0 0 6 10 6 10 0 0 6 10 6 10 0 0 6 10 6 10 0M18 54V37h13v17M39 37h8v9h-8z"/></svg></div>
+        <div class="gs-visit">{% if current_visit %}<span>ویزیت <bdi>{{ current_visit.id }}</bdi> · <bdi>{{ current_visit.visit_date|date:"Y/m/d" }}</bdi></span><span class="ds-badge" data-status="{{ current_visit.status }}">{% if current_visit.status == 'IN_PROGRESS' %}در حال انجام{% elif current_visit.status == 'PLANNED' %}برنامه‌ریزی‌شده{% elif current_visit.status == 'COMPLETED' %}تکمیل‌شده{% else %}لغوشده{% endif %}</span>{% else %}<span class="ds-muted">بدون ویزیت انتخاب‌شده · فقط مشاهده</span>{% endif %}</div>
+    </section>
     <main id="main-content" tabindex="-1">
-    {% if recommendation %}
-        <div class="gs-progress"><div><strong>پیشنهاد {{ position }} از {{ total }}</strong><span class="ds-muted">{{ remaining }} پیشنهاد پس از این</span></div><progress value="{{ position }}" max="{{ total }}" aria-label="جایگاه در نمایش پیشنهادها"></progress></div>
-        <section id="workspace-recommendations" data-guided="true" aria-label="نمایش یک محصول پیشنهادی">
-        <article id="recommendation-{{ recommendation.id }}" class="recommendation-outcome-card gs-product" tabindex="-1" data-recommendation-id="{{ recommendation.id }}" data-product-code="{{ recommendation.product.product_code }}" aria-labelledby="product-title">
-            <div class="gs-visual">
-                {% if position == 1 %}<span class="ds-badge gs-primary-badge">پیشنهاد اصلی</span>{% endif %}
-                {% if image_url %}<img class="gs-product-image" src="{{ image_url }}" alt="{{ recommendation.product.name }}" data-product-image>{% endif %}
-                <div class="gs-image-fallback" {% if image_url %}hidden{% endif %}><svg viewBox="0 0 120 120" role="img" aria-label="تصویر محصول در دسترس نیست"><rect x="22" y="20" width="76" height="80" rx="12"/><path d="M22 75 45 52 62 70 76 58 98 80"/><circle cx="78" cy="42" r="7"/></svg><span>تصویر محصول ثبت نشده است</span></div>
-            </div>
-            <div class="gs-product-copy">
-                <div class="gs-brand-row">{% if commercial %}<p class="gs-brand"><bdi>{{ recommendation.product.brand.name }}</bdi></p>{% endif %}<span class="gs-current-type">گروه: {% include "core/customer_360/_recommendation_type.html" %}</span></div>
-                {% if commercial %}
-                <h1 id="product-title" class="recommendation-product-name"><bdi>{{ recommendation.product.name }}</bdi></h1>
-                <p class="gs-product-meta"><bdi>{{ recommendation.product.product_code }}</bdi> · <bdi>{{ recommendation.product.category }}</bdi></p>
-                <div class="gs-selling-message"><small>پیام پیشنهاد ثبت‌شده</small><p>{% if short_reason %}{{ short_reason }}{% else %}دلیل متنی برای این پیشنهاد ثبت نشده است.{% endif %}</p></div>
-                <div class="gs-stock {% if commercial.inventory.is_in_stock %}gs-stock--positive{% endif %}"><div><span>موجودی فعلی</span>{% if commercial.inventory.has_record %}<strong><bdi>{{ commercial.inventory.sellable_quantity }} {{ recommendation.product.unit }}</bdi></strong>{% else %}<strong>اطلاعات موجودی در دسترس نیست</strong>{% endif %}</div>{% if commercial.inventory.has_record %}<small>{% if not commercial.inventory.is_in_stock %}ناموجود برای فروش{% elif commercial.inventory.is_low_stock %}موجودی کم{% else %}قابل فروش{% endif %}</small>{% endif %}</div>
-                {% if commercial.promotions %}<div class="gs-offer"><strong>طرح فعلی برای این مشتری</strong>{% for promotion in commercial.promotions %}<p>{{ promotion.name }}{% if promotion.discount_percent != None %} · {{ promotion.discount_percent|floatformat:"-2" }}٪{% endif %}</p>{% endfor %}<small>شرایط کامل در بررسی محصول؛ طرح به معنی تأیید اعتبار مالی نیست.</small></div>{% else %}<p class="gs-no-offer ds-muted">طرح فعلیِ واجد شرایط ندارد.</p>{% endif %}
-                {% else %}<h1 id="product-title" class="recommendation-product-name">محصول این پیشنهاد در دسترس نیست</h1><p class="ds-state ds-state--empty">از پیشنهاد بعدی استفاده کنید یا به نمای مشتری بازگردید.</p>{% endif %}
-                <div class="gs-more"><details class="gs-explanation"><summary>چرا این پیشنهاد؟</summary><p>{% if recommendation.reason %}{{ recommendation.reason|linebreaksbr }}{% else %}دلیل متنی ثبت نشده است.{% endif %}</p><p class="ds-caption ds-muted">این توضیح ذخیره‌شده است؛ موجودی و طرح‌های بالا وضعیت فعلی را نشان می‌دهند.</p></details>{% if brief_url %}<a class="ds-button ds-button--secondary gs-product-link" href="{{ brief_url }}">بررسی محصول</a>{% endif %}</div>
-            </div>
-            <div class="gs-interaction">
-                <div id="visitOutcomeRegion" data-visit-id="{% if current_visit %}{{ current_visit.id }}{% endif %}" data-customer-code="{{ customer.customer_code }}" {% if current_visit %}data-read-url="{% url 'visit-recommendation-outcomes' current_visit.id %}?customer_code={{ customer.customer_code|urlencode }}"{% endif %} aria-busy="false"><p id="visitOutcomeReadStatus" role="status">{% if current_visit %}در حال دریافت نتیجه همین ویزیت…{% else %}برای ثبت نتیجه، ویزیت مجاز را انتخاب کنید.{% endif %}</p><button id="visitOutcomeRefresh" type="button" class="ds-button ds-button--quiet" {% if not current_visit %}hidden{% endif %}>دریافت دوباره نتیجه</button></div>
-                <div class="recommendation-outcome-status" data-outcome-status="{{ recommendation.id }}" aria-live="polite"><span class="status-label">نتیجه همین ویزیت: </span><span class="status-value">{% if current_visit %}در حال دریافت…{% else %}بدون ویزیت انتخاب‌شده{% endif %}</span></div>
-                <div class="gs-outcomes" aria-label="انتخاب صریح نتیجه تعامل">
-                    <button type="button" class="outcome-btn gs-outcome gs-outcome--purchase" disabled {% if not commercial %}data-unavailable="true"{% endif %} data-outcome="PURCHASED">خرید شد</button>
-                    <button type="button" class="outcome-btn gs-outcome gs-outcome--interest" disabled {% if not commercial %}data-unavailable="true"{% endif %} data-outcome="INTERESTED">علاقه‌مند شد</button>
-                    <button type="button" class="outcome-btn gs-outcome gs-outcome--follow" disabled {% if not commercial %}data-unavailable="true"{% endif %} data-outcome="FOLLOW_UP">نیاز به پیگیری</button>
-                    <button type="button" class="outcome-btn gs-outcome gs-outcome--reject" disabled {% if not commercial %}data-unavailable="true"{% endif %} data-outcome="REJECTED">رد شد</button>
-                    <button type="button" class="outcome-btn gs-outcome" disabled {% if not commercial %}data-unavailable="true"{% endif %} data-outcome="NOT_PRESENTED">مطرح نشد</button>
+    {% if current_visit and current_visit.status == 'IN_PROGRESS' or current_visit and current_visit.status == 'PLANNED' %}
+        <div id="guidedCatalog" data-api-url="{% url 'product-catalog-v1' %}" data-customer-code="{{ customer.customer_code }}" data-visit-id="{{ current_visit.id }}" aria-busy="true">
+            <form id="catalogFilters" class="gc-filters" method="get" aria-label="جستجو و فیلتر محصولات">
+                <div id="catalogCategoryChips" class="gc-category-chips" aria-label="دسته‌بندی محصولات"></div>
+                <div class="gc-search"><label class="gc-sr-only" for="catalogSearch">جستجوی محصول</label><input id="catalogSearch" class="ds-control" name="q" type="search" maxlength="200" placeholder="جستجوی نام یا کد کالا…" disabled><button id="catalogApply" class="gc-search-submit" type="submit" aria-label="جستجوی محصولات" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg></button></div>
+                <button id="catalogFiltersToggle" class="gc-filter-toggle" type="button" aria-expanded="false" aria-controls="catalogFilterOptions"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>فیلترها</button>
+                <div id="catalogFilterOptions" class="gc-filter-options" hidden>
+                    <fieldset class="gc-priority-options"><legend>اولویت محصولات</legend><div class="gc-catalog-tabs" aria-label="اولویت محصولات">
+                        <button id="catalogAllTab" type="button" data-priority-filter="all" aria-pressed="true" disabled>همه محصولات <span id="catalogAllCount" class="gc-tab-count"></span></button>
+                        <button id="catalogPriorityTab" type="button" data-priority-filter="prioritized" aria-pressed="false" disabled>اولویت‌دار <span id="catalogPriorityCount" class="gc-tab-count"></span></button>
+                        <button id="catalogOrdinaryTab" type="button" data-priority-filter="ordinary" aria-pressed="false" disabled>بدون اولویت ویژه <span id="catalogOrdinaryCount" class="gc-tab-count"></span></button>
+                    </div></fieldset>
+                    <div><label for="catalogCategory">دسته‌بندی</label><select id="catalogCategory" class="ds-control" name="category_id" disabled><option value="">همه دسته‌ها</option></select></div>
+                    <div><label for="catalogPriority">نمایش</label><select id="catalogPriority" class="ds-control" name="priority" disabled><option value="all">همه محصولات</option><option value="prioritized">اولویت‌دار</option><option value="ordinary">بدون اولویت ویژه</option></select></div>
+                    <button id="catalogReset" class="ds-button ds-button--quiet" type="button" disabled>پاک‌کردن فیلترها</button>
                 </div>
+            </form>
+            <p id="catalogStatus" class="gc-status" role="status" aria-live="polite">در حال دریافت فهرست محصولات…</p>
+            <div id="catalogError" class="ds-state ds-state--error" role="alert" hidden><p id="catalogErrorText"></p><div class="gc-error-actions"><button id="catalogRetry" class="ds-button ds-button--secondary" type="button">تلاش دوباره</button><a class="ds-button ds-button--quiet" href="{{ customer_url }}">بازگشت به نمای مشتری</a></div></div>
+            <div id="catalogResults" hidden>
+                <p id="catalogSummary" class="gc-summary"></p>
+                <p id="catalogNoPriority" class="ds-state ds-state--empty" hidden>پیشنهاد ویژه‌ای ثبت نشده است؛ همه محصولات را بررسی کنید.</p>
+                <div id="catalogEmpty" class="ds-state ds-state--empty" hidden><p id="catalogEmptyText"></p></div>
+                <details id="catalogPrioritized" class="gc-group" aria-labelledby="catalogPrioritizedTitle" open hidden><summary class="gc-section-heading"><h2 id="catalogPrioritizedTitle"><span class="gc-spark" aria-hidden="true">✧</span> پیشنهادهای هوشمند برای این مشتری (<span id="catalogSmartGroupCount"></span>)</h2></summary><div id="catalogPrioritizedItems" class="gc-grid"></div></details>
+                <details id="catalogOrdinary" class="gc-group" aria-labelledby="catalogOrdinaryTitle" open hidden><summary class="gc-section-heading"><h2 id="catalogOrdinaryTitle">سایر محصولات قابل ارائه (<span id="catalogOrdinaryGroupCount"></span>) <small>بدون اولویت ویژه</small></h2></summary><div id="catalogOrdinaryItems" class="gc-grid"></div></details>
+                <nav id="catalogPagination" class="gc-pagination" aria-label="صفحه‌های فهرست محصولات" hidden><button id="catalogPrevious" class="ds-button ds-button--secondary" type="button">صفحه قبلی</button><span id="catalogPageLabel"></span><button id="catalogNext" class="ds-button ds-button--secondary" type="button">صفحه بعدی</button></nav>
             </div>
-        </article>
-        </section>
-        <nav class="gs-navigation" aria-label="حرکت میان پیشنهادها">{% if previous_url %}<a class="ds-button ds-button--secondary" data-previous href="{{ previous_url }}"><span aria-hidden="true">→</span> قبلی</a>{% else %}<button class="ds-button ds-button--secondary" data-previous disabled>قبلی</button>{% endif %}<span>پیشنهاد {{ position }} از {{ total }}</span>{% if next_url %}<a class="ds-button" data-next href="{{ next_url }}">بعدی <span aria-hidden="true">←</span></a>{% else %}<button class="ds-button" data-next disabled>آخرین پیشنهاد</button>{% endif %}</nav>
-        <div class="gs-completion"><button id="endGroup" type="button" class="ds-button ds-button--quiet" {% if group_next_url %}data-next-group="{{ group_next_url }}"{% endif %}>پایان این گروه</button><button id="endAll" type="button" class="ds-button ds-button--quiet">پایان نمایش همه پیشنهادها</button><small>این کنترل‌ها فقط نمایش را جابه‌جا یا بسته می‌کنند؛ نتیجه‌ای ثبت و ویزیتی تکمیل نمی‌شود.</small></div>
-        <dialog id="endPresentationDialog" class="gs-confirm" aria-labelledby="endPresentationTitle"><h2 id="endPresentationTitle" class="ds-heading">پایان نمایش پیشنهادها؟</h2><p>{% if current_visit %}برای مرور نتیجه‌ها به مرور ویزیت می‌روید.{% else %}به نمای مشتری بازمی‌گردید.{% endif %} نتیجه ثبت‌شده‌ای تغییر نمی‌کند و ویزیت پایان نمی‌یابد.</p><div class="ds-row"><button id="continuePresentation" type="button" class="ds-button ds-button--secondary">ادامه نمایش</button><a id="confirmEndPresentation" class="ds-button" href="{{ end_url }}">پایان نمایش</a></div></dialog>
-        {% include "core/customer_360/_outcome_modal.html" %}
-    {% else %}<section class="gs-empty ds-stack"><h1 class="ds-title">پیشنهاد فعالی موجود نیست</h1><p>برای این مشتری پیشنهادی برای نمایش ثبت نشده است.</p><a class="ds-button ds-button--secondary" href="{{ customer_url }}">بازگشت به نمای مشتری</a></section>{% endif %}
+            <noscript><p class="ds-state ds-state--empty">برای نمایش فهرست محصولات، جاوااسکریپت مرورگر را فعال کنید.</p></noscript>
+        </div>
+        <template id="catalogCardTemplate">
+            <article class="gc-card" tabindex="-1">
+                <div class="gc-card-body">
+                <div class="gc-media"><img data-image hidden alt=""><div data-image-fallback class="gc-image-fallback"><svg viewBox="0 0 120 120" aria-hidden="true"><rect x="22" y="20" width="76" height="80" rx="12"/><path d="M22 75 45 52 62 70 76 58 98 80"/><circle cx="78" cy="42" r="7"/></svg><span>تصویر ثبت نشده</span></div></div>
+                <div class="gc-copy"><h3 data-name></h3><p class="gc-code"><bdi data-code></bdi></p><p data-meta class="gc-meta"><bdi data-brand></bdi><span data-meta-separator aria-hidden="true"> · </span><bdi data-category></bdi></p></div>
+                <span class="gc-badge"><svg class="gc-priority-star" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg><span data-priority></span></span>
+                <details data-cue-details class="gc-cue-details" hidden><summary><span class="gc-cue-dot" aria-hidden="true">●</span><span data-cue></span></summary><p data-reason class="gc-saved-reason" hidden></p></details>
+                </div>
+                <div class="gc-commercial-status"><div class="gc-stock-slot"><small class="gc-sr-only">موجودی قابل ارائه</small><p data-stock></p></div></div>
+                <div class="gc-card-bottom">
+                    <div class="gc-quantity-slot" aria-hidden="true"></div>
+                    <div class="gc-price-slot"><small>قیمت پایه</small><p data-price class="gc-price"></p></div>
+                    <div class="gc-add-slot" aria-hidden="true"></div>
+                </div>
+                <div class="gc-secondary-actions"><a data-detail aria-label="جزئیات محصول" class="ds-button ds-button--secondary gc-detail"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12C5 7 8 5 12 5s7 2 10 7c-3 5-6 7-10 7s-7-2-10-7z"/><circle cx="12" cy="12" r="3"/></svg>جزئیات</a></div>
+            </article>
+        </template>
+    {% else %}
+        <section class="ds-state ds-state--empty"><h2 class="ds-heading">{% if current_visit %}این ویزیت دیگر فعال نیست{% else %}ویزیت را انتخاب کنید{% endif %}</h2><p>برای ادامه، ویزیت این مشتری را در نمای مشتری بررسی کنید.</p><a class="ds-button ds-button--secondary" href="{{ customer_url }}">بازگشت به نمای مشتری</a></section>
+    {% endif %}
+    {% if current_visit %}<footer class="gc-footer"><a class="ds-button ds-button--quiet" href="{{ end_url }}">مرور ویزیت</a></footer>{% endif %}
     </main>
 </div>
-<script src="{% static 'core/js/recommendation_outcome.js' %}?v=002i-guided-1"></script>
-<script src="{% static 'core/js/recommendation_presentation.js' %}?v=002i-1"></script>
+<script src="{% static 'core/js/guided_catalog.js' %}?v=2b-final-1" defer></script>
 </body>
 </html>

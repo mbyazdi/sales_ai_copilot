@@ -1,4 +1,4 @@
-"""Single-product presentation, navigation and source/access contracts."""
+"""Catalog presentation plus preserved legacy navigation/source/access contracts."""
 from html.parser import HTMLParser
 from urllib.parse import parse_qs, urlsplit
 from unittest.mock import patch
@@ -52,14 +52,16 @@ class RecommendationPresentationTests(TestCase):
             query["recommendation_id"] = rec.pk
         return self.client.get(reverse("recommendation-presentation", args=[self.customer.customer_code]), query)
 
-    def test_authorized_salesperson_sees_only_one_product_without_raw_diagnostics(self):
+    def test_authorized_salesperson_gets_full_catalog_shell_without_raw_diagnostics(self):
         response = self.page()
         self.assertEqual(response.status_code, 200)
         elements = PageElements(response.content.decode()).elements
         cards = [attrs for tag, attrs in elements if tag == "article" and "recommendation-outcome-card" in attrs.get("class", "")]
-        self.assertEqual(len(cards), 1)
-        self.assertContains(response, self.product.name)
-        self.assertNotContains(response, self.recs[1].product.name)
+        self.assertEqual(len(cards), 0)  # Legacy one-product/outcome cards are replaced.
+        self.assertContains(response, 'id="guidedCatalog"')
+        self.assertContains(response, 'data-api-url="/api/products/v1/catalog/"')
+        catalog = self.client.get(reverse("product-catalog-v1"), {"customer_code": self.customer.customer_code, "visit_id": self.visit.pk}).json()
+        self.assertEqual([item["product_id"] for item in catalog["items"]], [rec.product_id for rec in self.recs])
         self.assertContains(response, 'lang="fa" dir="rtl"')
         self.assertNotContains(response, "ترکیب امتیاز")
         self.assertNotContains(response, "امتیاز ثبت‌شده")
@@ -111,8 +113,9 @@ class RecommendationPresentationTests(TestCase):
         self.assertEqual(query["recommendation_id"], [str(self.recs[3].pk)])
         later_category = self.page(self.recs[4])
         self.assertIsNone(later_category.context["group_next_url"])
-        self.assertContains(later_category, 'id="endAll"')
-        self.assertContains(later_category, 'id="endPresentationDialog"')
+        self.assertNotContains(later_category, 'id="endAll"')
+        self.assertNotContains(later_category, 'id="endPresentationDialog"')
+        self.assertContains(later_category, 'id="catalogPagination"')
         self.assertNotContains(later_category, "گروه تکمیل شد")
 
     def test_single_and_empty_recommendations_are_intentional_states(self):
@@ -123,29 +126,36 @@ class RecommendationPresentationTests(TestCase):
         self.assertIsNone(single.context["previous_url"])
         self.rec.is_active = False; self.rec.save()
         empty = self.page()
-        self.assertContains(empty, "پیشنهاد فعالی موجود نیست")
+        self.assertContains(empty, 'id="guidedCatalog"')
+        catalog = self.client.get(reverse("product-catalog-v1"), {"customer_code": self.customer.customer_code, "visit_id": self.visit.pk}).json()
+        self.assertEqual(len(catalog["items"]), len(self.recs))
+        self.assertTrue(all(not item["is_prioritized"] for item in catalog["items"]))
         self.assertNotContains(empty, 'class="gs-product"')
 
     def test_image_missing_and_zero_stock_remain_truthful(self):
         response = self.page()
         self.assertIsNone(response.context["image_url"])
-        self.assertContains(response, "تصویر محصول ثبت نشده است")
-        self.assertNotContains(response, 'data-product-image')
+        self.assertContains(response, "تصویر ثبت نشده")
+        self.assertContains(response, 'data-image hidden alt=""')
         self.assertEqual(response.context["commercial"]["inventory"]["sellable_quantity"], 8)
         self.inventory.available_quantity = 0; self.inventory.reserved_quantity = 0; self.inventory.save()
         zero = self.page()
-        self.assertContains(zero, "ناموجود برای فروش")
+        catalog = self.client.get(reverse("product-catalog-v1"), {"customer_code": self.customer.customer_code, "visit_id": self.visit.pk}).json()
+        self.assertEqual(catalog["items"][0]["inventory_state"], "UNAVAILABLE")
         self.assertEqual(zero.context["commercial"]["inventory"]["sellable_quantity"], 0)
         self.inventory.delete()
         missing = self.page()
-        self.assertContains(missing, "اطلاعات موجودی در دسترس نیست")
+        catalog = self.client.get(reverse("product-catalog-v1"), {"customer_code": self.customer.customer_code, "visit_id": self.visit.pk}).json()
+        self.assertEqual(catalog["items"][0]["inventory_state"], "UNKNOWN")
         self.assertIsNone(missing.context["commercial"]["inventory"]["sellable_quantity"])
 
     def test_unavailable_product_and_recommendation_fail_safely(self):
         self.product.is_active = False; self.product.save()
         unavailable = self.page()
-        self.assertContains(unavailable, "محصول این پیشنهاد در دسترس نیست")
-        self.assertEqual(unavailable.content.decode().count('data-unavailable="true"'), 5)
+        self.assertContains(unavailable, 'id="guidedCatalog"')
+        self.assertNotContains(unavailable, 'class="outcome-btn')
+        catalog = self.client.get(reverse("product-catalog-v1"), {"customer_code": self.customer.customer_code, "visit_id": self.visit.pk}).json()
+        self.assertNotIn(self.product.pk, [item["product_id"] for item in catalog["items"]])
         self.assertEqual(self.page(recommendation_id=self.recommendations[1].pk).status_code, 404)
 
     def test_customer_only_and_planned_context_never_auto_start_or_record(self):

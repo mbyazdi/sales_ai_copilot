@@ -83,17 +83,19 @@ class SalespersonJourneyPresentationTests(TestCase):
         self.assertNotContains(response, 'class="ds-surface c360-customer-background"')
         self.assertIsNone(response.context["current_visit"])
 
-    def test_outcome_hosts_share_the_dialog_fields_and_presentation_owner(self):
-        pages = [self.customer_page(), self.guided()]
-        contracts = []
-        for response in pages:
-            self.assertEqual(response.status_code, 200)
-            self.assertContains(response, "core/css/recommendation_outcome.css?v=002p-1")
-            ids = {a["id"]: (tag, a) for tag, a in Elements(response).items if a.get("id", "").startswith("outcome")}
-            contracts.append(ids)
-            self.assertIn("hidden", ids["outcomeModal"][1])
-            self.assertContains(response, "csrfmiddlewaretoken")
-        self.assertEqual(contracts[0], contracts[1])
+    def test_customer_legacy_outcome_contract_remains_and_catalog_has_no_mutations(self):
+        customer, guided = self.customer_page(), self.guided()
+        self.assertEqual(customer.status_code, 200)
+        self.assertContains(customer, "core/css/recommendation_outcome.css?v=002p-1")
+        ids = {a["id"]: (tag, a) for tag, a in Elements(customer).items if a.get("id", "").startswith("outcome")}
+        self.assertIn("hidden", ids["outcomeModal"][1])
+        for name in ("outcomeForm", "outcomeModal", "outcomeQuantity", "outcomeSalesAmount", "outcomeFollowUpDate", "outcomeNotes", "outcomeSubmit"):
+            self.assertIn(name, ids)
+        self.assertContains(customer, "csrfmiddlewaretoken")
+        self.assertEqual(guided.status_code, 200)
+        self.assertNotContains(guided, 'id="outcomeModal"')
+        self.assertNotContains(guided, "core/js/recommendation_outcome.js")
+        self.assertContains(guided, "core/js/guided_catalog.js")
 
     def test_guided_and_review_share_identity_without_duplicate_navigation(self):
         guided = self.guided()

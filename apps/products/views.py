@@ -3,7 +3,7 @@
 from urllib.parse import urlencode
 from decimal import Decimal, InvalidOperation
 
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -13,9 +13,11 @@ from django.views.decorators.http import require_safe
 from apps.core.commercial_context import build_product_commercial_context
 from apps.customers.access import customer_access_queryset
 from apps.recommendations.models import CustomerRecommendation
+from apps.recommendations.catalog_context import CatalogContextUnavailable
 from apps.visits.models import Visit
 
 from .models import Product
+from .catalog import guided_catalog_return_url
 
 
 # Presentation labels only; all values and classifications remain stored values.
@@ -73,9 +75,12 @@ def product_commercial_brief(request, product_code):
             Product.objects.select_related("brand", "category"),
             product_code=product_code, is_active=True,
         )
+        catalog_return_url = None
+        if request.GET.get("return_to") == "catalog":
+            catalog_return_url = guided_catalog_return_url(request.user, customer, visit, product, request.GET)
     except PermissionDenied:
         return render(request, "products/unavailable.html", status=403)
-    except Http404:
+    except (Http404, ValidationError, CatalogContextUnavailable):
         return render(request, "products/unavailable.html", status=404)
 
     today = timezone.localdate()
@@ -116,6 +121,8 @@ def product_commercial_brief(request, product_code):
         if visit:
             query["visit_id"] = visit.pk
         return_url = reverse("recommendation-presentation", args=[customer.customer_code]) + "?" + urlencode(query) + f"#recommendation-{recommendation.pk}"
+    if catalog_return_url:
+        return_url = catalog_return_url
     return render(request, "core/product_detail.html", {
         "product": product, "customer": customer, "commercial": commercial,
         "as_of_date": today, "recommendation": recommendation,
