@@ -2,10 +2,12 @@
 <!doctype html>
 <html lang="fa" dir="rtl">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>مرور ویزیت · {{ customer.name }}</title>
-<link rel="stylesheet" href="{% static 'css/design-system.css' %}?v=002b-1"><link rel="stylesheet" href="{% static 'visits/css/completion_review.css' %}?v=002j-1"></head>
+<link rel="stylesheet" href="{% static 'css/design-system.css' %}?v=002b-1"><link rel="stylesheet" href="{% static 'visits/css/completion_review.css' %}?v=002j-1"><link rel="stylesheet" href="{% static 'css/salesperson_journey.css' %}?v=002p-1"></head>
 <body class="vr-page"><a class="vr-skip" href="#main-content">رفتن به مرور ویزیت</a>
 <main id="main-content" class="vr-container" tabindex="-1">
-    <header class="ds-page-header"><div><p class="vr-eyebrow">مرور پیش از پایان</p><h1 class="ds-title">مرور ویزیت مشتری</h1></div><a class="ds-button ds-button--quiet" href="{% url 'salesperson-dashboard' %}">فضای کار روزانه</a></header>
+    {% url 'salesperson-dashboard' as daily_url %}
+    {% include "components/salesperson_context.html" with salesperson=visit.salesperson back_url=daily_url back_label="فضای کار روزانه" only %}
+    <header class="ds-page-header"><div><p class="vr-eyebrow">مرور پیش از پایان</p><h1 class="ds-title">مرور ویزیت مشتری</h1></div></header>
     <section class="vr-context ds-surface" aria-label="مشتری و وضعیت ویزیت"><div><strong><bdi>{{ customer.name }}</bdi></strong><span class="ds-caption ds-muted"><bdi>{{ customer.customer_code }}</bdi> · ویزیت {{ visit.id }} · <bdi>{{ visit.visit_date|date:"Y/m/d" }}</bdi></span></div><span id="reviewVisitStatus" class="ds-badge">{% if visit.status == 'IN_PROGRESS' %}در حال انجام{% elif visit.status == 'COMPLETED' %}تکمیل‌شده{% elif visit.status == 'PLANNED' %}برنامه‌ریزی‌شده{% else %}لغوشده{% endif %}</span></section>
     <div id="visitReview" data-visit-id="{{ visit.id }}" data-customer-code="{{ customer.customer_code }}" data-status="{{ visit.status }}" data-read-url="{% url 'visit-recommendation-outcomes' visit.id %}?customer_code={{ customer.customer_code|urlencode }}" data-complete-url="{% url 'visit-complete' visit.id %}">
         <section id="reviewPanel" class="ds-stack" {% if completed %}hidden{% endif %}>

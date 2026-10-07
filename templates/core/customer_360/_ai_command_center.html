@@ -30,7 +30,7 @@
         {% if sales_ai_context %}
             <label class="ds-label" for="salesCopilotMessage">{% if manager_inspection %}پرسش درباره اطلاعات و پیشنهادهای مشتری{% else %}پرسش درباره این مشتری و اقدام پیشنهادی{% endif %}</label>
             <textarea id="salesCopilotMessage" class="ds-control" rows="3" placeholder="{% if manager_inspection %}مثلاً: دلیل پیشنهاد اصلی برای این مشتری چیست؟{% else %}مثلاً: پیشنهاد اصلی را چگونه مطرح کنم؟{% endif %}"></textarea>
-            <button type="button" id="salesCopilotSubmit" class="ds-button">از دستیار بپرس</button>
+            <button type="button" id="salesCopilotSubmit" class="ds-button{% if not manager_inspection %} ds-button--secondary{% endif %}">از دستیار بپرس</button>
             <div id="salesCopilotLoading" class="ds-state ds-state--loading" role="status" style="display:none;">در حال دریافت پاسخ...</div>
             <div id="salesCopilotError" class="ds-state ds-state--error" role="alert" style="display:none;"></div>
             <div id="salesCopilotResponse" class="c360-copilot-response ds-surface" role="status" style="display:none;"></div>

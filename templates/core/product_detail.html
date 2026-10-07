@@ -2,12 +2,13 @@
 {% load static %}
 {% block title %}{{ product.name }} · بررسی محصول برای مشتری{% endblock %}
 {% block breadcrumb %}نمای محصول در زمینه مشتری{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/product_brief.css' %}?v=002h-2">{% endblock %}
+{% block body_class %}{% if not manager_inspection %}sj-shell{% endif %}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/product_brief.css' %}?v=002h-2">{% if not manager_inspection %}<link rel="stylesheet" href="{% static 'css/salesperson_journey.css' %}?v=002p-1">{% endif %}{% endblock %}
 {% block content %}
 <div class="pb-workspace ds-stack">
     <header class="ds-page-header">
         <div><p class="pb-eyebrow">بررسی پیش از ارائه محصول</p><h1 class="ds-title">نمای محصول برای این مشتری</h1><p class="ds-muted">موجودی و طرح‌های فعلی را کنار دلیل ثبت‌شده پیشنهاد بررسی کنید.</p></div>
-        <a class="ds-button ds-button--secondary" href="{{ return_url }}">بازگشت به نمای مشتری</a>
+        <a class="ds-button ds-button--secondary" href="{{ return_url }}">بازگشت</a>
     </header>
 
     <section class="pb-identity ds-card" aria-labelledby="product-title">
@@ -24,8 +25,8 @@
         </div>
         <aside class="pb-customer ds-stack" aria-label="زمینه مشتری">
             <span class="ds-caption ds-muted">برای مشتری</span>
-            <strong>{{ customer.name }}</strong><span class="ds-caption"><bdi>{{ customer.customer_code }}</bdi></span>
-            {% if manager_inspection %}<span class="ds-badge ds-badge--info">بررسی مدیریتی · فقط مشاهده</span>{% elif visit %}<span class="ds-badge">بازگشت به ویزیت {{ visit.visit_date|date:"Y/m/d" }}</span>{% else %}<span class="ds-caption ds-muted">بدون ویزیت انتخاب‌شده</span>{% endif %}
+            <strong><bdi>{{ customer.name }}</bdi></strong><span class="ds-caption"><bdi>{{ customer.customer_code }}</bdi></span>
+            {% if manager_inspection %}<span class="ds-badge ds-badge--info">بررسی مدیریتی · فقط مشاهده</span>{% elif visit %}<span class="ds-caption ds-muted">ویزیت <bdi>{{ visit.id }}</bdi> · <bdi>{{ visit.visit_date|date:"Y/m/d" }}</bdi></span><span class="ds-badge{% if visit.status == 'IN_PROGRESS' %} ds-badge--info{% elif visit.status == 'COMPLETED' %} ds-badge--success{% endif %}">{% if visit.status == 'IN_PROGRESS' %}در حال انجام{% elif visit.status == 'PLANNED' %}برنامه‌ریزی‌شده{% elif visit.status == 'COMPLETED' %}تکمیل‌شده{% else %}لغوشده{% endif %}</span>{% else %}<span class="ds-caption ds-muted">بدون ویزیت انتخاب‌شده</span>{% endif %}
         </aside>
     </section>
 
@@ -104,6 +105,6 @@
         </details>
         {% else %}<p class="ds-state ds-state--empty">پیشنهاد فعالی برای این محصول و مشتری ثبت نشده است؛ دلیل یا شواهدی برای آن ساخته نمی‌شود.</p>{% endif %}
     </section>
-    <footer class="pb-return ds-surface ds-page-header"><p class="ds-caption ds-muted">{% if manager_inspection %}این نما برای بررسی اطلاعات است. برای ادامه بررسی به نمای مشتری بازگردید.{% else %}برای ادامه تعامل یا ثبت نتیجه در ویزیت، به پیشنهادهای مشتری بازگردید.{% endif %}</p><a class="ds-button" href="{{ return_url }}">بازگشت به پیشنهادهای مشتری</a></footer>
+    <footer class="pb-return ds-surface ds-page-header"><p class="ds-caption ds-muted">{% if manager_inspection %}این نما برای بررسی اطلاعات است. برای ادامه بررسی به نمای مشتری بازگردید.{% else %}برای ادامه تعامل یا ثبت نتیجه در ویزیت، به پیشنهادهای مشتری بازگردید.{% endif %}</p><a class="ds-button" href="{{ return_url }}">بازگشت</a></footer>
 </div>
 {% endblock %}

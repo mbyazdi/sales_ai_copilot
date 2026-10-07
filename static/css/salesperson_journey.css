@@ -1,0 +1,29 @@
+/* Opt-in salesperson presentation. No workflow or shared manager shell rules. */
+.sj-context { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--ds-space-2); margin-block-end: var(--ds-space-2); }
+.sj-identity { display: flex; align-items: center; gap: var(--ds-space-2); min-width: 0; font-size: var(--ds-font-sm); }
+.sj-identity bdi { overflow-wrap: anywhere; }
+.sj-identity small { display: block; color: var(--ds-muted); font-size: var(--ds-font-xs); }
+.sj-avatar { display: grid; place-items: center; width: 38px; height: 38px; flex: 0 0 auto; border-radius: var(--ds-radius-md); background: var(--ds-brand); color: var(--ds-surface); font-weight: var(--ds-weight-strong); }
+.sj-shell .shell-brand small, .sj-shell .shell-page-header { display: none; }
+.sj-shell .shell-brand strong { font-size: var(--ds-font-sm); }
+.sj-shell .shell-header-inner { gap: var(--ds-space-2) var(--ds-space-4); }
+.sj-shell .shell-user { font-size: var(--ds-font-sm); }
+.sj-shell .ds-help > summary { min-height: var(--ds-control-size); }
+.vr-page:has(#completionAcknowledgement:not([hidden])) .sj-context .ds-button,
+.vr-page:has(#completionAcknowledgement:not([hidden])) .vr-eyebrow { display: none; }
+/* Persisted statuses keep the Daily Workspace semantic treatment, including rereads. */
+.gs-visit [data-status="IN_PROGRESS"], .vr-page:has(#visitReview[data-status="IN_PROGRESS"]) #reviewVisitStatus,
+.sj-shell #currentVisitStatus[data-status="IN_PROGRESS"] { color: var(--ds-info); background: var(--ds-info-soft); }
+.gs-visit [data-status="COMPLETED"], .vr-page:has(#visitReview[data-status="COMPLETED"]) #reviewVisitStatus,
+.sj-shell #currentVisitStatus[data-status="COMPLETED"] { color: var(--ds-success); background: var(--ds-success-soft); }
+.sj-shell #currentVisitStatus[data-status="PLANNED"], .sj-shell #currentVisitStatus[data-status="CANCELLED"] { color: var(--ds-text); background: var(--ds-surface-soft); }
+/* Shared dialog rhythm; each page still owns its appropriate width. */
+.gs-page .gs-confirm, .vr-page .vr-confirm { max-height: calc(100dvh - 32px); overflow-y: auto; padding: var(--ds-space-5); background: var(--ds-surface); box-shadow: var(--ds-shadow-md); font: var(--ds-font-base)/var(--ds-line-height) var(--ds-font-family); }
+.gs-page .gs-confirm::backdrop, .vr-page .vr-confirm::backdrop { background: rgb(24 40 59 / 45%); backdrop-filter: none; }
+.gs-page .gs-confirm p, .vr-page .vr-confirm p { margin-block: var(--ds-space-4); }
+@media (max-width: 600px) {
+    .vr-page .vr-container { padding-inline: var(--ds-space-3); }
+    .sj-shell .shell-user { max-width: 45%; }
+    .gs-page .gs-confirm, .vr-page .vr-confirm { padding: var(--ds-space-4); }
+    .gs-confirm .ds-row > *, .vr-confirm .ds-row > * { flex: 1 1 130px; }
+}

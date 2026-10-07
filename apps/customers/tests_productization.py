@@ -51,7 +51,7 @@ class Customer360ProductTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "base.html")
         self.assertContains(response, "css/design-system.css")
-        self.assertContains(response, "core/css/customer_workspace.css?v=002d-1")
+        self.assertContains(response, "core/css/customer_workspace.css?v=002p-blocker-1")
         self.assertContains(response, 'id="workspace-decision"')
         self.assertContains(response, self.product.name)
         self.assertContains(response, response.context["sales_session"]["next_best_action"])

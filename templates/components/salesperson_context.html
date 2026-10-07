@@ -1,0 +1,8 @@
+{# Presentation only: callers supply identity and an optional existing back destination. #}
+<header class="sj-context" aria-label="نماینده فروش">
+    <div class="sj-identity">
+        <span class="sj-avatar" aria-hidden="true">{{ salesperson.first_name|slice:":1" }}</span>
+        <div><strong><bdi>{{ salesperson.full_name }}</bdi></strong><small>نماینده فروش · <bdi>{{ salesperson.employee_code }}</bdi></small></div>
+    </div>
+    {% if back_url %}<a class="ds-button ds-button--quiet" href="{{ back_url }}">{{ back_label }}</a>{% endif %}
+</header>

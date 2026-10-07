@@ -2,22 +2,27 @@
 {% load static %}
 {% block title %}نمای مشتری{% endblock %}
 {% block breadcrumb %}مشتریان{% endblock %}
+{% block body_class %}{% if not manager_inspection %}sj-shell{% endif %}{% endblock %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'core/css/customer_360.css' %}">
-<link rel="stylesheet" href="{% static 'core/css/customer_workspace.css' %}?v=002d-1">
-<link rel="stylesheet" href="{% static 'core/css/recommendation_outcome.css' %}?v=002i-1">
+<link rel="stylesheet" href="{% static 'core/css/customer_workspace.css' %}?v=002p-blocker-1">
+<link rel="stylesheet" href="{% static 'core/css/recommendation_outcome.css' %}?v=002p-1">
+{% if not manager_inspection %}<link rel="stylesheet" href="{% static 'css/salesperson_journey.css' %}?v=002p-1">{% endif %}
 {% endblock %}
 {% block content %}
 <div class="customer-decision-workspace ds-stack">
     {% if manager_inspection %}
     <header class="ds-page-header"><div><h1 class="ds-title">بررسی مدیریتی مشتری</h1><p class="ds-muted">مشاهده اطلاعات و پیشنهادهای ثبت‌شده مشتری؛ عملیات ویزیت و ثبت نتیجه از این نما انجام نمی‌شود.</p></div><a class="ds-button ds-button--secondary" href="/customers/">بازگشت به مشتریان</a></header>
-    {% else %}{% include "core/customer_360/_search.html" %}{% endif %}
+    {% elif current_visit.status != 'IN_PROGRESS' %}{% include "core/customer_360/_search.html" %}{% endif %}
     {% if not_found %}<p class="ds-state ds-state--error" role="alert">مشتری موردنظر پیدا نشد.</p>{% endif %}
     {% if customer %}
-        {% include "core/customer_360/_customer_hero.html" %}
+        {% if not manager_inspection and current_visit.status == 'IN_PROGRESS' %}
+        <header class="ds-page-header c360-operational-identity"><div><h1 class="ds-title"><bdi>{{ customer.name }}</bdi></h1><p class="ds-caption ds-muted">کد مشتری <bdi>{{ customer.customer_code }}</bdi></p></div><a class="ds-button ds-button--quiet" href="{% url 'salesperson-dashboard' %}">برنامه ویزیت امروز</a></header>
+        {% else %}{% include "core/customer_360/_customer_hero.html" %}{% endif %}
         {% if visit_not_found %}<p class="ds-state ds-state--error" role="alert">ویزیت انتخاب‌شده معتبر نیست یا متعلق به این مشتری نیست؛ اطلاعات مشتری بدون زمینه ویزیت نمایش داده می‌شود.</p>{% endif %}
         <div class="sales-workspace visit-state-{% if current_visit %}{{ current_visit.status|lower }}{% else %}none{% endif %}">
             {% if not manager_inspection %}{% include "core/customer_360/_sales_context.htm" %}{% endif %}
+            {% if not manager_inspection and current_visit.status == 'IN_PROGRESS' %}<details class="ds-surface c360-customer-background"><summary>اطلاعات مشتری و جستجو</summary><div class="ds-stack c360-detail-content">{% include "core/customer_360/_customer_hero.html" %}{% include "core/customer_360/_search.html" %}</div></details>{% endif %}
             <nav class="c360-links ds-row" aria-label="{% if manager_inspection %}ناوبری بررسی مشتری{% else %}ناوبری فضای کاری فروش{% endif %}">
                 <a href="#workspace-decision">{% if manager_inspection %}پیشنهاد اصلی{% else %}اقدام پیشنهادی{% endif %}</a><a href="#workspace-copilot">{% if manager_inspection %}دستیار بررسی{% else %}دستیار فروش{% endif %}</a><a href="#workspace-recommendations">{% if manager_inspection %}پیشنهادها{% else %}پیشنهادها و نتیجه{% endif %}</a><a href="#workspace-kpis">شاخص‌ها</a><a href="#workspace-details">جزئیات</a>
             </nav>

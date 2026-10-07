@@ -2,8 +2,10 @@
 {% load static %}
 {% block title %}فضای کار روزانه{% endblock %}
 {% block breadcrumb %}فضای کار روزانه{% endblock %}
+{% block body_class %}{% if not request.user.is_staff %}sj-shell{% endif %}{% endblock %}
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'visits/css/daily_workspace.css' %}?v=002c-1">
+<link rel="stylesheet" href="{% static 'visits/css/daily_workspace.css' %}?v=002p-final-1">
+{% if not request.user.is_staff %}<link rel="stylesheet" href="{% static 'css/salesperson_journey.css' %}?v=002p-1">{% endif %}
 {% endblock %}
 {% block content %}
 <div class="daily-workspace ds-stack">
@@ -12,7 +14,7 @@
             <p class="ds-caption ds-muted">برنامه امروز شما</p>
             <h1 class="ds-title">فضای کار روزانه</h1>
             {% if salesperson %}
-            <p class="ds-muted"><strong>{{ salesperson.full_name }}</strong> · کد فروشنده <bdi>{{ salesperson.employee_code }}</bdi>{% if salesperson.phone %} · <bdi>{{ salesperson.phone }}</bdi>{% endif %}</p>
+            <p class="ds-caption ds-muted">{% if request.user.is_staff %}<strong><bdi>{{ salesperson.full_name }}</bdi></strong> · {% endif %}کد فروشنده <bdi>{{ salesperson.employee_code }}</bdi>{% if salesperson.phone %} · <bdi>{{ salesperson.phone }}</bdi>{% endif %}</p>
             {% endif %}
         </div>
         <div class="workspace-date">
@@ -33,21 +35,13 @@
             <div><dt>لغوشده</dt><dd class="ds-number">{{ summary.cancelled }}</dd></div>
         </dl>
     </section>
-    <section class="workspace-priorities ds-row" aria-labelledby="priorities-title">
-        <h2 id="priorities-title" class="ds-heading">اولویت‌های امروز</h2>
-        <span class="ds-badge ds-badge--danger">بالا <strong class="ds-number">{{ priority_summary.high }}</strong></span>
-        <span class="ds-badge ds-badge--warning">متوسط <strong class="ds-number">{{ priority_summary.medium }}</strong></span>
-        <span class="ds-badge ds-badge--info">عادی <strong class="ds-number">{{ priority_summary.normal }}</strong></span>
-        <details class="workspace-priority-help">
-            <summary>این اولویت‌ها چگونه تعیین می‌شوند؟</summary>
-            <p class="ds-caption ds-muted">اولویت و ترتیب ویزیت‌ها از امتیاز پیشنهاد، اطمینان پیشنهاد، وضعیت مشتری و پیگیری‌های باز محاسبه می‌شود. دلایل هر ویزیت در جزئیات کارت آمده است؛ اولویت بالا به معنی مجاز بودن همه پیشنهادها نیست.</p>
-        </details>
-    </section>
+    {% if request.user.is_staff %}{% include "visits/_daily_priorities.html" %}{% endif %}
     <section class="ds-stack" aria-labelledby="visits-title">
-        <header class="ds-page-header">
+        {% if not request.user.is_staff %}<header class="ds-stack"><div class="ds-page-header"><h2 id="visits-title" class="ds-heading">ویزیت‌های امروز</h2><a class="ds-button ds-button--quiet" href="{% url 'follow-up-dashboard' %}">پیگیری‌های من</a></div><p class="ds-caption ds-muted">به ترتیب اولویت؛ برای آماده‌سازی یا ادامه کار، وارد نمای مشتری شوید.</p></header>
+        {% else %}<header class="ds-page-header">
             <div><h2 id="visits-title" class="ds-heading">ویزیت‌های امروز</h2><p class="ds-caption ds-muted">به ترتیب اولویت؛ برای آماده‌سازی یا ادامه کار، وارد نمای مشتری شوید.</p></div>
             <a class="ds-button ds-button--secondary" href="{% url 'follow-up-dashboard' %}">پیگیری‌های من</a>
-        </header>
+        </header>{% endif %}
         <div class="workspace-visit-list ds-stack">
             {% for visit in visits %}
                 {% include "visits/_visit_card.html" %}
@@ -60,6 +54,7 @@
             {% endfor %}
         </div>
     </section>
+    {% if not request.user.is_staff %}{% include "visits/_daily_priorities.html" %}{% endif %}
     {% if target_progress %}
     <details class="workspace-targets ds-surface">
         <summary><strong>هدف‌های فروش این دوره</strong><span class="ds-caption ds-muted">میانگین تحقق: {{ target_summary.average_achievement_percent|floatformat:0 }}٪</span></summary>

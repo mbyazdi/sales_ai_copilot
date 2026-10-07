@@ -1,5 +1,5 @@
 <form class="search-bar ds-search" method="get" data-customer-code="{{ customer_code }}">
     {% if current_visit %}<input type="hidden" name="visit_id" value="{{ current_visit.id }}">{% endif %}
     <div class="ds-field"><label class="ds-label" for="customer-code-search">جستجوی مشتری</label><input id="customer-code-search" class="ds-control" name="customer_code" placeholder="کد مشتری؛ مثلاً C0003" value="{{ customer_code }}"></div>
-    <button class="ds-button" type="submit">جستجوی مشتری</button>
+    <button class="ds-button ds-button--secondary" type="submit">جستجوی مشتری</button>
 </form>

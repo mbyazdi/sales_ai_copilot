@@ -1,0 +1,4 @@
+<footer class="workspace-visit-actions ds-row">
+    <a class="ds-button" href="{% if visit.status == 'IN_PROGRESS' and not request.user.is_staff %}{% url 'recommendation-presentation' visit.customer.customer_code %}?visit_id={{ visit.id }}{% else %}/customers/?customer_code={{ visit.customer.customer_code|urlencode }}&visit_id={{ visit.id }}{% endif %}" aria-describedby="visit-{{ visit.id }}-title">{% if request.user.is_staff %}بررسی مشتری{% elif visit.status == 'PLANNED' %}آماده‌سازی و شروع ویزیت{% elif visit.status == 'IN_PROGRESS' %}ادامه و ثبت نتیجه{% elif visit.status == 'COMPLETED' %}مشاهده خلاصه ویزیت{% else %}مشاهده اطلاعات مشتری{% endif %}</a>
+    <a class="ds-button {% if request.user.is_staff %}ds-button--secondary{% else %}ds-button--quiet{% endif %}" href="/customers/?customer_code={{ visit.customer.customer_code|urlencode }}&visit_id={{ visit.id }}" aria-describedby="visit-{{ visit.id }}-title">نمای ۳۶۰ درجه مشتری</a>
+</footer>

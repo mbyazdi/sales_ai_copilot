@@ -54,7 +54,7 @@ class DailyWorkspaceTests(TestCase):
         self.assertEqual(len(response.context["visits"]), 3)
         self.assertNotContains(response, self.other_customer.name)
         self.assertTemplateUsed(response, "base.html")
-        self.assertContains(response, "visits/css/daily_workspace.css?v=002c-1")
+        self.assertContains(response, "visits/css/daily_workspace.css?v=002p-final-1")
 
     def test_real_priority_order_and_counts_are_preserved_with_persian_labels(self):
         response = self.page()
@@ -121,3 +121,19 @@ class DailyWorkspaceTests(TestCase):
         self.assertContains(response, "هدف‌های فروش این دوره")
         html = response.content.decode()
         self.assertLess(html.index('id="visits-title"'), html.index("هدف‌های فروش این دوره"))
+
+    def test_operational_card_puts_primary_action_before_collapsed_readiness_without_losing_data(self):
+        response = self.page()
+        visit = next(v for v in response.context["visits"] if v.pk == self.visits[0].pk)
+        card = render_to_string("visits/_visit_card.html", {"visit": visit, "request": response.wsgi_request})
+        self.assertLess(card.index('class="workspace-recommendation-cue"'), card.index('class="workspace-visit-actions'))
+        self.assertLess(card.index('class="workspace-visit-actions'), card.index('class="workspace-visit-details"'))
+        self.assertLess(card.index('class="workspace-visit-details"'), card.index('class="workspace-commercial'))
+        self.assertEqual(card.count('class="workspace-visit-actions'), 1)
+        self.assertIn('class="ds-button ds-button--quiet"', card)
+        self.assertIn("آمادگی و جزئیات ویزیت", card)
+        brief = visit.pre_visit_brief
+        self.assertIn(brief["primary_recommendation"]["product_name"], card)
+        self.assertIn(brief["commercial_decision"]["next_best_action"], card)
+        self.assertIn("امتیاز اولویت", card)
+        self.assertIn("پیگیری باز", card)

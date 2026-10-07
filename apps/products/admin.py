@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Brand, Category, Product
+from .models import Brand, Category, Product, ProductDemoPrice
+from apps.sales_requests.admin_base import InspectionOnlyAdmin
 
 
 @admin.register(Brand)
@@ -69,3 +70,9 @@ class ProductAdmin(admin.ModelAdmin):
         "name",
         "brand__name",
     )
+
+
+@admin.register(ProductDemoPrice)
+class ProductDemoPriceAdmin(InspectionOnlyAdmin):
+    list_display = ("product", "base_price", "currency", "source", "source_version", "updated_at")
+    list_select_related = ("product",)

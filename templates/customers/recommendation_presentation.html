@@ -5,14 +5,15 @@
     <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>نمایش پیشنهادها · {{ customer.name }}</title>
     <link rel="stylesheet" href="{% static 'css/design-system.css' %}?v=002b-1">
-    <link rel="stylesheet" href="{% static 'core/css/recommendation_outcome.css' %}?v=002i-1">
+    <link rel="stylesheet" href="{% static 'core/css/recommendation_outcome.css' %}?v=002p-1">
     <link rel="stylesheet" href="{% static 'core/css/recommendation_presentation.css' %}?v=002i-1">
+    <link rel="stylesheet" href="{% static 'css/salesperson_journey.css' %}?v=002p-1">
 </head>
 <body class="gs-page">
 <a class="gs-skip" href="#main-content">رفتن به پیشنهاد محصول</a>
 <div class="gs-container">
-    <header class="gs-header"><div class="gs-salesperson"><span class="gs-avatar" aria-hidden="true">{{ salesperson.first_name|slice:":1" }}</span><div><strong>{{ salesperson.full_name }}</strong><small>نماینده فروش</small></div></div><a class="ds-button ds-button--quiet" href="{{ customer_url }}">خروج و بازگشت</a></header>
-    <section class="gs-customer" aria-label="زمینه مشتری و ویزیت"><div><strong><bdi>{{ customer.name }}</bdi></strong><span><bdi>{{ customer.customer_code }}</bdi></span></div><div class="gs-visit">{% if current_visit %}<span>ویزیت {{ current_visit.id }} · <bdi>{{ current_visit.visit_date|date:"Y/m/d" }}</bdi></span><span class="ds-badge">{% if current_visit.status == 'IN_PROGRESS' %}در حال انجام{% elif current_visit.status == 'PLANNED' %}برنامه‌ریزی‌شده{% elif current_visit.status == 'COMPLETED' %}تکمیل‌شده{% else %}لغوشده{% endif %}</span>{% else %}<span class="ds-muted">بدون ویزیت انتخاب‌شده · فقط مشاهده</span>{% endif %}</div></section>
+    {% include "components/salesperson_context.html" with salesperson=salesperson back_url=customer_url back_label="خروج و بازگشت" only %}
+    <section class="gs-customer" aria-label="زمینه مشتری و ویزیت"><div><strong><bdi>{{ customer.name }}</bdi></strong><span><bdi>{{ customer.customer_code }}</bdi></span></div><div class="gs-visit">{% if current_visit %}<span>ویزیت <bdi>{{ current_visit.id }}</bdi> · <bdi>{{ current_visit.visit_date|date:"Y/m/d" }}</bdi></span><span class="ds-badge" data-status="{{ current_visit.status }}">{% if current_visit.status == 'IN_PROGRESS' %}در حال انجام{% elif current_visit.status == 'PLANNED' %}برنامه‌ریزی‌شده{% elif current_visit.status == 'COMPLETED' %}تکمیل‌شده{% else %}لغوشده{% endif %}</span>{% else %}<span class="ds-muted">بدون ویزیت انتخاب‌شده · فقط مشاهده</span>{% endif %}</div></section>
     <main id="main-content" tabindex="-1">
     {% if recommendation %}
         <div class="gs-progress"><div><strong>پیشنهاد {{ position }} از {{ total }}</strong><span class="ds-muted">{{ remaining }} پیشنهاد پس از این</span></div><progress value="{{ position }}" max="{{ total }}" aria-label="جایگاه در نمایش پیشنهادها"></progress></div>

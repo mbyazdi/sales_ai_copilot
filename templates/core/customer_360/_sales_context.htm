@@ -5,15 +5,18 @@
             <div class="ds-row"><h2 class="ds-heading">ویزیت {{ current_visit.id }}</h2>
                 <span id="currentVisitStatus" class="ds-badge visit-status-badge visit-status-{{ current_visit.status|lower }}" data-status="{{ current_visit.status }}">{% if current_visit.status == 'PLANNED' %}برنامه‌ریزی‌شده{% elif current_visit.status == 'IN_PROGRESS' %}در حال انجام{% elif current_visit.status == 'COMPLETED' %}تکمیل‌شده{% elif current_visit.status == 'CANCELLED' %}لغوشده{% endif %}</span>
             </div>
-            <p class="ds-caption ds-muted"><time datetime="{{ current_visit.visit_date|date:'Y-m-d' }}">{{ current_visit.visit_date|date:"Y/m/d" }}</time> · {{ current_visit.salesperson.full_name }} · <bdi>{{ current_visit.salesperson.employee_code }}</bdi></p>
+            <p class="ds-caption ds-muted"><time datetime="{{ current_visit.visit_date|date:'Y-m-d' }}"><bdi>{{ current_visit.visit_date|date:"Y/m/d" }}</bdi></time> · کد فروشنده <bdi>{{ current_visit.salesperson.employee_code }}</bdi></p>
         </div>
-        <div class="visit-workflow-actions ds-row">
+        {% if current_visit.status != 'IN_PROGRESS' %}<div class="visit-workflow-actions ds-row">
             {% if current_visit.status == 'PLANNED' %}<button type="button" id="startVisitButton" class="ds-button visit-action-btn visit-start-btn" data-visit-id="{{ current_visit.id }}">شروع ویزیت</button>
-            {% elif current_visit.status == 'IN_PROGRESS' %}<button type="button" id="completeVisitButton" class="ds-button visit-action-btn visit-complete-btn" data-visit-id="{{ current_visit.id }}">پایان ویزیت</button>
             {% elif current_visit.status == 'COMPLETED' %}<span class="ds-badge ds-badge--success">این ویزیت تکمیل شده است</span>
             {% elif current_visit.status == 'CANCELLED' %}<span class="ds-badge">این ویزیت لغو شده است</span>{% endif %}
-        </div>
+        </div>{% endif %}
     </div>
+    {% if not manager_inspection and current_visit.status == 'IN_PROGRESS' %}
+    {% include "core/customer_360/_guided_entry.html" %}
+    <div class="visit-workflow-actions ds-row c360-entry-secondary"><button type="button" id="completeVisitButton" class="ds-button visit-action-btn visit-complete-btn" data-visit-id="{{ current_visit.id }}">پایان ویزیت</button></div>
+    {% endif %}
     <div class="visit-state-banner" role="status">
         <span class="visit-state-banner-icon" hidden aria-hidden="true"></span>
         <div><strong class="visit-state-banner-title">{% if current_visit.status == 'PLANNED' %}آماده‌سازی پیش از شروع{% elif current_visit.status == 'IN_PROGRESS' %}تعامل و ثبت نتیجه{% elif current_visit.status == 'COMPLETED' %}مرور ویزیت تکمیل‌شده{% else %}ویزیت لغو شده است{% endif %}</strong>

@@ -35,3 +35,33 @@
 .customer-decision-workspace { overflow-wrap: anywhere; }
 @media (max-width: 850px) { .c360-decision-grid { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 600px) { .c360-signals { grid-template-columns: repeat(2, minmax(0, 1fr)); } .customer-decision-workspace .search-bar .ds-field { flex-basis: 100%; } }
+
+/* Operational controls must also cover the lifecycle controller's injected button. */
+.customer-decision-workspace .visit-workflow-actions #startVisitButton,
+.customer-decision-workspace .visit-workflow-actions #completeVisitButton {
+    min-height: var(--ds-control-size); padding: var(--ds-space-2) var(--ds-space-4);
+    border: 1px solid var(--ds-brand); border-radius: var(--ds-radius-md);
+    background: var(--ds-brand); color: var(--ds-surface); box-shadow: none;
+    font: var(--ds-weight-medium) var(--ds-font-base)/var(--ds-line-height) var(--ds-font-family);
+}
+.customer-decision-workspace .visit-workflow-actions #startVisitButton:hover { background: var(--ds-brand-hover); transform: none; box-shadow: none; }
+.customer-decision-workspace .visit-workflow-actions #completeVisitButton { background: var(--ds-surface); color: var(--ds-brand); border-color: var(--ds-border-strong); }
+.customer-decision-workspace .visit-workflow-actions #completeVisitButton:hover { background: var(--ds-brand-soft); transform: none; box-shadow: none; }
+.customer-decision-workspace .visit-workflow-actions :is(#startVisitButton, #completeVisitButton):disabled { background: var(--ds-surface-soft); color: var(--ds-muted); border-color: var(--ds-border); box-shadow: none; }
+.customer-decision-workspace .visit-workflow-actions :is(#startVisitButton, #completeVisitButton):focus-visible { outline: 3px solid var(--ds-focus); outline-offset: 3px; }
+.sj-shell .customer-decision-workspace .c360-links a { display: inline-flex; align-items: center; min-height: var(--ds-control-size); }
+.sj-shell .customer-decision-workspace .visit-state-planned .c360-guided-link { background: var(--ds-surface); color: var(--ds-brand); border-color: var(--ds-border-strong); }
+.sj-shell .customer-decision-workspace .visit-state-planned .c360-guided-link:hover { background: var(--ds-brand-soft); }
+.sj-shell .customer-decision-workspace #currentVisitStatus { border: 1px solid var(--ds-border); font: var(--ds-font-xs)/var(--ds-line-height) var(--ds-font-family); }
+
+/* Active entry precedes intelligence; these rules never target another journey host. */
+.sj-shell .c360-operational-identity { align-items: center; }
+.sj-shell .visit-state-in_progress .c360-guided-entry { padding: 0; border: 0; background: transparent; }
+.sj-shell .visit-state-in_progress .c360-guided-entry h3 { color: var(--ds-muted); font-size: var(--ds-font-sm); }
+.sj-shell .visit-state-in_progress .c360-entry-cue { margin-block: var(--ds-space-1); font-size: var(--ds-font-lg); }
+.sj-shell .visit-state-in_progress .c360-entry-secondary { justify-content: flex-end; }
+@media (max-width: 600px) {
+    .sj-shell .c360-operational-identity { gap: var(--ds-space-1); }
+    .sj-shell .visit-state-in_progress .c360-guided-entry { gap: var(--ds-space-2); }
+    .sj-shell .visit-state-in_progress .c360-guided-link { width: 100%; }
+}

@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{% static 'css/design-system.css' %}?v=002b-1">
     <link rel="stylesheet" href="{% static 'css/app.css' %}?v=002b-1">
 </head>
-<body class="product-shell">
+<body class="product-shell {% block body_class %}{% endblock %}">
     <a class="shell-skip-link" href="#main-content">رفتن به محتوای صفحه</a>
     <div class="app-shell">
         <header class="shell-header">

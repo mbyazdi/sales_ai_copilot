@@ -3,23 +3,30 @@
 #visitOutcomeRefresh { align-self: flex-start; }
 .recommendation-outcome-card:target, .recommendation-outcome-card:focus { outline: 3px solid var(--ds-focus); outline-offset: 3px; scroll-margin-block-start: 90px; }
 .ri-modal[hidden] { display: none !important; }
-.ri-modal { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: var(--ds-space-4); background: rgb(24 40 59 / 45%); }
-.ri-modal .outcome-modal-card { width: min(560px, 100%); max-height: calc(100dvh - 32px); overflow-y: auto; box-sizing: border-box; padding: var(--ds-space-5); border: 1px solid var(--ds-border); border-radius: var(--ds-radius-lg); background: var(--ds-surface); font-family: var(--ds-font-family); font-size: var(--ds-font-base); color: var(--ds-text); }
+.ri-modal { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: var(--ds-space-4); background: rgb(24 40 59 / 45%); backdrop-filter: none; }
+.ri-modal .outcome-modal-card { width: min(560px, 100%); max-height: calc(100dvh - 32px); overflow-y: auto; box-sizing: border-box; padding: var(--ds-space-5); border: 1px solid var(--ds-border); border-radius: var(--ds-radius-lg); background: var(--ds-surface); box-shadow: var(--ds-shadow-md); direction: rtl; font: var(--ds-font-base)/var(--ds-line-height) var(--ds-font-family); color: var(--ds-text); }
 .ri-modal *, .ri-modal *::before { box-sizing: border-box; }
 .ri-modal p { margin: 0; overflow-wrap: anywhere; }
-.ri-modal .outcome-modal-header { display: flex; gap: var(--ds-space-3); justify-content: space-between; align-items: start; }
-.ri-modal .outcome-modal-title { font-size: var(--ds-font-lg); font-weight: var(--ds-weight-strong); }
-.ri-modal .outcome-modal-product { margin-block-start: var(--ds-space-2); overflow-wrap: anywhere; }
-.ri-modal .outcome-modal-outcome { color: var(--ds-brand); font-weight: var(--ds-weight-medium); }
-.ri-modal .outcome-modal-close { min-width: var(--ds-control-size); min-height: var(--ds-control-size); padding: 0; border: 1px solid var(--ds-border); border-radius: var(--ds-radius-md); background: var(--ds-surface); color: var(--ds-text); cursor: pointer; font-size: 1.25rem; }
+.ri-modal .outcome-modal-header { display: flex; gap: var(--ds-space-3); justify-content: space-between; align-items: start; margin: 0; }
+.ri-modal .outcome-modal-header > div { min-width: 0; }
+.ri-modal .outcome-modal-title { color: var(--ds-text); font-size: var(--ds-font-lg); font-weight: var(--ds-weight-strong); }
+.ri-modal .outcome-modal-product { margin: var(--ds-space-2) 0 0; color: var(--ds-muted); font-size: var(--ds-font-sm); font-weight: var(--ds-weight-normal); overflow-wrap: anywhere; unicode-bidi: plaintext; }
+.ri-modal .outcome-modal-outcome { display: block; margin: var(--ds-space-1) 0 0; padding: 0; background: transparent; border-radius: 0; color: var(--ds-brand); font-size: var(--ds-font-sm); font-weight: var(--ds-weight-medium); }
+.ri-modal .outcome-modal-close { width: var(--ds-control-size); height: var(--ds-control-size); min-width: var(--ds-control-size); min-height: var(--ds-control-size); flex: 0 0 auto; padding: 0; border: 1px solid var(--ds-border); border-radius: var(--ds-radius-md); background: var(--ds-surface); color: var(--ds-text); cursor: pointer; font: 1.25rem/var(--ds-line-height) var(--ds-font-family); }
 .ri-modal .outcome-form-group { margin: 0; display: flex; flex-direction: column; gap: var(--ds-space-1); }
 .ri-modal .outcome-form-group[hidden], .ri-modal .ri-value-fields[hidden] { display: none; }
-.ri-modal .outcome-form-label { color: var(--ds-text); font-size: var(--ds-font-sm); font-weight: var(--ds-weight-medium); }
-.ri-modal .outcome-form-input, .ri-modal .outcome-form-textarea { width: 100%; font-family: var(--ds-font-family); min-height: var(--ds-control-size); }
+.ri-modal .outcome-form-label { margin: 0; color: var(--ds-text); font-size: var(--ds-font-sm); font-weight: var(--ds-weight-medium); }
+.ri-modal .outcome-form-input, .ri-modal .outcome-form-textarea { width: 100%; min-height: var(--ds-control-size); padding: var(--ds-space-2) var(--ds-space-3); border: 1px solid var(--ds-border-strong); border-radius: var(--ds-radius-md); background: var(--ds-surface); color: var(--ds-text); font: var(--ds-font-base)/var(--ds-line-height) var(--ds-font-family); box-shadow: none; }
+.ri-modal .outcome-form-input:focus, .ri-modal .outcome-form-textarea:focus { border-color: var(--ds-focus); background: var(--ds-surface); box-shadow: none; outline: 3px solid var(--ds-focus); outline-offset: 3px; }
 .ri-modal .outcome-form-textarea { min-height: 80px; resize: vertical; }
 .ri-modal .outcome-modal-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: var(--ds-space-2); margin: 0; }
-.ri-modal .outcome-error { padding: var(--ds-space-3); color: var(--ds-danger); background: var(--ds-danger-soft); border-radius: var(--ds-radius-sm); }
-.ri-modal .outcome-success { padding: var(--ds-space-3); color: var(--ds-success); background: var(--ds-success-soft); border-radius: var(--ds-radius-sm); }
+.ri-modal .outcome-modal-actions .ds-button { min-height: var(--ds-control-size); padding: var(--ds-space-2) var(--ds-space-4); border: 1px solid var(--ds-brand); border-radius: var(--ds-radius-md); background: var(--ds-brand); color: var(--ds-surface); box-shadow: none; font: var(--ds-weight-medium) var(--ds-font-base)/var(--ds-line-height) var(--ds-font-family); }
+.ri-modal .outcome-modal-actions .ds-button--secondary { background: var(--ds-surface); color: var(--ds-brand); border-color: var(--ds-border-strong); }
+.ri-modal .outcome-modal-actions .ds-button:hover { background: var(--ds-brand-hover); }
+.ri-modal .outcome-modal-actions .ds-button--secondary:hover { background: var(--ds-brand-soft); }
+.ri-modal .outcome-modal-actions .ds-button:disabled { background: var(--ds-surface-soft); color: var(--ds-muted); border-color: var(--ds-border); opacity: 1; cursor: not-allowed; }
+.ri-modal .outcome-error { margin: 0; padding: var(--ds-space-3); color: var(--ds-danger); background: var(--ds-danger-soft); border-radius: var(--ds-radius-sm); font-size: var(--ds-font-sm); }
+.ri-modal .outcome-success { margin: 0; padding: var(--ds-space-3); color: var(--ds-success); background: var(--ds-success-soft); border-radius: var(--ds-radius-sm); font-size: var(--ds-font-sm); }
 .ri-modal .outcome-error:not([hidden]), .ri-modal .outcome-success:not([hidden]) { display: block; }
 .ri-modal [hidden] { display: none !important; }
 .ri-modal button:focus-visible { outline: 3px solid var(--ds-focus); outline-offset: 3px; }

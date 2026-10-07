@@ -1,5 +1,7 @@
 from django.db import models
 from decimal import Decimal
+from django.core.exceptions import ValidationError
+from apps.sales_requests.model_guards import AppendOnlyModel, validate_snapshot
 
 
 class CustomerRecommendation(models.Model):
@@ -522,3 +524,77 @@ class RecommendationTuningSuggestion(models.Model):
             f"- {self.metric} "
             f"- {self.status}"
         )
+
+
+class RecommendationFeedbackEvent(AppendOnlyModel):
+    """Recommendation acceptance/rejection history, separate from legacy outcomes."""
+
+    class EventType(models.TextChoices):
+        ADDED_TO_REQUEST = "ADDED_TO_REQUEST", "افزوده‌شده به درخواست"
+        REMOVED_FROM_REQUEST = "REMOVED_FROM_REQUEST", "حذف‌شده از درخواست"
+        REJECTED = "REJECTED", "رد پیشنهاد"
+
+    class RejectionReason(models.TextChoices):
+        NOT_INTERESTED = "NOT_INTERESTED", "مشتری علاقه‌مند نبود"
+        PRICE = "PRICE", "قیمت مناسب نبود"
+        STOCK = "STOCK", "موجودی کافی نبود"
+        NO_CURRENT_NEED = "NO_CURRENT_NEED", "فعلاً نیاز ندارد"
+        OTHER_BRAND = "OTHER_BRAND", "قبلاً از برند/مدل دیگری استفاده می‌کند"
+        LATER = "LATER", "بعداً پیگیری شود"
+        OTHER = "OTHER", "دلیل دیگر"
+
+    visit = models.ForeignKey("visits.Visit", on_delete=models.PROTECT, related_name="recommendation_feedback_events")
+    recommendation = models.ForeignKey(CustomerRecommendation, on_delete=models.PROTECT, related_name="feedback_events")
+    sales_request = models.ForeignKey("sales_requests.SalesRequest", on_delete=models.PROTECT, null=True, blank=True, related_name="feedback_events")
+    line = models.ForeignKey("sales_requests.SalesRequestLine", on_delete=models.PROTECT, null=True, blank=True, related_name="feedback_events")
+    event_type = models.CharField(max_length=24, choices=EventType.choices)
+    reason_code = models.CharField(max_length=24, choices=RejectionReason.choices, blank=True)
+    note = models.CharField(max_length=200, blank=True)
+    lineage_snapshot = models.JSONField(default=dict)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "رویداد بازخورد پیشنهاد"
+        verbose_name_plural = "رویدادهای بازخورد پیشنهاد"
+        ordering = ["created_at", "pk"]
+        constraints = [
+            models.CheckConstraint(condition=models.Q(event_type__in=["ADDED_TO_REQUEST", "REMOVED_FROM_REQUEST", "REJECTED"]), name="rfe_valid_event_type"),
+            models.CheckConstraint(
+                condition=(models.Q(event_type="REJECTED", reason_code__in=["NOT_INTERESTED", "PRICE", "STOCK", "NO_CURRENT_NEED", "OTHER_BRAND", "LATER", "OTHER"]) | models.Q(event_type__in=["ADDED_TO_REQUEST", "REMOVED_FROM_REQUEST"], reason_code="")),
+                name="rfe_rejection_reason",
+            ),
+            models.CheckConstraint(condition=models.Q(event_type="REJECTED") | models.Q(sales_request__isnull=False, line__isnull=False), name="rfe_acceptance_has_line"),
+            models.CheckConstraint(condition=models.Q(line__isnull=True) | models.Q(sales_request__isnull=False), name="rfe_line_has_request"),
+        ]
+
+    @property
+    def product(self):
+        return self.recommendation.product
+
+    def clean(self):
+        super().clean()
+        validate_snapshot(self.lineage_snapshot, "lineage_snapshot")
+        if not self.visit_id or not self.recommendation_id:
+            return  # Field validation supplies the missing-reference error.
+        recommendation = CustomerRecommendation.objects.filter(pk=self.recommendation_id).first()
+        visit_model = self._meta.get_field("visit").remote_field.model
+        visit = visit_model.objects.filter(pk=self.visit_id).first()
+        if recommendation is None or visit is None:
+            raise ValidationError("The authoritative visit and recommendation must exist.")
+        if recommendation.customer_id != visit.customer_id:
+            raise ValidationError({"recommendation": "Recommendation must belong to the visit customer."})
+        if self.lineage_snapshot.get("recommendation_id") != self.recommendation_id:
+            raise ValidationError({"lineage_snapshot": "Preserve the linked recommendation identity."})
+        if self.sales_request_id:
+            request_model = self._meta.get_field("sales_request").remote_field.model
+            request_visit = request_model.objects.filter(pk=self.sales_request_id).values_list("visit_id", flat=True).first()
+            if request_visit != self.visit_id:
+                raise ValidationError({"sales_request": "Request must belong to the event visit."})
+        if self.line_id:
+            line_model = self._meta.get_field("line").remote_field.model
+            line = line_model.objects.filter(pk=self.line_id).first()
+            if line is None or line.sales_request_id != self.sales_request_id or line.recommendation_id != self.recommendation_id or line.product_id != recommendation.product_id:
+                raise ValidationError({"line": "Line, request and recommendation identities must match."})
+
+    def __str__(self):
+        return f"پیشنهاد {self.recommendation_id} · {self.get_event_type_display()}"
