@@ -34,6 +34,25 @@ SIGNAL_LABELS = {
     "rule_score": "امتیاز قواعد", "final_score": "امتیاز نهایی",
 }
 
+# Match Engine v1's saved component sequence; aliases stay beside their component.
+# This is display order only, never a scoring/ranking rule or JSON storage contract.
+COMPONENT_DISPLAY_ORDER = (
+    "group_score", "group_affinity", "purchase_score", "repurchase",
+    "association_score", "association", "upsell_score", "upsell",
+    "grade_score", "customer_grade", "promotion_score", "promotion",
+    "similar_score", "similar_product", "rule_score",
+    "feedback_score", "historical_feedback", "final_score",
+)
+
+
+def _display_components(breakdown):
+    if not isinstance(breakdown, dict):
+        return []
+    known = [key for key in COMPONENT_DISPLAY_ORDER if key in breakdown]
+    unknown = sorted(key for key in breakdown if key not in COMPONENT_DISPLAY_ORDER)
+    return [{"label": SIGNAL_LABELS.get(key, "شاخص ثبت‌شده"), "value": breakdown[key]}
+            for key in known + unknown]
+
 
 def _has_nonzero_score(value):
     """Presentation eligibility only; never recompute a signal's score."""
@@ -106,10 +125,7 @@ def product_commercial_brief(request, product_code):
     # Preserve source order and values; only select what is useful at first glance.
     active_signals = [signal for signal in signals if signal["active"] and _has_nonzero_score(signal["score"])]
     breakdown = recommendation.score_breakdown if recommendation else {}
-    components = [
-        {"label": SIGNAL_LABELS.get(key, "شاخص ثبت‌شده"), "value": value}
-        for key, value in breakdown.items()
-    ] if isinstance(breakdown, dict) else []
+    components = _display_components(breakdown)
     return_query = {"customer_code": customer.customer_code}
     if visit:
         return_query["visit_id"] = visit.pk

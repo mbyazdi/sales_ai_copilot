@@ -114,7 +114,7 @@ class ProductShellTests(TestCase):
         href = re.search(r'href="([^\"]*css/app\.css[^\"]*)"', html).group(1)
         url = urlsplit(href)
         self.assertEqual(url.path, "/static/css/app.css")
-        self.assertEqual(url.query, "v=002b-1")
+        self.assertEqual(url.query, "v=db01c4a-f1")
         response = serve(RequestFactory().get(href), "css/app.css")
         try:
             self.assertEqual(response.status_code, 200)

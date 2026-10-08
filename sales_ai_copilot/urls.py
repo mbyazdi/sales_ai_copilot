@@ -67,6 +67,11 @@ urlpatterns = [
         include("apps.targets.urls"),
     ),
     path(
+        "accounts/logout/",
+        auth_views.LogoutView.as_view(next_page="login", redirect_field_name=None),
+        name="logout",
+    ),
+    path(
         "accounts/login/",
         auth_views.LoginView.as_view(
             template_name="core/login.html"

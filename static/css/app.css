@@ -56,6 +56,14 @@ body.product-shell {
     background: var(--shell-active); border-color: var(--ds-border-strong);
     color: var(--shell-accent); font-weight: var(--ds-weight-strong);
 }
+.shell-logout { margin: 0; flex: 0 0 auto; }
+.shell-logout button {
+    display: flex; align-items: center; min-height: var(--ds-control-size);
+    padding: 10px var(--ds-space-3); border: 1px solid transparent;
+    border-radius: var(--shell-radius); background: transparent; color: var(--shell-muted);
+    font-family: inherit; font-size: var(--ds-font-sm); line-height: inherit; cursor: pointer;
+}
+.shell-logout button:hover { background: var(--ds-surface-soft); color: var(--shell-accent); }
 .product-shell :focus-visible { outline: 3px solid var(--ds-focus); outline-offset: 3px; }
 .shell-content { min-width: 0; padding: var(--ds-space-3) var(--shell-space) var(--ds-space-8); }
 .shell-page-header, .shell-page-container { width: 100%; max-width: var(--ds-container-width); margin-inline: auto; }
@@ -88,5 +96,6 @@ body.product-shell {
     .shell-brand small { font-size: 11px; }
     .shell-user { max-width: 140px; }
     .shell-nav a { font-size: 12px; padding: 8px 10px; }
+    .shell-logout button { font-size: 12px; padding: 8px 0; }
     .shell-content { padding-top: 10px; }
 }

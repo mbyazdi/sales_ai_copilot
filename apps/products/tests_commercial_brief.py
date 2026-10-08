@@ -6,7 +6,7 @@ from unittest.mock import patch
 from urllib.parse import parse_qs, urlsplit
 
 from django.db import connection
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
@@ -19,6 +19,7 @@ from apps.visits import tests_authorization
 from apps.visits.models import Visit, VisitCommercialSnapshot, VisitCustomerSnapshot
 
 from .models import Product
+from .views import _display_components
 
 
 class BriefLinkParser(HTMLParser):
@@ -31,6 +32,31 @@ class BriefLinkParser(HTMLParser):
         href = dict(attrs).get("href", "")
         if tag == "a" and href.startswith("/products/"):
             self.links.append(href)
+
+
+class ScoreComponentDisplayTests(SimpleTestCase):
+    def test_engine_v1_display_sequence_preserves_zero_and_all_values(self):
+        saved = {
+            "final_score": 10, "feedback_score": 0, "rule_score": 8, "similar_score": 7,
+            "promotion_score": 6, "grade_score": 5, "upsell_score": 4,
+            "association_score": 3, "purchase_score": 2, "group_score": 1,
+        }
+        original = dict(saved)
+        self.assertEqual([component["value"] for component in _display_components(saved)], [1, 2, 3, 4, 5, 6, 7, 8, 0, 10])
+        self.assertEqual(saved, original)
+
+    def test_aliases_and_unknown_keys_have_stable_order_without_dropping_data(self):
+        saved = {"unknown_z": -1, "historical_feedback": 0, "repurchase": 12, "unknown_a": None}
+        forward = _display_components(saved)
+        reverse = _display_components(dict(reversed(list(saved.items()))))
+        self.assertEqual(forward, reverse)
+        self.assertEqual([component["value"] for component in forward], [12, 0, None, -1])
+        self.assertEqual(len(forward), len(saved))
+
+    def test_missing_or_invalid_breakdown_is_still_empty(self):
+        for value in (None, [], "missing", {}):
+            with self.subTest(value=value):
+                self.assertEqual(_display_components(value), [])
 
 
 class ProductCommercialBriefTests(TestCase):
@@ -202,7 +228,8 @@ class ProductCommercialBriefTests(TestCase):
         self.assertContains(response, "17")
 
     def test_promotion_date_active_product_and_grade_filters_reused(self):
-        grade = CustomerGrade.objects.create(code="BRIEF-GRADE", name="Grade")
+        grade = CustomerGrade.objects.create(code="BRIEF-GRD", name="Grade")
+        self.assertLessEqual(len(grade.code), CustomerGrade._meta.get_field("code").max_length)
         self.promotion("PUBLIC")
         restricted = self.promotion("RESTRICTED")
         restricted.customer_grades.add(grade)
@@ -276,6 +303,29 @@ class ProductCommercialBriefTests(TestCase):
         self.assertContains(response, "چرخه خرید مجدد")
         self.assertContains(response, "شواهد ذخیره‌شده")
         self.assertContains(response, "دوباره محاسبه نشده‌اند")
+
+    def test_component_order_is_explicit_after_jsonb_storage(self):
+        saved = {"feedback_score": 0, "final_score": 35, "extra_z": -2, "purchase_score": 35, "extra_a": 0}
+        expected = [
+            {"label": "چرخه خرید مجدد", "value": 35},
+            {"label": "بازخورد تاریخی", "value": 0},
+            {"label": "امتیاز نهایی", "value": 35},
+            {"label": "شاخص ثبت‌شده", "value": 0},
+            {"label": "شاخص ثبت‌شده", "value": -2},
+        ]
+        identity = (self.recommendation.pk, self.recommendation.rank, self.recommendation.score)
+        for pairs in (list(saved.items()), list(reversed(list(saved.items())))):
+            self.recommendation.score_breakdown = dict(pairs)
+            self.recommendation.save(update_fields=["score_breakdown"])
+            response = self.page()
+            self.assertEqual(response.context["components"], expected)
+            stored = CustomerRecommendation.objects.get(pk=self.recommendation.pk)
+            self.assertEqual(stored.score_breakdown, saved)
+            self.assertEqual((stored.pk, stored.rank, stored.score), identity)
+        if connection.vendor == "postgresql":
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT pg_typeof(score_breakdown)::text FROM recommendations_customerrecommendation WHERE id=%s", [self.recommendation.pk])
+                self.assertEqual(cursor.fetchone()[0], "jsonb")
 
     def test_missing_evidence_reason_and_product_metadata_are_truthful(self):
         self.recommendation.reason = ""

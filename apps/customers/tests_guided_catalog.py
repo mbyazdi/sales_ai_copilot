@@ -175,7 +175,10 @@ class GuidedCatalogUITests(TestCase):
         self.assertNotIn("position: sticky", css)
 
     def test_long_persian_customer_text_is_escaped_and_isolated(self):
-        self.customer.name = "نام طولانی فروشگاه " * 12 + "<script>bad()</script>"
+        payload = "<script>bad()</script>"
+        maximum = self.customer._meta.get_field("name").max_length
+        self.customer.name = ("نام طولانی فروشگاه " * 12)[:maximum - len(payload)] + payload
+        self.assertEqual(len(self.customer.name), maximum)
         self.customer.save()
         response = self.page()
         self.assertContains(response, "&lt;script&gt;bad()&lt;/script&gt;")

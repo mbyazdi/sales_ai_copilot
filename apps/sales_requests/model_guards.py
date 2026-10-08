@@ -1,6 +1,7 @@
 """ORM persistence guards, without basket, pricing or submission operations."""
 from django.core.exceptions import ValidationError
 from django.db import models, router, transaction
+from django.db.models import OuterRef, Subquery
 
 
 class GuardedQuerySet(models.QuerySet):
@@ -30,9 +31,17 @@ class RequestQuerySet(GuardedQuerySet):
             raise ValidationError("Submitted requests are immutable.")
         if self.filter(visit__status__in=["COMPLETED", "CANCELLED"]).exists():
             raise ValidationError("Closed-visit drafts are read-only.")
-        # The SQL predicate protects a row that becomes submitted after the read.
-        # A future service must additionally supply its expected revision.
-        return models.QuerySet.update(self.filter(status="DRAFT", visit__status__in=["PLANNED", "IN_PROGRESS"]), **kwargs)
+        visit_model = self.model._meta.get_field("visit").remote_field.model
+        open_visits = visit_model.objects.using(self.db).filter(status__in=["PLANNED", "IN_PROGRESS"]).values("pk")
+        # Keep the original selection (including ownership joins/expected revision)
+        # as a scalar snapshot, and compare it to the actual UPDATE target row.
+        # A joined UPDATE's id-only subquery isn't a safe PostgreSQL CAS after waiting.
+        selected_revision = self.filter(pk=OuterRef("pk")).order_by().values("revision")[:1]
+        writable = self.model.objects.using(self.db).filter(
+            status="DRAFT", visit_id__in=open_visits, revision=Subquery(selected_revision),
+        )
+        # Zero rows is a conflict; callers must still supply their expected revision.
+        return models.QuerySet.update(writable, **kwargs)
 
 
 class GuardedModel(models.Model):
