@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .admin_base import InspectionOnlyAdmin
-from .models import SalesRequest, SalesRequestAcknowledgement, SalesRequestLine
+from .models import SalesRequest, SalesRequestAcknowledgement, SalesRequestLine, SalesRequestMutationReceipt
 
 
 @admin.register(SalesRequest)
@@ -22,3 +22,9 @@ class SalesRequestLineAdmin(InspectionOnlyAdmin):
 class SalesRequestAcknowledgementAdmin(InspectionOnlyAdmin):
     list_display = ("id", "sales_request", "actor", "acknowledged_at")
     list_select_related = ("sales_request", "actor")
+
+
+@admin.register(SalesRequestMutationReceipt)
+class SalesRequestMutationReceiptAdmin(InspectionOnlyAdmin):
+    list_display = ("id", "visit", "command_uuid", "operation", "actor", "applied_revision", "created_at")
+    list_select_related = ("visit", "actor", "sales_request")

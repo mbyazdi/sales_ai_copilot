@@ -1,4 +1,5 @@
 from django.urls import path
+from .feedback_views import RecommendationFeedbackAPIView
 
 from .views import (
     CustomerRecommendationAPIView,
@@ -14,6 +15,7 @@ from .views import (
 
 
 urlpatterns = [
+    path("v1/visits/<int:visit_id>/feedback/", RecommendationFeedbackAPIView.as_view(), name="recommendation-feedback-v1"),
 
     path(
         "v1/recommendations/<str:customer_code>/",

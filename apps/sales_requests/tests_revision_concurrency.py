@@ -19,7 +19,7 @@ from django.utils import timezone
 from apps.customers.models import Customer
 from apps.products.models import Brand, Category, Product
 from apps.visits.models import Salesperson, Visit
-from .models import SalesRequest, SalesRequestLine
+from .models import SalesRequest, SalesRequestLine, SalesRequestMutationReceipt
 
 
 @skipUnless(connection.vendor == "postgresql", "Requires real PostgreSQL row-lock/READ COMMITTED behavior")
@@ -167,7 +167,13 @@ class RequestRevisionConcurrencyTests(TransactionTestCase):
         self.assertIn('"sales_requests_salesrequest"."status" =', updates[0])
         self.assertIn('"sales_requests_salesrequest"."revision" = (SELECT', updates[0])
 
-    def test_successive_and_stale_revisions(self):
+    def test_successive_and_stale_revisions_preserve_historical_receipt(self):
+        receipt = SalesRequestMutationReceipt.objects.create(
+            visit=self.visit, actor=self.owner, command_uuid=uuid4(), operation="REJECT_RECOMMENDATION",
+            intent_fingerprint="a" * 64, sales_request=self.request, applied_revision=0,
+            result={"revision": 0, "feedback_event_id": 123},
+        )
+        original = SalesRequestMutationReceipt.objects.values().get(pk=receipt.pk)
         self.assertEqual(self.cas(0), 1)
         self.assertEqual(self.cas(0), 0)
         self.assertEqual(self.cas(1), 1)
@@ -175,6 +181,11 @@ class RequestRevisionConcurrencyTests(TransactionTestCase):
         self.assertEqual(self.cas(1), 0)
         self.request.refresh_from_db()
         self.assertEqual(self.request.revision, 2)
+        receipt.refresh_from_db()
+        receipt.full_clean()
+        self.assertEqual(SalesRequestMutationReceipt.objects.values().get(pk=receipt.pk), original)
+        with self.assertRaises(ValidationError):
+            receipt.save()
 
     def test_closed_visits_still_block_revision_mutations(self):
         for status in ("COMPLETED", "CANCELLED"):

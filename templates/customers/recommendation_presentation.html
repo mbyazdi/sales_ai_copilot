@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{% static 'core/css/guided_catalog.css' %}?v=2b-final-1">
     <link rel="stylesheet" href="{% static 'demo/assets.css' %}?v=demo04-1">
     <link rel="stylesheet" href="{% static 'products/css/commercial_quote.css' %}?v=3c3-1">
+    <link rel="stylesheet" href="{% static 'core/css/guided_feedback.css' %}?v=3d2-1">
 </head>
 <body class="gs-page gc-page">
 <a class="gs-skip" href="#main-content">رفتن به فهرست محصولات</a>
@@ -29,7 +30,7 @@
     </section>
     <main id="main-content" tabindex="-1">
     {% if current_visit and current_visit.status == 'IN_PROGRESS' or current_visit and current_visit.status == 'PLANNED' %}
-        <div id="guidedCatalog" data-api-url="{% url 'product-catalog-v1' %}" data-quote-url="{% url 'visit-quote-v1' current_visit.id %}" data-customer-code="{{ customer.customer_code }}" data-visit-id="{{ current_visit.id }}" aria-busy="true">
+        <div id="guidedCatalog" data-api-url="{% url 'product-catalog-v1' %}" data-quote-url="{% url 'visit-quote-v1' current_visit.id %}" data-feedback-url="{% url 'recommendation-feedback-v1' current_visit.id %}" data-actor-id="{{ request.user.pk }}" data-customer-code="{{ customer.customer_code }}" data-visit-id="{{ current_visit.id }}" aria-busy="true">
             <form id="catalogFilters" class="gc-filters" method="get" aria-label="جستجو و فیلتر محصولات">
                 <div id="catalogCategoryChips" class="gc-category-chips" aria-label="دسته‌بندی محصولات"></div>
                 <div class="gc-search"><label class="gc-sr-only" for="catalogSearch">جستجوی محصول</label><input id="catalogSearch" class="ds-control" name="q" type="search" maxlength="200" placeholder="جستجوی نام یا کد کالا…" disabled><button id="catalogApply" class="gc-search-submit" type="submit" aria-label="جستجوی محصولات" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg></button></div>
@@ -48,6 +49,8 @@
             <p id="catalogStatus" class="gc-status" role="status" aria-live="polite">در حال دریافت فهرست محصولات…</p>
             <div id="catalogError" class="ds-state ds-state--error" role="alert" hidden><p id="catalogErrorText"></p><div class="gc-error-actions"><button id="catalogRetry" class="ds-button ds-button--secondary" type="button">تلاش دوباره</button><a class="ds-button ds-button--quiet" href="{{ customer_url }}">بازگشت به نمای مشتری</a></div></div>
             <div id="catalogResults" hidden>
+                <div id="feedbackRecovery" class="gf-recovery" role="status" hidden><p>نتیجه تصمیم قبلی هنوز مشخص نیست؛ فرمان تازه‌ای ارسال نکنید.</p><button id="feedbackResume" class="ds-button ds-button--secondary" type="button">بررسی نتیجه تصمیم قبلی</button></div>
+                <p id="feedbackNotice" class="gc-sr-only" role="status" aria-live="polite"></p>
                 <p id="catalogSummary" class="gc-summary"></p>
                 <p id="catalogNoPriority" class="ds-state ds-state--empty" hidden>پیشنهاد ویژه‌ای ثبت نشده است؛ همه محصولات را بررسی کنید.</p>
                 <div id="catalogEmpty" class="ds-state ds-state--empty" hidden><p id="catalogEmptyText"></p></div>
@@ -72,6 +75,7 @@
                     <div class="gc-add-slot" aria-hidden="true"></div>
                 </div>
                 <div class="gc-secondary-actions"><a data-detail aria-label="جزئیات محصول" class="ds-button ds-button--secondary gc-detail"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12C5 7 8 5 12 5s7 2 10 7c-3 5-6 7-10 7s-7-2-10-7z"/><circle cx="12" cy="12" r="3"/></svg>جزئیات</a><details data-image-disclosure class="gc-image-credit" hidden><summary aria-label="اطلاعات تصویر نمونه محصول">تصویر نمونه</summary><p data-image-label></p><p data-image-credit></p><a data-image-source target="_blank" rel="noopener noreferrer">منبع تصویر</a> · <a data-image-licence target="_blank" rel="noopener noreferrer">مجوز تصویر</a><a data-image-original target="_blank" rel="noopener noreferrer" hidden> · مرجع اصلی</a></details></div>
+                <details data-feedback-actions class="gf-actions" hidden><summary data-feedback-summary>بازخورد</summary><div class="gf-panel"><p data-feedback-history hidden></p><ul data-feedback-history-list class="gf-history" hidden></ul><p data-feedback-guidance></p><button data-feedback-change class="ds-button ds-button--quiet" type="button" hidden disabled>تغییر تصمیم</button><div data-feedback-options class="gf-buttons"><button data-feedback-reject class="ds-button ds-button--quiet" type="button" disabled>رد پیشنهاد</button><button data-feedback-later class="ds-button ds-button--quiet" type="button" disabled>بعداً بررسی می‌کنم</button></div></div></details>
             </article>
         </template>
     {% else %}
@@ -80,7 +84,17 @@
     {% if current_visit %}<footer class="gc-footer"><a class="ds-button ds-button--quiet" href="{{ end_url }}">مرور ویزیت</a></footer>{% endif %}
     </main>
 </div>
+<dialog id="feedbackDialog" class="gf-dialog" dir="rtl" aria-labelledby="feedbackTitle" aria-describedby="feedbackDescription">
+    <form id="feedbackForm" class="ds-stack" method="dialog" novalidate>
+        {% csrf_token %}
+        <h2 id="feedbackTitle" class="ds-heading">رد پیشنهاد</h2><p id="feedbackProduct" class="gf-product"></p><p id="feedbackDescription" class="ds-caption ds-muted"></p>
+        <div id="feedbackReasonRow"><label for="feedbackReason">دلیل تصمیم</label><select id="feedbackReason" class="ds-control" required><option value="">دلیل را انتخاب کنید</option><option value="NOT_INTERESTED">مشتری علاقه‌مند نبود</option><option value="PRICE">قیمت مناسب نبود</option><option value="STOCK">موجودی کافی نبود</option><option value="NO_CURRENT_NEED">فعلاً نیاز ندارد</option><option value="OTHER_BRAND">از برند یا مدل دیگری استفاده می‌کند</option><option value="LATER">بعداً بررسی می‌کنم</option><option value="OTHER">دلیل دیگر</option></select></div>
+        <p id="feedbackMessage" class="gf-message" role="status" aria-live="polite"></p>
+        <div class="gf-dialog-actions"><button id="feedbackConfirm" class="ds-button" type="submit">تأیید و ثبت تصمیم</button><button id="feedbackCancel" class="ds-button ds-button--secondary" type="button">انصراف</button></div>
+    </form>
+</dialog>
 <script src="{% static 'products/js/commercial_quotes.js' %}?v=3c3-1" defer></script>
+<script src="{% static 'core/js/guided_feedback.js' %}?v=3d2-1" defer></script>
 <script src="{% static 'core/js/guided_catalog.js' %}?v=3c3-1" defer></script>
 <script src="{% static 'demo/assets.js' %}?v=demo04-1" defer></script>
 </body>

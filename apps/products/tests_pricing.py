@@ -13,7 +13,7 @@ from apps.inventory.models import Inventory
 from apps.promotions.models import Promotion, PromotionProduct
 from apps.recommendations.models import RecommendationFeedbackEvent
 from apps.sales.models import Sale, SaleItem
-from apps.sales_requests.models import SalesRequest, SalesRequestLine
+from apps.sales_requests.models import SalesRequest, SalesRequestLine, SalesRequestMutationReceipt
 from apps.visits.models import Visit
 from .models import Brand, Category, Product, ProductDemoPrice
 from .pricing import (
@@ -289,7 +289,7 @@ class DemoPriceProviderTests(TestCase):
 
     def test_reads_leave_prices_and_all_workflow_tables_unchanged(self):
         models = (ProductDemoPrice, Customer, Visit, Inventory, SalesRequest, SalesRequestLine,
-                  RecommendationFeedbackEvent, Sale, SaleItem)
+                  SalesRequestMutationReceipt, RecommendationFeedbackEvent, Sale, SaleItem)
         before = {model: list(model.objects.order_by("pk").values()) for model in models}
         with CaptureQueriesContext(connection) as queries:
             self.provider.quote_many(self.customer.pk, {self.product.pk: 3})

@@ -183,6 +183,10 @@
             window.CommercialQuotes.load({apiUrl: root.dataset.quoteUrl, customerCode: root.dataset.customerCode, visitId: root.dataset.visitId},
                 mounts.map(mount => ({productId: Number(mount.dataset.productId), mount})),
                 {signal: controller.signal, isCurrent: () => version === requestVersion});
+            window.GuidedFeedback?.load({apiUrl: root.dataset.feedbackUrl, catalogContext: data.catalog_context},
+                mounts.map(mount => ({mount, productId: Number(mount.dataset.productId), recommendationId: mount.dataset.recommendationId ? Number(mount.dataset.recommendationId) : null,
+                    name: data.items.find(item => item.product_id === Number(mount.dataset.productId)).name})),
+                {signal: controller.signal, isCurrent: () => version === requestVersion});
         } catch (error) {
             if (version !== requestVersion || error.name === 'AbortError') return;
             if (error.message !== 'Handled response') {

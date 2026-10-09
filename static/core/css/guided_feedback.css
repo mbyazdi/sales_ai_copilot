@@ -1,0 +1,39 @@
+/* Guided-only disclosure/dialog; existing commercial/card zones remain intact. */
+.gc-secondary-actions:has(.gf-actions) { flex-wrap: wrap; gap: 6px; }
+.gc-secondary-actions:has(.gf-actions) > .gc-detail { flex: 0 0 112px; }
+.gc-secondary-actions:has(.gf-actions) > .gc-image-credit:not([open]) { position: static; width: 68px; flex: 0 0 68px; }
+.gc-secondary-actions:has(.gf-actions) > .gc-image-credit > summary { padding-block: 2px; }
+.gc-secondary-actions:has(.gf-actions) > .gc-image-credit[open] { flex-basis: 100%; }
+.gf-actions { min-width: 0; }
+.gf-actions:not([open]) { flex: 1 1 0; }
+.gf-actions > summary { display: flex; align-items: center; justify-content: center; min-height: var(--ds-control-size); max-width: 156px; padding-inline: 6px; color: var(--gc-navy); font-size: .8125rem; line-height: 1.5; cursor: pointer; list-style: none; }
+.gf-actions > summary::-webkit-details-marker { display: none; }
+.gf-actions > summary::after { content: '⌄'; margin-inline-start: 5px; }
+.gf-actions[open] { flex-basis: 100%; }
+.gf-actions[open] > summary { margin-inline: auto; }
+/* Open history only: keep navigation in its collapsed-row position. */
+.gc-secondary-actions:has(> .gf-actions[open]) { display: grid; grid-template-columns: minmax(0, 1fr) 112px 68px; grid-template-areas: '. detail credit' 'history history history'; align-items: start; }
+.gc-secondary-actions:has(> .gf-actions[open]):has(> .gc-image-credit[hidden]) { grid-template-columns: minmax(0, 1fr) 112px; grid-template-areas: '. detail' 'history history'; }
+.gc-secondary-actions:has(> .gf-actions[open]) > .gc-detail { grid-area: detail; }
+.gc-secondary-actions:has(> .gf-actions[open]) > .gc-image-credit:not([open]) { grid-area: credit; }
+.gc-secondary-actions:has(> .gf-actions[open]) > .gc-image-credit[open] { grid-column: 1 / -1; grid-row: 3; }
+.gf-actions[open] { grid-area: history; }
+.gf-actions[open] > summary { max-width: none; margin-inline: 0; padding: 8px 12px; justify-content: space-between; text-align: start; font-weight: var(--ds-weight-medium); background: var(--ds-surface-soft); border-radius: var(--ds-radius-sm); }
+.gf-actions[open] > .gf-panel { display: grid; gap: var(--ds-space-2); padding-block: var(--ds-space-3); }
+.gf-actions[open] .gf-history { display: grid; gap: var(--ds-space-2); margin: 0; padding-inline-start: 24px; }
+.gf-actions[open] [data-feedback-change] { justify-self: start; margin-block-start: var(--ds-space-2); min-height: var(--ds-control-size); border: 1px solid var(--ds-border); background: var(--ds-brand-soft); color: var(--ds-brand); }
+.gf-panel { padding-block: var(--ds-space-2); border-block-start: 1px solid var(--ds-border); font-size: .8125rem; line-height: 1.6; }
+.gf-panel p { margin: 0; overflow-wrap: anywhere; }
+.gf-history { margin: 4px 0; padding-inline-start: 20px; color: var(--ds-muted); }
+.gf-history li { overflow-wrap: anywhere; }
+.gf-buttons, .gf-dialog-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--ds-space-2); }
+.gf-buttons button { min-height: var(--ds-control-size); font-size: .8125rem; }
+.gf-panel [data-feedback-guidance] { color: var(--ds-muted); }
+.gf-actions summary:focus-visible { outline: 3px solid var(--ds-focus); outline-offset: 2px; border-radius: var(--ds-radius-sm); }
+.gf-dialog { width: min(440px, calc(100% - 24px)); max-height: calc(100dvh - 32px); margin: auto; padding: var(--ds-space-5); border: 1px solid var(--ds-border); border-radius: var(--ds-radius-lg); background: var(--ds-surface); color: var(--ds-text); overflow-y: auto; font-family: inherit; }
+.gf-dialog::backdrop { background: rgba(7, 51, 91, .38); }
+.gf-dialog h2, .gf-dialog p { margin: 0; overflow-wrap: anywhere; }
+.gf-dialog select { width: 100%; min-height: var(--ds-control-size); font-family: inherit; }
+.gf-product { font-weight: var(--ds-weight-medium); }
+.gf-message { font-size: .875rem; line-height: 1.6; }
+.gf-recovery { padding: var(--ds-space-3); margin-block: var(--ds-space-2); background: var(--ds-brand-soft); border-radius: var(--ds-radius-sm); }

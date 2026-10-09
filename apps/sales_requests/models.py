@@ -1,6 +1,7 @@
 """Sales Request persistence only; amounts are supplied snapshots, never calculated."""
 from decimal import Decimal
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db import models
@@ -257,3 +258,76 @@ class SalesRequestAcknowledgement(AppendOnlyModel):
                 raise ValidationError({"sales_request": "Only submitted requests can be acknowledged."})
             if self.actor_id != request.salesperson_id:
                 raise ValidationError({"actor": "Acknowledgement actor must be the visit owner."})
+
+
+class SalesRequestMutationReceipt(AppendOnlyModel):
+    """Successful command evidence; replay/authorization belongs to later services.
+
+    Create together with the successful effects in the caller's atomic transaction.
+    result preserves the prior canonical response, not a projection of current state.
+    """
+
+    class Operation(models.TextChoices):
+        ADD_PRODUCT = "ADD_PRODUCT", "افزودن محصول"
+        SET_QUANTITY = "SET_QUANTITY", "تغییر تعداد"
+        REMOVE_PRODUCT = "REMOVE_PRODUCT", "حذف محصول"
+        REJECT_RECOMMENDATION = "REJECT_RECOMMENDATION", "رد پیشنهاد"
+
+    visit = models.ForeignKey("visits.Visit", on_delete=models.PROTECT, related_name="mutation_receipts")
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="sales_request_mutation_receipts")
+    command_uuid = models.UUIDField()
+    operation = models.CharField(max_length=24, choices=Operation.choices)
+    intent_fingerprint = models.CharField(
+        max_length=64, validators=[RegexValidator(r"\A[0-9a-f]{64}\Z", "Expected a SHA256 intent fingerprint.")],
+    )
+    sales_request = models.ForeignKey(SalesRequest, on_delete=models.PROTECT, null=True, blank=True, related_name="mutation_receipts")
+    applied_revision = models.PositiveBigIntegerField(null=True, blank=True)
+    result = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "رسید اجرای فرمان درخواست فروش"
+        verbose_name_plural = "رسیدهای اجرای فرمان درخواست فروش"
+        ordering = ["created_at", "pk"]
+        constraints = [
+            models.UniqueConstraint(fields=["visit", "command_uuid"], name="srmr_unique_visit_command"),
+            models.CheckConstraint(
+                condition=models.Q(operation__in=["ADD_PRODUCT", "SET_QUANTITY", "REMOVE_PRODUCT", "REJECT_RECOMMENDATION"]),
+                name="srmr_valid_operation",
+            ),
+            models.CheckConstraint(condition=~models.Q(intent_fingerprint=""), name="srmr_intent_not_empty"),
+            models.CheckConstraint(
+                condition=(models.Q(sales_request__isnull=True, applied_revision__isnull=True) | models.Q(
+                    sales_request__isnull=False, applied_revision__isnull=False, applied_revision__gte=0,
+                )), name="srmr_revision_request_pair",
+            ),
+        ]
+
+    def clean_fields(self, exclude=None):
+        if "applied_revision" not in (exclude or ()) and self.applied_revision is not None:
+            if isinstance(self.applied_revision, bool) or not isinstance(self.applied_revision, int):
+                raise ValidationError({"applied_revision": "Revision must be an integer."})
+        return super().clean_fields(exclude=exclude)
+
+    def clean(self):
+        super().clean()
+        validate_snapshot(self.result, "result")
+        if not self.result:
+            raise ValidationError({"result": "Preserve the canonical successful result."})
+        if self.visit_id and self.actor_id:
+            visit_model = self._meta.get_field("visit").remote_field.model
+            owner_user = visit_model.objects.filter(pk=self.visit_id).values_list("salesperson__user_id", flat=True).first()
+            if owner_user != self.actor_id:
+                raise ValidationError({"actor": "Receipt actor must be the visit owner's authenticated user."})
+        if self.sales_request_id:
+            request = SalesRequest.objects.filter(pk=self.sales_request_id).values("visit_id", "revision").first()
+            if request is None or request["visit_id"] != self.visit_id:
+                raise ValidationError({"sales_request": "Receipt request must belong to the same visit."})
+            # Existing receipts retain historical revisions as the request advances.
+            if self._state.adding and self.applied_revision != request["revision"]:
+                raise ValidationError({"applied_revision": "Capture the request revision when the command is applied."})
+        elif self.applied_revision is not None:
+            raise ValidationError({"applied_revision": "A revision requires a request."})
+
+    def __str__(self):
+        return f"ویزیت {self.visit_id} · {self.command_uuid}"
