@@ -1,0 +1,143 @@
+{
+  "evidence_version": 1,
+  "checked_on": "2026-10-09",
+  "files": {
+    "PHD001": {
+      "title": "File:Philips Thermo Protect 2100W.jpg",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Philips_Thermo_Protect_2100W.jpg",
+      "page_revision_id": 1176783668,
+      "author": "Air fans",
+      "licence": "CC BY-SA 4.0",
+      "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "evidence": "Own-work copyright holder grant on the individual Commons file page.",
+      "grant_template": "{{self|cc-by-sa-4.0}}",
+      "source_original_url": "https://upload.wikimedia.org/wikipedia/commons/3/30/Philips_Thermo_Protect_2100W.jpg",
+      "original_sha1": "229c8a334a42436ec8a7054fecb5b80d340d85ad",
+      "downloaded_url": "https://upload.wikimedia.org/wikipedia/commons/3/30/Philips_Thermo_Protect_2100W.jpg",
+      "downloaded_sha256": "3140387395db6039c0aa2b8567ee54c3e8260a6c791ba419e4580c2f8bba57e2"
+    },
+    "BRN001": {
+      "title": "File:Braun S3 electric shaver.jpg",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Braun_S3_electric_shaver.jpg",
+      "page_revision_id": 864019317,
+      "author": "Malcolm Koo (Mk2010)",
+      "licence": "CC BY-SA 4.0",
+      "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "evidence": "Own work; formal file licence CC BY-SA 4.0; description separately offers CC BY 4.0. Use the stricter share-alike licence and Malcolm Koo attribution.",
+      "grant_template": "{{self|cc-by-sa-4.0}}",
+      "source_original_url": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Braun_S3_electric_shaver.jpg",
+      "original_sha1": "2a1b17aa4ece65bb7a0c2018a503df382eadb788",
+      "downloaded_url": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Braun_S3_electric_shaver.jpg",
+      "downloaded_sha256": "18182be2634a8a5fa0f958709c95a1144873b70574f7e3ec4890ab1523d03a06"
+    },
+    "BRN002": {
+      "title": "File:Bartschneider.jpg",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Bartschneider.jpg",
+      "page_revision_id": 817557492,
+      "author": "Gmhofmann",
+      "licence": "Public domain",
+      "licence_url": null,
+      "evidence": "Copyright holder explicitly releases own photograph to public domain (PD-self/PD-user-de).",
+      "grant_template": "{{PD-user-de|Gmhofmann}}",
+      "source_original_url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Bartschneider.jpg",
+      "original_sha1": "d80e55fedd02208676a25e592474293a9900fb5d",
+      "downloaded_url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Bartschneider.jpg",
+      "downloaded_sha256": "c648b0967beee334af1c9c8c52a6bf3e525b7000a45baf94e0645af3bae42fbf"
+    },
+    "PHI002": {
+      "title": "File:Philips Sonicare 1100 Series Electric Toothbrush - 51967361282.jpg",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Philips_Sonicare_1100_Series_Electric_Toothbrush_-_51967361282.jpg",
+      "page_revision_id": 1124640883,
+      "author": "electricteeth",
+      "licence": "CC BY 2.0",
+      "licence_url": "https://creativecommons.org/licenses/by/2.0",
+      "evidence": "Flickr licence CC BY 2.0 reviewed by FlickreviewR 2; description also offers CC BY 4.0. Chosen conservative reviewed CC BY 2.0; include original review article link.",
+      "grant_template": null,
+      "source_original_url": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Philips_Sonicare_1100_Series_Electric_Toothbrush_-_51967361282.jpg",
+      "original_sha1": "f23dceccdc3ccbab883091ebf499425a7070a349",
+      "downloaded_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/Philips_Sonicare_1100_Series_Electric_Toothbrush_-_51967361282.jpg/960px-Philips_Sonicare_1100_Series_Electric_Toothbrush_-_51967361282.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "downloaded_sha256": "e0f2eff48b475134a9781e64f20764413854ca0824083b1da90c21886f7da9e2"
+    },
+    "BOS001": {
+      "title": "File:Bosch Serie 4 ProHygienic.jpg",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Bosch_Serie_4_ProHygienic.jpg",
+      "page_revision_id": 1092167312,
+      "author": "Air fans",
+      "licence": "CC0",
+      "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "evidence": "Own-work copyright holder grant on the individual Commons file page.",
+      "grant_template": "{{self|cc-zero}}",
+      "source_original_url": "https://upload.wikimedia.org/wikipedia/commons/2/28/Bosch_Serie_4_ProHygienic.jpg",
+      "original_sha1": "7d29fbf898e0be4d1e536e9b417f90259ed4c885",
+      "downloaded_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/28/Bosch_Serie_4_ProHygienic.jpg/960px-Bosch_Serie_4_ProHygienic.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "downloaded_sha256": "ae3134fddab8fa6a61e47d996d3599a3c7e7dc918be4d3af3ec68decaaac1d3b"
+    },
+    "PHI003": {
+      "title": "File:Electric kettle phillips white.JPG",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Electric_kettle_phillips_white.JPG",
+      "page_revision_id": 1227282028,
+      "author": "Rafa",
+      "licence": "Public domain",
+      "licence_url": null,
+      "evidence": "Copyright holder explicitly releases own photograph to public domain (PD-self/PD-user-de).",
+      "grant_template": "{{PD-self}}",
+      "source_original_url": "https://upload.wikimedia.org/wikipedia/commons/1/15/Electric_kettle_phillips_white.JPG",
+      "original_sha1": "d169faf6a586db5b2ec1cd886b86f1ea3b417528",
+      "downloaded_url": "https://upload.wikimedia.org/wikipedia/commons/1/15/Electric_kettle_phillips_white.JPG",
+      "downloaded_sha256": "97f69443e2479e918b1e8e0a3a873fdb9fafa6b9fb973127b150a990f9d4439d"
+    },
+    "TEF002": {
+      "title": "File:Airfryer.jpg",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Airfryer.jpg",
+      "page_revision_id": 845762222,
+      "author": "Djsgmnd",
+      "licence": "CC BY-SA 4.0",
+      "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "evidence": "Own-work copyright holder grant on the individual Commons file page.",
+      "grant_template": "{{self|cc-by-sa-4.0}}",
+      "source_original_url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Airfryer.jpg",
+      "original_sha1": "2430299aba3b2c1048ae696a063caf1b64a8bea7",
+      "downloaded_url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Airfryer.jpg",
+      "downloaded_sha256": "e7ac0ffa9482f9f939749d59794af8c22754f414f331f30019ca4a469ad630dc"
+    },
+    "ROW001": {
+      "title": "File:FK5401.jpg",
+      "page_url": "https://commons.wikimedia.org/wiki/File:FK5401.jpg",
+      "page_revision_id": 1239312901,
+      "author": "Groupe SEB",
+      "licence": "CC BY-SA 3.0",
+      "licence_url": "https://creativecommons.org/licenses/by-sa/3.0",
+      "evidence": "Groupe SEB supplied photograph; Commons PermissionTicket 2010060110010948; CC BY-SA 3.0.",
+      "grant_template": "{{Cc-by-sa-3.0}}",
+      "source_original_url": "https://upload.wikimedia.org/wikipedia/commons/e/ea/FK5401.jpg",
+      "original_sha1": "1caea5ef47c88218771a420de2695cf04f5995e6",
+      "downloaded_url": "https://upload.wikimedia.org/wikipedia/commons/e/ea/FK5401.jpg",
+      "downloaded_sha256": "5e9eba57a76f6cd4c8d0d819904f33a9b32d807e8f427173d8b3a43978dd3256"
+    },
+    "PHI004": {
+      "title": "File:Juice Blender.jpg",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Juice_Blender.jpg",
+      "page_revision_id": 1252915451,
+      "author": "Nana Pearls",
+      "licence": "CC0",
+      "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "evidence": "Own-work copyright holder grant on the individual Commons file page.",
+      "grant_template": "{{self|cc-zero}}",
+      "source_original_url": "https://upload.wikimedia.org/wikipedia/commons/0/08/Juice_Blender.jpg",
+      "original_sha1": "04337183d7970beedfb436fea3d4d938440f2657",
+      "downloaded_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/Juice_Blender.jpg/960px-Juice_Blender.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "downloaded_sha256": "713eb9b00ae428f9b001fd00d6eae40cd7d779c5a2384b0d7e4f993ca778cf71"
+    }
+  },
+  "rejected_alternatives": [
+    {
+      "sku": "PHI002",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Philips_Sonicare_1100_Series_Electric_Toothbrush.jpg",
+      "licence": "CC BY 2.0",
+      "author": "electricteeth",
+      "licence_url": "https://creativecommons.org/licenses/by/2.0",
+      "reason": "Original crop cuts off toothbrush head; contact sheet evidence only.",
+      "downloaded_sha256": "a050d2aa7af2b246d93f912fa7d0ba8c80627cf35833901208843f1c79c7dc51"
+    }
+  ]
+}

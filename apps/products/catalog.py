@@ -10,6 +10,7 @@ from django.http import Http404
 from django.urls import reverse
 
 from apps.recommendations.catalog_context import saved_priority
+from apps.core.demo_assets import demo_image
 from apps.visits.models import Visit
 
 from .catalog_access import catalog_access
@@ -129,7 +130,7 @@ def build_catalog(user, customer_code, visit_id, query=None):
             "catalog_visible": True, "inventory_state": eligibility["inventory_state"],
             "available_quantity": eligibility["available_quantity"], "inventory_can_add": eligibility["can_add"],
             "can_add": bool(can_add), "non_addable_reason": reason,
-            "image": {"url": None, "state": "MISSING"},
+            "image": demo_image("products", product.product_code),
             "pricing": {"has_demo_price": product._has_demo_price, "state": "NOT_EVALUATED"},
             "brief_url": reverse("product-commercial-brief", args=[product.product_code]) + "?" + urlencode(brief_query),
         })

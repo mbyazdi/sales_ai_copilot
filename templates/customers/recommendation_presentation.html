@@ -1,4 +1,4 @@
-{% load static %}
+{% load static demo_assets %}
 <!doctype html>
 <html lang="fa" dir="rtl">
 <head>
@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{% static 'core/css/recommendation_presentation.css' %}?v=002i-1">
     <link rel="stylesheet" href="{% static 'css/salesperson_journey.css' %}?v=002p-1">
     <link rel="stylesheet" href="{% static 'core/css/guided_catalog.css' %}?v=2b-final-1">
+    <link rel="stylesheet" href="{% static 'demo/assets.css' %}?v=demo04-1">
 </head>
 <body class="gs-page gc-page">
 <a class="gs-skip" href="#main-content">رفتن به فهرست محصولات</a>
@@ -21,7 +22,8 @@
             {% if customer.grade %}<span class="gc-grade" aria-label="رتبه مشتری"><bdi>{{ customer.grade.code }}</bdi></span>{% endif %}
             <div class="gc-customer-copy"><strong><bdi>{{ customer.name }}</bdi></strong><span class="gc-customer-code"><bdi>{{ customer.customer_code }}</bdi></span></div>
         </div>
-        <div class="gc-customer-image" aria-label="تصویر مشتری ثبت نشده است"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M10 26h44v28H10zM7 26l6-15h38l6 15M7 26c0 6 10 6 10 0 0 6 10 6 10 0 0 6 10 6 10 0 0 6 10 6 10 0 0 6 10 6 10 0M18 54V37h13v17M39 37h8v9h-8z"/></svg></div>
+        {% demo_asset "stores" customer.customer_code as store_image %}
+        <div class="gc-customer-image" data-demo-slot="store" aria-label="{% if store_image.url %}تصویر نمونهٔ فروشگاه{% else %}تصویر مشتری ثبت نشده است{% endif %}">{% if store_image.url %}<img data-demo-image src="{{ store_image.url }}" alt="تصویر نمونهٔ فروشگاه" width="92" height="92">{% endif %}<svg data-demo-fallback {% if store_image.url %}hidden{% endif %} viewBox="0 0 64 64" aria-hidden="true"><path d="M10 26h44v28H10zM7 26l6-15h38l6 15M7 26c0 6 10 6 10 0 0 6 10 6 10 0 0 6 10 6 10 0 0 6 10 6 10 0 0 6 10 6 10 0M18 54V37h13v17M39 37h8v9h-8z"/></svg></div>
         <div class="gs-visit">{% if current_visit %}<span>ویزیت <bdi>{{ current_visit.id }}</bdi> · <bdi>{{ current_visit.visit_date|date:"Y/m/d" }}</bdi></span><span class="ds-badge" data-status="{{ current_visit.status }}">{% if current_visit.status == 'IN_PROGRESS' %}در حال انجام{% elif current_visit.status == 'PLANNED' %}برنامه‌ریزی‌شده{% elif current_visit.status == 'COMPLETED' %}تکمیل‌شده{% else %}لغوشده{% endif %}</span>{% else %}<span class="ds-muted">بدون ویزیت انتخاب‌شده · فقط مشاهده</span>{% endif %}</div>
     </section>
     <main id="main-content" tabindex="-1">
@@ -68,7 +70,7 @@
                     <div class="gc-price-slot"><small>قیمت پایه</small><p data-price class="gc-price"></p></div>
                     <div class="gc-add-slot" aria-hidden="true"></div>
                 </div>
-                <div class="gc-secondary-actions"><a data-detail aria-label="جزئیات محصول" class="ds-button ds-button--secondary gc-detail"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12C5 7 8 5 12 5s7 2 10 7c-3 5-6 7-10 7s-7-2-10-7z"/><circle cx="12" cy="12" r="3"/></svg>جزئیات</a></div>
+                <div class="gc-secondary-actions"><a data-detail aria-label="جزئیات محصول" class="ds-button ds-button--secondary gc-detail"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12C5 7 8 5 12 5s7 2 10 7c-3 5-6 7-10 7s-7-2-10-7z"/><circle cx="12" cy="12" r="3"/></svg>جزئیات</a><details data-image-disclosure class="gc-image-credit" hidden><summary aria-label="اطلاعات تصویر نمونه محصول">تصویر نمونه</summary><p data-image-label></p><p data-image-credit></p><a data-image-source target="_blank" rel="noopener noreferrer">منبع تصویر</a> · <a data-image-licence target="_blank" rel="noopener noreferrer">مجوز تصویر</a><a data-image-original target="_blank" rel="noopener noreferrer" hidden> · مرجع اصلی</a></details></div>
             </article>
         </template>
     {% else %}
@@ -77,6 +79,7 @@
     {% if current_visit %}<footer class="gc-footer"><a class="ds-button ds-button--quiet" href="{{ end_url }}">مرور ویزیت</a></footer>{% endif %}
     </main>
 </div>
-<script src="{% static 'core/js/guided_catalog.js' %}?v=2b-final-1" defer></script>
+<script src="{% static 'core/js/guided_catalog.js' %}?v=demo04-1" defer></script>
+<script src="{% static 'demo/assets.js' %}?v=demo04-1" defer></script>
 </body>
 </html>

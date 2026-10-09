@@ -28,8 +28,9 @@ class Element {
 }
 function makeCard() {
     const card = new Element(); card.fields = {};
-    for (const name of ['name', 'code', 'meta', 'brand', 'category', 'meta-separator', 'priority', 'reason', 'cue', 'cue-details', 'stock', 'price', 'detail', 'image', 'image-fallback']) card.fields[name] = new Element();
+    for (const name of ['name', 'code', 'meta', 'brand', 'category', 'meta-separator', 'priority', 'reason', 'cue', 'cue-details', 'stock', 'price', 'detail', 'image', 'image-fallback', 'image-disclosure', 'image-label', 'image-credit', 'image-source', 'image-licence', 'image-original']) card.fields[name] = new Element();
     card.fields.reason.hidden = true; card.fields['cue-details'].hidden = true; card.fields.image.hidden = true;
+    card.fields['image-disclosure'].hidden = true;
     return card;
 }
 function item(id, prioritized = false, stock = 'AVAILABLE') {
@@ -73,6 +74,23 @@ function fixture({query = '?visit_id=14', responses = [payload()]} = {}) {
     return {elements, calls, history, listeners, get location() { return location; }, responses};
 }
 const settle = () => new Promise(resolve => setImmediate(resolve));
+test('representative image has truthful visible label and credit, and failure restores fallback', async () => {
+    const product = item(1);
+    product.image = {url: '/static/demo/products/BRN001/thumb.webp', label: 'تصویر نمونهٔ محصول؛ مدل دقیق تأیید نشده',
+        credit: {author: 'Photographer', licence: 'CC BY-SA 4.0', source_url: 'https://commons.wikimedia.org/wiki/File:Example.jpg', licence_url: 'https://creativecommons.org/licenses/by-sa/4.0', changes: 'اندازه و قالب تصویر تغییر کرده است.'}};
+    const f = fixture({responses: [payload([product])]}); await settle();
+    const fields = f.elements.catalogOrdinaryItems.children[0].fields;
+    assert(!fields.image.hidden); assert(fields['image-fallback'].hidden);
+    assert(!fields['image-disclosure'].hidden);
+    assert.equal(fields['image-label'].textContent, product.image.label);
+    assert.match(fields.image.alt, /مدل دقیق تأیید نشده/);
+    assert.match(fields['image-credit'].textContent, /Photographer/);
+    assert(fields['image-source'].href.startsWith('https://commons.wikimedia.org/'));
+    fields.image.listeners.error();
+    assert(fields.image.hidden); assert(!fields['image-fallback'].hidden);
+    assert(fields['image-disclosure'].hidden);
+    assert(f.calls.every(call => call.options.method === 'GET'));
+});
 test('renders the complete server page, prioritized before ordinary, without a three-product limit', async () => {
     const f = fixture(); await settle();
     assert.equal(f.elements.catalogPrioritizedItems.children.length, 2);

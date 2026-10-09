@@ -85,8 +85,24 @@
             const imageURL = new URL(item.image.url, window.location.origin);
             if (['http:', 'https:'].includes(imageURL.protocol)) {
                 const image = field('image'), fallback = field('image-fallback');
-                image.alt = item.name; image.hidden = false; fallback.hidden = true;
-                image.addEventListener('error', () => { image.hidden = true; fallback.hidden = false; });
+                image.alt = item.image.label ? `${item.image.label} — ${item.name}` : item.name;
+                image.hidden = false; fallback.hidden = true;
+                const disclosure = field('image-disclosure'), credit = item.image.credit;
+                if (item.image.label) {
+                    disclosure.hidden = false;
+                    field('image-label').textContent = item.image.label;
+                    field('image-credit').textContent = [credit?.author, credit?.licence, credit?.changes].filter(Boolean).join(' · ');
+                    for (const [name, value] of [['image-source', credit?.source_url], ['image-licence', credit?.licence_url], ['image-original', credit?.additional_source_url]]) {
+                        const link = field(name);
+                        link.hidden = !value;
+                        if (value) {
+                            const destination = new URL(value);
+                            if (destination.protocol === 'https:') link.href = destination.href;
+                            else link.hidden = true;
+                        }
+                    }
+                }
+                image.addEventListener('error', () => { image.hidden = true; fallback.hidden = false; disclosure.hidden = true; });
                 image.src = imageURL.href;
             }
         }

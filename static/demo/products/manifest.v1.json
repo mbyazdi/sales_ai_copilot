@@ -1,0 +1,699 @@
+{
+  "schema_version": 1,
+  "manifest_version": "demo-products-1.0.0",
+  "prepared_on": "2026-10-09",
+  "scope": "product photographs only; no UI integration",
+  "source_checkpoint": "docs/checkpoints/DEMO_02_VISUAL_ASSET_SELECTION_APPROVAL.md",
+  "baseline_commit": "56ab473439a4714eeadef36dd1981185a5c62f19",
+  "fallback_policy": "Keep existing application SVG fallback until owner approval, required sample label and attribution are integrated.",
+  "product_slot": {
+    "width": 80,
+    "height": 84,
+    "object_fit": "contain"
+  },
+  "processing": {
+    "canvas": "square #F7F9FB",
+    "hero": [
+      800,
+      800
+    ],
+    "thumb": [
+      256,
+      256
+    ],
+    "fit": "contain; centered; uniform aspect-preserving scale; no upscaling",
+    "webp_quality": 82,
+    "method": 6,
+    "changes": "EXIF orientation; resize; neutral outer padding; WebP encoding; metadata stripped. Original photographic background retained; no synthetic background/product edits."
+  },
+  "products": {
+    "PHD001": {
+      "asset_id": "product.PHD001.v1",
+      "sku": "PHD001",
+      "recorded_product": {
+        "name": "Philips Hair Dryer 2100W",
+        "brand": "Philips",
+        "category": "Hair Dryer",
+        "manufacturer_candidate_url": "https://www.documents.philips.com/assets/20220616/80b2a8e9169c44128b7daeb6011102ee.pdf"
+      },
+      "pictured_model": "Philips Thermo Protect 2100W; model number unknown",
+      "exact_model_verified": false,
+      "match_class": "C",
+      "candidate_match_class": "B",
+      "image_type": "existing_svg_fallback",
+      "status": "fallback",
+      "approval_status": "quality_hold",
+      "approved_for_ui": false,
+      "fallback_remains": true,
+      "label_requirement": "تصویر نمونهٔ محصول؛ مدل دقیق تأیید نشده",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Philips_Thermo_Protect_2100W.jpg",
+      "permission": {
+        "status": "verified_open_grant",
+        "licence": "CC BY-SA 4.0",
+        "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+        "evidence": "Own-work copyright holder grant on the individual Commons file page.",
+        "evidence_file": "docs/demo/product-permission-evidence.v1.json"
+      },
+      "attribution": {
+        "author": "Air fans",
+        "source": "https://commons.wikimedia.org/wiki/File:Philips_Thermo_Protect_2100W.jpg",
+        "licence": "CC BY-SA 4.0",
+        "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+        "required": true,
+        "share_alike": true,
+        "changes": "Resized, neutral padded canvas, WebP conversion; original product/background retained."
+      },
+      "planned_paths": {
+        "hero": "static/demo/products/PHD001/hero.webp",
+        "thumb": "static/demo/products/PHD001/thumb.webp"
+      },
+      "files": {},
+      "next_action": "Bathroom/toilet background unsuitable; no public asset prepared. Acquire a permitted product-focused photograph; no automatic integration.",
+      "source_original_url": "https://upload.wikimedia.org/wikipedia/commons/3/30/Philips_Thermo_Protect_2100W.jpg",
+      "source_download_sha256": "3140387395db6039c0aa2b8567ee54c3e8260a6c791ba419e4580c2f8bba57e2"
+    },
+    "PHS001": {
+      "asset_id": "product.PHS001.v1",
+      "sku": "PHS001",
+      "recorded_product": {
+        "name": "Philips Hair Straightener",
+        "brand": "Philips",
+        "category": "Hair Straightener",
+        "manufacturer_candidate_url": "https://www.philips.co.uk/c-p/BHS530_00/5000-series-straightener/support"
+      },
+      "pictured_model": null,
+      "exact_model_verified": false,
+      "match_class": "C",
+      "candidate_match_class": null,
+      "image_type": "existing_svg_fallback",
+      "status": "permission_pending",
+      "approval_status": "not_acquired",
+      "approved_for_ui": false,
+      "fallback_remains": true,
+      "label_requirement": null,
+      "source_url": "https://www.philips.co.uk/c-p/BHS530_00/5000-series-straightener/support",
+      "permission": {
+        "status": "not_established",
+        "evidence": "Product page availability is not a reuse grant."
+      },
+      "attribution": null,
+      "planned_paths": {
+        "hero": "static/demo/products/PHS001/hero.webp",
+        "thumb": "static/demo/products/PHS001/thumb.webp"
+      },
+      "files": {},
+      "next_action": "Obtain supplier/manufacturer written permission and model evidence, or an independently licensed correctly branded photograph."
+    },
+    "BRN001": {
+      "asset_id": "product.BRN001.v1",
+      "sku": "BRN001",
+      "recorded_product": {
+        "name": "Braun Electric Shaver Series 3",
+        "brand": "Braun",
+        "category": "Electric Shaver",
+        "manufacturer_candidate_url": "https://uk.braun.com/en-gb/male-grooming/shavers-for-men/series-3"
+      },
+      "pictured_model": "Braun S3 / Series 3; model variant unknown",
+      "exact_model_verified": false,
+      "match_class": "B",
+      "candidate_match_class": "B",
+      "image_type": "licensed_representative_photo",
+      "status": "ready_for_owner_review",
+      "approval_status": "owner_review_pending",
+      "approved_for_ui": false,
+      "fallback_remains": true,
+      "label_requirement": "تصویر نمونهٔ محصول؛ مدل دقیق تأیید نشده",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Braun_S3_electric_shaver.jpg",
+      "permission": {
+        "status": "verified_open_grant",
+        "licence": "CC BY-SA 4.0",
+        "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+        "evidence": "Own work; formal file licence CC BY-SA 4.0; description separately offers CC BY 4.0. Use the stricter share-alike licence and Malcolm Koo attribution.",
+        "evidence_file": "docs/demo/product-permission-evidence.v1.json"
+      },
+      "attribution": {
+        "author": "Malcolm Koo (Mk2010)",
+        "source": "https://commons.wikimedia.org/wiki/File:Braun_S3_electric_shaver.jpg",
+        "licence": "CC BY-SA 4.0",
+        "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+        "required": true,
+        "share_alike": true,
+        "changes": "Resized, neutral padded canvas, WebP conversion; original product/background retained."
+      },
+      "planned_paths": {
+        "hero": "static/demo/products/BRN001/hero.webp",
+        "thumb": "static/demo/products/BRN001/thumb.webp"
+      },
+      "files": {
+        "hero": {
+          "path": "static/demo/products/BRN001/hero.webp",
+          "width": 800,
+          "height": 800,
+          "bytes": 41596,
+          "sha256": "a327510bd01daef28151fc59efdab74f329397b7e8a1c6f046774af550d71e8b"
+        },
+        "thumb": {
+          "path": "static/demo/products/BRN001/thumb.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 5348,
+          "sha256": "32b292cc45a3b0afd86152d44dc4eff569c8d326e3abc5a8043ca5fd5c93e44b"
+        }
+      },
+      "next_action": "Approve representative model/appearance and quality; carry sample label and attribution into later UI integration.",
+      "source_original_url": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Braun_S3_electric_shaver.jpg",
+      "source_download_sha256": "18182be2634a8a5fa0f958709c95a1144873b70574f7e3ec4890ab1523d03a06"
+    },
+    "BRN002": {
+      "asset_id": "product.BRN002.v1",
+      "sku": "BRN002",
+      "recorded_product": {
+        "name": "Braun Beard Trimmer",
+        "brand": "Braun",
+        "category": "Trimmer",
+        "manufacturer_candidate_url": "https://uk.braun.com/en-gb/male-grooming/stylers-and-trimmers/beard-trimmer/beard-trimmer-bt5500"
+      },
+      "pictured_model": "Braun exact 5 universal; identifier visible on device",
+      "exact_model_verified": false,
+      "match_class": "B",
+      "candidate_match_class": "B",
+      "image_type": "licensed_representative_photo",
+      "status": "ready_for_owner_review",
+      "approval_status": "owner_review_pending",
+      "approved_for_ui": false,
+      "fallback_remains": true,
+      "label_requirement": "تصویر نمونهٔ محصول؛ مدل دقیق تأیید نشده",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Bartschneider.jpg",
+      "permission": {
+        "status": "verified_open_grant",
+        "licence": "Public domain",
+        "licence_url": null,
+        "evidence": "Copyright holder explicitly releases own photograph to public domain (PD-self/PD-user-de).",
+        "evidence_file": "docs/demo/product-permission-evidence.v1.json"
+      },
+      "attribution": {
+        "author": "Gmhofmann",
+        "source": "https://commons.wikimedia.org/wiki/File:Bartschneider.jpg",
+        "licence": "Public domain",
+        "licence_url": null,
+        "required": false,
+        "share_alike": false,
+        "changes": "Resized, neutral padded canvas, WebP conversion; original product/background retained."
+      },
+      "planned_paths": {
+        "hero": "static/demo/products/BRN002/hero.webp",
+        "thumb": "static/demo/products/BRN002/thumb.webp"
+      },
+      "files": {
+        "hero": {
+          "path": "static/demo/products/BRN002/hero.webp",
+          "width": 800,
+          "height": 800,
+          "bytes": 13230,
+          "sha256": "625e7ab17f3aa5e5f0cc21c85330764abbc5cc5b7fc15492d979c00eb0ade846"
+        },
+        "thumb": {
+          "path": "static/demo/products/BRN002/thumb.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 2958,
+          "sha256": "12c035249b95f6ccb4ede6fbe537f5d752a374bed1f4f82974d57219b6285afd"
+        }
+      },
+      "next_action": "Approve representative model/appearance and quality; carry sample label and attribution into later UI integration.",
+      "source_original_url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Bartschneider.jpg",
+      "source_download_sha256": "c648b0967beee334af1c9c8c52a6bf3e525b7000a45baf94e0645af3bae42fbf"
+    },
+    "PAN001": {
+      "asset_id": "product.PAN001.v1",
+      "sku": "PAN001",
+      "recorded_product": {
+        "name": "Panasonic Hair Curler",
+        "brand": "Panasonic",
+        "category": "Hair Curler",
+        "manufacturer_candidate_url": "https://www.panasonic.com/sg/consumer/personal-care/hair-care/hair-styler/eh-ht40.html"
+      },
+      "pictured_model": null,
+      "exact_model_verified": false,
+      "match_class": "C",
+      "candidate_match_class": null,
+      "image_type": "existing_svg_fallback",
+      "status": "permission_pending",
+      "approval_status": "not_acquired",
+      "approved_for_ui": false,
+      "fallback_remains": true,
+      "label_requirement": null,
+      "source_url": "https://www.panasonic.com/sg/consumer/personal-care/hair-care/hair-styler/eh-ht40.html",
+      "permission": {
+        "status": "not_established",
+        "evidence": "Product page availability is not a reuse grant."
+      },
+      "attribution": null,
+      "planned_paths": {
+        "hero": "static/demo/products/PAN001/hero.webp",
+        "thumb": "static/demo/products/PAN001/thumb.webp"
+      },
+      "files": {},
+      "next_action": "Obtain supplier/manufacturer written permission and model evidence, or an independently licensed correctly branded photograph."
+    },
+    "PHI002": {
+      "asset_id": "product.PHI002.v1",
+      "sku": "PHI002",
+      "recorded_product": {
+        "name": "Philips Electric Toothbrush",
+        "brand": "Philips",
+        "category": "Electric Toothbrush",
+        "manufacturer_candidate_url": "https://www.philips.co.uk/c-p/HX3651_12/sonicare-2100-series-sonic-electric-toothbrush"
+      },
+      "pictured_model": "Philips Sonicare 1100 Series; exact HX variant unknown",
+      "exact_model_verified": false,
+      "match_class": "B",
+      "candidate_match_class": "B",
+      "image_type": "licensed_representative_photo",
+      "status": "ready_for_owner_review",
+      "approval_status": "owner_review_pending",
+      "approved_for_ui": false,
+      "fallback_remains": true,
+      "label_requirement": "تصویر نمونهٔ محصول؛ مدل دقیق تأیید نشده",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Philips_Sonicare_1100_Series_Electric_Toothbrush_-_51967361282.jpg",
+      "permission": {
+        "status": "verified_open_grant",
+        "licence": "CC BY 2.0",
+        "licence_url": "https://creativecommons.org/licenses/by/2.0",
+        "evidence": "Flickr licence CC BY 2.0 reviewed by FlickreviewR 2; description also offers CC BY 4.0. Chosen conservative reviewed CC BY 2.0; include original review article link.",
+        "evidence_file": "docs/demo/product-permission-evidence.v1.json"
+      },
+      "attribution": {
+        "author": "electricteeth",
+        "source": "https://commons.wikimedia.org/wiki/File:Philips_Sonicare_1100_Series_Electric_Toothbrush_-_51967361282.jpg",
+        "licence": "CC BY 2.0",
+        "licence_url": "https://creativecommons.org/licenses/by/2.0",
+        "required": true,
+        "share_alike": false,
+        "changes": "Resized, neutral padded canvas, WebP conversion; original product/background retained.",
+        "additional_source_url": "https://www.electricteeth.com/philips-sonicare-1100-series-review/"
+      },
+      "planned_paths": {
+        "hero": "static/demo/products/PHI002/hero.webp",
+        "thumb": "static/demo/products/PHI002/thumb.webp"
+      },
+      "files": {
+        "hero": {
+          "path": "static/demo/products/PHI002/hero.webp",
+          "width": 800,
+          "height": 800,
+          "bytes": 25132,
+          "sha256": "1c425ae323e45095bf8c8c6e5036ff1c1623866820f8b7abe6f88e3f9ef83f17"
+        },
+        "thumb": {
+          "path": "static/demo/products/PHI002/thumb.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 4434,
+          "sha256": "bc7cf68cd3e817634a28851aea6f0ab739f6fec93c7f213b22b377b2ea1cbe26"
+        }
+      },
+      "next_action": "Approve representative model/appearance and quality; carry sample label and attribution into later UI integration.",
+      "source_original_url": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Philips_Sonicare_1100_Series_Electric_Toothbrush_-_51967361282.jpg",
+      "source_download_sha256": "e0f2eff48b475134a9781e64f20764413854ca0824083b1da90c21886f7da9e2",
+      "quality_note": " Original scene/background retained; neutral outer canvas, not a studio-isolated packshot."
+    },
+    "BOS001": {
+      "asset_id": "product.BOS001.v1",
+      "sku": "BOS001",
+      "recorded_product": {
+        "name": "Bosch Vacuum Cleaner",
+        "brand": "Bosch",
+        "category": "Vacuum Cleaner",
+        "manufacturer_candidate_url": "https://www.bosch-home.co.uk/en/productservice/BGB41HYGGB-12"
+      },
+      "pictured_model": "Bosch Serie 4 ProHygienic; E-number unknown",
+      "exact_model_verified": false,
+      "match_class": "C",
+      "candidate_match_class": "B",
+      "image_type": "existing_svg_fallback",
+      "status": "fallback",
+      "approval_status": "quality_hold",
+      "approved_for_ui": false,
+      "fallback_remains": true,
+      "label_requirement": "تصویر نمونهٔ محصول؛ مدل دقیق تأیید نشده",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Bosch_Serie_4_ProHygienic.jpg",
+      "permission": {
+        "status": "verified_open_grant",
+        "licence": "CC0",
+        "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+        "evidence": "Own-work copyright holder grant on the individual Commons file page.",
+        "evidence_file": "docs/demo/product-permission-evidence.v1.json"
+      },
+      "attribution": {
+        "author": "Air fans",
+        "source": "https://commons.wikimedia.org/wiki/File:Bosch_Serie_4_ProHygienic.jpg",
+        "licence": "CC0",
+        "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+        "required": false,
+        "share_alike": false,
+        "changes": "Resized, neutral padded canvas, WebP conversion; original product/background retained."
+      },
+      "planned_paths": {
+        "hero": "static/demo/products/BOS001/hero.webp",
+        "thumb": "static/demo/products/BOS001/thumb.webp"
+      },
+      "files": {},
+      "next_action": "Overhead floor scene gives insufficient product emphasis; no public asset prepared. Acquire a permitted product-focused photograph; no automatic integration.",
+      "source_original_url": "https://upload.wikimedia.org/wikipedia/commons/2/28/Bosch_Serie_4_ProHygienic.jpg",
+      "source_download_sha256": "ae3134fddab8fa6a61e47d996d3599a3c7e7dc918be4d3af3ec68decaaac1d3b"
+    },
+    "TEF001": {
+      "asset_id": "product.TEF001.v1",
+      "sku": "TEF001",
+      "recorded_product": {
+        "name": "Tefal Steam Iron",
+        "brand": "Tefal",
+        "category": "Steam Iron",
+        "manufacturer_candidate_url": "https://www.tefal.com/Linen-Care/Steam-Irons/TURBO-PRO-ANTI-CALC-FV5645/p/1830006357?scc=steam%2Birons"
+      },
+      "pictured_model": null,
+      "exact_model_verified": false,
+      "match_class": "C",
+      "candidate_match_class": null,
+      "image_type": "existing_svg_fallback",
+      "status": "permission_pending",
+      "approval_status": "not_acquired",
+      "approved_for_ui": false,
+      "fallback_remains": true,
+      "label_requirement": null,
+      "source_url": "https://www.tefal.com/Linen-Care/Steam-Irons/TURBO-PRO-ANTI-CALC-FV5645/p/1830006357?scc=steam%2Birons",
+      "permission": {
+        "status": "not_established",
+        "evidence": "Product page availability is not a reuse grant."
+      },
+      "attribution": null,
+      "planned_paths": {
+        "hero": "static/demo/products/TEF001/hero.webp",
+        "thumb": "static/demo/products/TEF001/thumb.webp"
+      },
+      "files": {},
+      "next_action": "Obtain supplier/manufacturer written permission and model evidence, or an independently licensed correctly branded photograph."
+    },
+    "BOS002": {
+      "asset_id": "product.BOS002.v1",
+      "sku": "BOS002",
+      "recorded_product": {
+        "name": "Bosch Blender",
+        "brand": "Bosch",
+        "category": "Blender",
+        "manufacturer_candidate_url": "https://www.bosch-home.co.uk/en/product/small-appliances/blenders/blenders/MMB6174SG"
+      },
+      "pictured_model": null,
+      "exact_model_verified": false,
+      "match_class": "C",
+      "candidate_match_class": null,
+      "image_type": "existing_svg_fallback",
+      "status": "permission_pending",
+      "approval_status": "not_acquired",
+      "approved_for_ui": false,
+      "fallback_remains": true,
+      "label_requirement": null,
+      "source_url": "https://www.bosch-home.co.uk/en/product/small-appliances/blenders/blenders/MMB6174SG",
+      "permission": {
+        "status": "not_established",
+        "evidence": "Product page availability is not a reuse grant."
+      },
+      "attribution": null,
+      "planned_paths": {
+        "hero": "static/demo/products/BOS002/hero.webp",
+        "thumb": "static/demo/products/BOS002/thumb.webp"
+      },
+      "files": {},
+      "next_action": "Obtain supplier/manufacturer written permission and model evidence, or an independently licensed correctly branded photograph."
+    },
+    "PHI003": {
+      "asset_id": "product.PHI003.v1",
+      "sku": "PHI003",
+      "recorded_product": {
+        "name": "Philips Electric Kettle",
+        "brand": "Philips",
+        "category": "Electric Kettle",
+        "manufacturer_candidate_url": "https://www.philips.co.uk/c-p/HD9352_31/5000-series-kettle-in-black-copper"
+      },
+      "pictured_model": "Philips Cucina electric kettle; HD model unknown",
+      "exact_model_verified": false,
+      "match_class": "B",
+      "candidate_match_class": "B",
+      "image_type": "licensed_representative_photo",
+      "status": "ready_for_owner_review",
+      "approval_status": "owner_review_pending",
+      "approved_for_ui": false,
+      "fallback_remains": true,
+      "label_requirement": "تصویر نمونهٔ محصول؛ مدل دقیق تأیید نشده",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Electric_kettle_phillips_white.JPG",
+      "permission": {
+        "status": "verified_open_grant",
+        "licence": "Public domain",
+        "licence_url": null,
+        "evidence": "Copyright holder explicitly releases own photograph to public domain (PD-self/PD-user-de).",
+        "evidence_file": "docs/demo/product-permission-evidence.v1.json"
+      },
+      "attribution": {
+        "author": "Rafa",
+        "source": "https://commons.wikimedia.org/wiki/File:Electric_kettle_phillips_white.JPG",
+        "licence": "Public domain",
+        "licence_url": null,
+        "required": false,
+        "share_alike": false,
+        "changes": "Resized, neutral padded canvas, WebP conversion; original product/background retained."
+      },
+      "planned_paths": {
+        "hero": "static/demo/products/PHI003/hero.webp",
+        "thumb": "static/demo/products/PHI003/thumb.webp"
+      },
+      "files": {
+        "hero": {
+          "path": "static/demo/products/PHI003/hero.webp",
+          "width": 800,
+          "height": 800,
+          "bytes": 21564,
+          "sha256": "e8fb5e1fae1e612f5730af8ba6cebce03463992de4483b1c97081e25c9fce477"
+        },
+        "thumb": {
+          "path": "static/demo/products/PHI003/thumb.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 3134,
+          "sha256": "997e3087d84e1e6455acd487183325cddb898fe28a784f78af40a16d449a6b14"
+        }
+      },
+      "next_action": "Approve representative model/appearance and quality; carry sample label and attribution into later UI integration.",
+      "source_original_url": "https://upload.wikimedia.org/wikipedia/commons/1/15/Electric_kettle_phillips_white.JPG",
+      "source_download_sha256": "97f69443e2479e918b1e8e0a3a873fdb9fafa6b9fb973127b150a990f9d4439d",
+      "quality_note": "Older/grainy source; representative appearance and quality need explicit owner review. Original scene/background retained; neutral outer canvas, not a studio-isolated packshot."
+    },
+    "TEF002": {
+      "asset_id": "product.TEF002.v1",
+      "sku": "TEF002",
+      "recorded_product": {
+        "name": "Tefal Air Fryer",
+        "brand": "Tefal",
+        "category": "Air Fryer",
+        "manufacturer_candidate_url": "https://www.tefal.com/instructions-for-use/Products-/Electrical-Cooking/Oilless-Fryer/Easy-Fry-Mega--Air-fryer--Extra-Large-Capacity-7-5-L--8-Preset-Programs/csp/1510002620"
+      },
+      "pictured_model": "Tefal drawer air fryer; exact model unknown",
+      "exact_model_verified": false,
+      "match_class": "B",
+      "candidate_match_class": "B",
+      "image_type": "licensed_representative_photo",
+      "status": "ready_for_owner_review",
+      "approval_status": "owner_review_pending",
+      "approved_for_ui": false,
+      "fallback_remains": true,
+      "label_requirement": "تصویر نمونهٔ محصول؛ مدل دقیق تأیید نشده",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Airfryer.jpg",
+      "permission": {
+        "status": "verified_open_grant",
+        "licence": "CC BY-SA 4.0",
+        "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+        "evidence": "Own-work copyright holder grant on the individual Commons file page.",
+        "evidence_file": "docs/demo/product-permission-evidence.v1.json"
+      },
+      "attribution": {
+        "author": "Djsgmnd",
+        "source": "https://commons.wikimedia.org/wiki/File:Airfryer.jpg",
+        "licence": "CC BY-SA 4.0",
+        "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+        "required": true,
+        "share_alike": true,
+        "changes": "Resized, neutral padded canvas, WebP conversion; original product/background retained."
+      },
+      "planned_paths": {
+        "hero": "static/demo/products/TEF002/hero.webp",
+        "thumb": "static/demo/products/TEF002/thumb.webp"
+      },
+      "files": {
+        "hero": {
+          "path": "static/demo/products/TEF002/hero.webp",
+          "width": 800,
+          "height": 800,
+          "bytes": 28432,
+          "sha256": "cc90e5a0a3d660588314691d1cd1ec91c084edf6ad2aae3a4f32507dbb09b8eb"
+        },
+        "thumb": {
+          "path": "static/demo/products/TEF002/thumb.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 5782,
+          "sha256": "72298c2176e95957683752873b303e3d417d7944f336aa3a743700660d82f399"
+        }
+      },
+      "next_action": "Approve representative model/appearance and quality; carry sample label and attribution into later UI integration.",
+      "source_original_url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Airfryer.jpg",
+      "source_download_sha256": "e7ac0ffa9482f9f939749d59794af8c22754f414f331f30019ca4a469ad630dc",
+      "quality_note": " Original scene/background retained; neutral outer canvas, not a studio-isolated packshot."
+    },
+    "ROW001": {
+      "asset_id": "product.ROW001.v1",
+      "sku": "ROW001",
+      "recorded_product": {
+        "name": "Rowenta Coffee Maker",
+        "brand": "Rowenta",
+        "category": "Coffee Maker",
+        "manufacturer_candidate_url": "https://www.rowenta.com/instructions-for-use/csp/1500636237"
+      },
+      "pictured_model": "Rowenta FK5401 filter coffee maker; file identifier",
+      "exact_model_verified": false,
+      "match_class": "B",
+      "candidate_match_class": "B",
+      "image_type": "licensed_representative_photo",
+      "status": "ready_for_owner_review",
+      "approval_status": "owner_review_pending",
+      "approved_for_ui": false,
+      "fallback_remains": true,
+      "label_requirement": "تصویر نمونهٔ محصول؛ مدل دقیق تأیید نشده",
+      "source_url": "https://commons.wikimedia.org/wiki/File:FK5401.jpg",
+      "permission": {
+        "status": "verified_open_grant",
+        "licence": "CC BY-SA 3.0",
+        "licence_url": "https://creativecommons.org/licenses/by-sa/3.0",
+        "evidence": "Groupe SEB supplied photograph; Commons PermissionTicket 2010060110010948; CC BY-SA 3.0.",
+        "evidence_file": "docs/demo/product-permission-evidence.v1.json"
+      },
+      "attribution": {
+        "author": "Groupe SEB",
+        "source": "https://commons.wikimedia.org/wiki/File:FK5401.jpg",
+        "licence": "CC BY-SA 3.0",
+        "licence_url": "https://creativecommons.org/licenses/by-sa/3.0",
+        "required": true,
+        "share_alike": true,
+        "changes": "Resized, neutral padded canvas, WebP conversion; original product/background retained."
+      },
+      "planned_paths": {
+        "hero": "static/demo/products/ROW001/hero.webp",
+        "thumb": "static/demo/products/ROW001/thumb.webp"
+      },
+      "files": {
+        "hero": {
+          "path": "static/demo/products/ROW001/hero.webp",
+          "width": 800,
+          "height": 800,
+          "bytes": 27496,
+          "sha256": "9638d0afa581213e1ee3b83dff4e2bf595e09026a63f409512b288968fa2360f"
+        },
+        "thumb": {
+          "path": "static/demo/products/ROW001/thumb.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 6108,
+          "sha256": "aae5232a97f1f06a737d9a1a6c91278e08207baef4b8eae1acbed4f3ef8eeace"
+        }
+      },
+      "next_action": "Approve representative model/appearance and quality; carry sample label and attribution into later UI integration.",
+      "source_original_url": "https://upload.wikimedia.org/wikipedia/commons/e/ea/FK5401.jpg",
+      "source_download_sha256": "5e9eba57a76f6cd4c8d0d819904f33a9b32d807e8f427173d8b3a43978dd3256",
+      "quality_note": "Older/grainy source; representative appearance and quality need explicit owner review."
+    },
+    "PHI004": {
+      "asset_id": "product.PHI004.v1",
+      "sku": "PHI004",
+      "recorded_product": {
+        "name": "Philips Blender",
+        "brand": "Philips",
+        "category": "Blender",
+        "manufacturer_candidate_url": "https://www.philips.com/c-p/HR2223_00/series-5000-blender-core"
+      },
+      "pictured_model": "White Philips jug blender; HR model unknown",
+      "exact_model_verified": false,
+      "match_class": "C",
+      "candidate_match_class": "B",
+      "image_type": "existing_svg_fallback",
+      "status": "fallback",
+      "approval_status": "quality_hold",
+      "approved_for_ui": false,
+      "fallback_remains": true,
+      "label_requirement": "تصویر نمونهٔ محصول؛ مدل دقیق تأیید نشده",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Juice_Blender.jpg",
+      "permission": {
+        "status": "verified_open_grant",
+        "licence": "CC0",
+        "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+        "evidence": "Own-work copyright holder grant on the individual Commons file page.",
+        "evidence_file": "docs/demo/product-permission-evidence.v1.json"
+      },
+      "attribution": {
+        "author": "Nana Pearls",
+        "source": "https://commons.wikimedia.org/wiki/File:Juice_Blender.jpg",
+        "licence": "CC0",
+        "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+        "required": false,
+        "share_alike": false,
+        "changes": "Resized, neutral padded canvas, WebP conversion; original product/background retained."
+      },
+      "planned_paths": {
+        "hero": "static/demo/products/PHI004/hero.webp",
+        "thumb": "static/demo/products/PHI004/thumb.webp"
+      },
+      "files": {},
+      "next_action": "Disassembled appliance and outdoor background unsuitable; no public asset prepared. Acquire a permitted product-focused photograph; no automatic integration.",
+      "source_original_url": "https://upload.wikimedia.org/wikipedia/commons/0/08/Juice_Blender.jpg",
+      "source_download_sha256": "713eb9b00ae428f9b001fd00d6eae40cd7d779c5a2384b0d7e4f993ca778cf71"
+    },
+    "TEF003": {
+      "asset_id": "product.TEF003.v1",
+      "sku": "TEF003",
+      "recorded_product": {
+        "name": "Tefal Blender",
+        "brand": "Tefal",
+        "category": "Blender",
+        "manufacturer_candidate_url": "https://www.tefal.com/instructions-for-use/Products-/Food-preparation/Blender-%26-Smoothie-maker/Blendforce/csp/7211003003"
+      },
+      "pictured_model": null,
+      "exact_model_verified": false,
+      "match_class": "C",
+      "candidate_match_class": null,
+      "image_type": "existing_svg_fallback",
+      "status": "permission_pending",
+      "approval_status": "not_acquired",
+      "approved_for_ui": false,
+      "fallback_remains": true,
+      "label_requirement": null,
+      "source_url": "https://www.tefal.com/instructions-for-use/Products-/Food-preparation/Blender-%26-Smoothie-maker/Blendforce/csp/7211003003",
+      "permission": {
+        "status": "not_established",
+        "evidence": "Product page availability is not a reuse grant."
+      },
+      "attribution": null,
+      "planned_paths": {
+        "hero": "static/demo/products/TEF003/hero.webp",
+        "thumb": "static/demo/products/TEF003/thumb.webp"
+      },
+      "files": {},
+      "next_action": "Obtain supplier/manufacturer written permission and model evidence, or an independently licensed correctly branded photograph."
+    }
+  },
+  "summary": {
+    "products": 14,
+    "prepared_representative_B": 6,
+    "permission_pending_C": 5,
+    "licensed_but_quality_hold_C": 3,
+    "exact_A": 0,
+    "ui_approved": 0
+  }
+}

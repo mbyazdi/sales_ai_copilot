@@ -1,0 +1,16 @@
+/* Only fill existing image slots; layout dimensions and card zones stay owned by their page. */
+[data-demo-slot] img { width: 100%; height: 100%; object-fit: contain; border-radius: inherit; }
+[data-demo-slot="store"] img { object-fit: cover; }
+[data-demo-slot] [hidden] { display: none !important; }
+.gc-media img[hidden] { display: none; }
+.gc-secondary-actions { position: relative; }
+.gc-image-credit { position: absolute; inset-inline-end: 0; inset-block-start: 0; width: calc((100% - 112px) / 2); color: var(--gc-muted); font-size: .75rem; line-height: 1.6; }
+.gc-image-credit summary { min-height: 44px; padding-block: 12px; box-sizing: border-box; cursor: pointer; list-style-position: inside; }
+.gc-image-credit summary:focus-visible { outline: 3px solid var(--ds-focus); outline-offset: 2px; }
+.gc-image-credit[open] { position: static; width: 100%; }
+.gc-secondary-actions:has(> .gc-image-credit[open]) { flex-wrap: wrap; gap: var(--ds-space-2); }
+.gc-image-credit a { color: inherit; }
+[data-demo-caption] { overflow-wrap: anywhere; }
+.demo-image-info > summary { min-height: 44px; padding: var(--ds-space-2); width: fit-content; box-sizing: border-box; border-radius: var(--ds-radius-sm); cursor: pointer; color: var(--ds-brand); }
+.demo-image-info > summary:focus-visible { outline: 3px solid var(--ds-focus); outline-offset: 2px; }
+.demo-image-info > div { padding-block-end: var(--ds-space-2); }

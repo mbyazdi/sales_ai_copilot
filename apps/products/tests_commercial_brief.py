@@ -2,6 +2,7 @@
 
 from datetime import timedelta
 from html.parser import HTMLParser
+import re
 from unittest.mock import patch
 from urllib.parse import parse_qs, urlsplit
 
@@ -102,6 +103,21 @@ class ProductCommercialBriefTests(TestCase):
             "product-commercial-brief", args=[(product or self.product).product_code],
         ), query)
 
+    def assert_same_unavailable_page(self, first, second):
+        """Compare all rendered HTML except the masked CSRF value, not its presence."""
+        normalized = []
+        for response in (first, second):
+            self.assertEqual(response.status_code, 404)
+            self.assertTemplateUsed(response, "products/unavailable.html")
+            content, count = re.subn(
+                rb'(<input\b[^>]*\bname="csrfmiddlewaretoken"[^>]*\bvalue=")[A-Za-z0-9]{64}("[^>]*>)',
+                rb'\1[masked-csrf-token]\2', response.content,
+            )
+            # Keep the logout form and a correctly shaped CSRF field required.
+            self.assertEqual(count, 1)
+            normalized.append(content)
+        self.assertEqual(*normalized)
+
     def promotion(self, code, **fields):
         promotion = Promotion.objects.create(
             code=code, name=code, promotion_type="PERCENTAGE", discount_percent=10,
@@ -134,7 +150,7 @@ class ProductCommercialBriefTests(TestCase):
         absent = self.client.get(reverse("product-commercial-brief", args=[self.product.product_code]),
                                  {"customer_code": "DOES-NOT-EXIST"})
         self.assertEqual(forbidden.status_code, 404)
-        self.assertEqual(forbidden.content, absent.content)
+        self.assert_same_unavailable_page(forbidden, absent)
         for value in (self.other_customer.name, self.other_customer.phone, self.product.name,
                       self.recommendation.reason):
             self.assertNotIn(value.encode(), forbidden.content)
@@ -204,7 +220,7 @@ class ProductCommercialBriefTests(TestCase):
         )]
         for response in responses:
             self.assertEqual(response.status_code, 404)
-            self.assertEqual(response.content, responses[0].content)
+            self.assert_same_unavailable_page(response, responses[0])
 
     def test_missing_and_inactive_products_are_unavailable(self):
         missing = self.client.get("/products/NO-SUCH-PRODUCT/", {"customer_code": self.customer.customer_code})
@@ -212,7 +228,7 @@ class ProductCommercialBriefTests(TestCase):
         self.product.save()
         inactive = self.page()
         self.assertEqual(inactive.status_code, 404)
-        self.assertEqual(missing.content, inactive.content)
+        self.assert_same_unavailable_page(missing, inactive)
 
     def test_commercial_values_match_existing_builder_and_api(self):
         self.promotion("ELIGIBLE")

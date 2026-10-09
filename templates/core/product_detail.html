@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static demo_assets %}
 {% block title %}{{ product.name }} · بررسی محصول برای مشتری{% endblock %}
 {% block breadcrumb %}نمای محصول در زمینه مشتری{% endblock %}
 {% block body_class %}{% if not manager_inspection %}sj-shell{% endif %}{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/product_brief.css' %}?v=002h-2">{% if not manager_inspection %}<link rel="stylesheet" href="{% static 'css/salesperson_journey.css' %}?v=002p-1">{% endif %}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/product_brief.css' %}?v=002h-2"><link rel="stylesheet" href="{% static 'demo/assets.css' %}?v=demo04-1">{% if not manager_inspection %}<link rel="stylesheet" href="{% static 'css/salesperson_journey.css' %}?v=002p-1">{% endif %}{% endblock %}
 {% block content %}
 <div class="pb-workspace ds-stack">
     <header class="ds-page-header">
@@ -11,12 +11,14 @@
         <a class="ds-button ds-button--secondary" href="{{ return_url }}">بازگشت</a>
     </header>
 
-    <section class="pb-identity ds-card" aria-labelledby="product-title">
-        <div class="pb-product-mark" aria-hidden="true">{{ product.product_code|slice:":1" }}</div>
+    {% demo_asset "products" product.product_code "hero" as product_image %}
+    <section class="pb-identity ds-card" aria-labelledby="product-title" data-demo-scope>
+        <div class="pb-product-mark" data-demo-slot="product">{% if product_image.url %}<img data-demo-image src="{{ product_image.url }}" alt="{{ product_image.label }} — {{ product.name }}" width="56" height="56"><span data-demo-fallback hidden aria-hidden="true">{{ product.product_code|slice:":1" }}</span>{% else %}<span aria-hidden="true">{{ product.product_code|slice:":1" }}</span>{% endif %}</div>
         <div class="ds-stack">
             <div class="ds-row"><span class="ds-badge"><bdi>{{ product.product_code }}</bdi></span>{% if product.brand %}<span class="ds-caption ds-muted"><bdi>{{ product.brand.name }}</bdi></span>{% endif %}</div>
             <h2 id="product-title" class="pb-product-title"><bdi>{{ product.name }}</bdi></h2>
             <p class="ds-caption ds-muted">{% if product.category %}{{ product.category }}{% else %}دسته محصول ثبت نشده است.{% endif %}</p>
+            {% include "components/demo_image_credit.html" with asset=product_image only %}
             {% if show_product_description %}<p class="pb-description">{{ product.description|linebreaksbr }}</p>{% elif not product.description %}<p class="pb-description ds-muted">توضیحات محصول ثبت نشده است.</p>{% endif %}
             <dl class="pb-facts pb-facts--inline">
                 <div><dt>واحد ثبت‌شده</dt><dd><bdi>{{ product.unit|default:"ثبت نشده" }}</bdi></dd></div>
@@ -108,3 +110,4 @@
     <footer class="pb-return ds-surface ds-page-header"><p class="ds-caption ds-muted">{% if manager_inspection %}این نما برای بررسی اطلاعات است. برای ادامه بررسی به نمای مشتری بازگردید.{% else %}برای ادامه تعامل یا ثبت نتیجه در ویزیت، به پیشنهادهای مشتری بازگردید.{% endif %}</p><a class="ds-button" href="{{ return_url }}">بازگشت</a></footer>
 </div>
 {% endblock %}
+{% block extra_js %}<script src="{% static 'demo/assets.js' %}?v=demo04-1" defer></script>{% endblock %}
