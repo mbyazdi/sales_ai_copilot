@@ -91,6 +91,18 @@ test('representative image has truthful visible label and credit, and failure re
     assert(fields['image-disclosure'].hidden);
     assert(f.calls.every(call => call.options.method === 'GET'));
 });
+test('generated product imagery carries illustrative provenance without manufacturer photo or pricing claims', async () => {
+    const product = item(1);
+    product.image = {url: '/static/demo/products/PHD001/generated-v1/thumb.webp', label: 'تصویر نمونه محصول؛ مدل دقیق تأیید نشده',
+        description: 'تصویر تولیدشده با هوش مصنوعی؛ عکس محصول واقعی نیست.',
+        credit: {author: 'تصویرسازی با هوش مصنوعی', source_url: null, licence_url: null}};
+    const f = fixture({responses: [payload([product])]}); await settle();
+    const fields = f.elements.catalogOrdinaryItems.children[0].fields;
+    assert.match(fields.image.alt, /هوش مصنوعی/);
+    assert.match(fields['image-credit'].textContent, /عکس محصول واقعی نیست/);
+    assert(fields['image-source'].hidden); assert(fields['image-licence'].hidden);
+    assert.equal(fields.price.textContent, 'در دسترس نیست');
+});
 test('renders the complete server page, prioritized before ordinary, without a three-product limit', async () => {
     const f = fixture(); await settle();
     assert.equal(f.elements.catalogPrioritizedItems.children.length, 2);

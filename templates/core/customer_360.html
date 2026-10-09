@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static demo_assets %}
 {% block title %}نمای مشتری{% endblock %}
 {% block breadcrumb %}مشتریان{% endblock %}
 {% block body_class %}{% if not manager_inspection %}sj-shell{% endif %}{% endblock %}
@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="{% static 'core/css/customer_360.css' %}">
 <link rel="stylesheet" href="{% static 'core/css/customer_workspace.css' %}?v=002p-blocker-1">
 <link rel="stylesheet" href="{% static 'core/css/recommendation_outcome.css' %}?v=002p-1">
+<link rel="stylesheet" href="{% static 'demo/assets.css' %}?v=demo05-1">
 {% if not manager_inspection %}<link rel="stylesheet" href="{% static 'css/salesperson_journey.css' %}?v=002p-1">{% endif %}
 {% endblock %}
 {% block content %}
@@ -16,8 +17,9 @@
     {% elif current_visit.status != 'IN_PROGRESS' %}{% include "core/customer_360/_search.html" %}{% endif %}
     {% if not_found %}<p class="ds-state ds-state--error" role="alert">مشتری موردنظر پیدا نشد.</p>{% endif %}
     {% if customer %}
+        {% demo_asset "stores" customer.customer_code as customer_image %}
         {% if not manager_inspection and current_visit.status == 'IN_PROGRESS' %}
-        <header class="ds-page-header c360-operational-identity"><div><h1 class="ds-title"><bdi>{{ customer.name }}</bdi></h1><p class="ds-caption ds-muted">کد مشتری <bdi>{{ customer.customer_code }}</bdi></p></div><a class="ds-button ds-button--quiet" href="{% url 'salesperson-dashboard' %}">برنامه ویزیت امروز</a></header>
+        <header class="ds-page-header c360-operational-identity"><div{% if customer_image.url %} class="demo-customer-identity" data-demo-scope{% endif %}>{% include "components/demo_store_image.html" with asset=customer_image only %}<div><h1 class="ds-title"><bdi>{{ customer.name }}</bdi></h1><p class="ds-caption ds-muted">کد مشتری <bdi>{{ customer.customer_code }}</bdi></p>{% include "components/demo_store_caption.html" with asset=customer_image only %}</div></div><a class="ds-button ds-button--quiet" href="{% url 'salesperson-dashboard' %}">برنامه ویزیت امروز</a></header>
         {% else %}{% include "core/customer_360/_customer_hero.html" %}{% endif %}
         {% if visit_not_found %}<p class="ds-state ds-state--error" role="alert">ویزیت انتخاب‌شده معتبر نیست یا متعلق به این مشتری نیست؛ اطلاعات مشتری بدون زمینه ویزیت نمایش داده می‌شود.</p>{% endif %}
         <div class="sales-workspace visit-state-{% if current_visit %}{{ current_visit.status|lower }}{% else %}none{% endif %}">
@@ -51,6 +53,7 @@
 {% if not manager_inspection %}{% include "core/customer_360/_outcome_modal.html" %}{% endif %}
 {% endblock %}
 {% block extra_js %}
+<script src="{% static 'demo/assets.js' %}?v=demo05-1" defer></script>
 <script>
 window.salesAiCopilot = {
     customerCode: "{{ customer.customer_code|escapejs }}",

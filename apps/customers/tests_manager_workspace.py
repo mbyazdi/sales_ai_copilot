@@ -1,6 +1,7 @@
 """Manager customer inspection and existing customer-access regressions."""
 
 from datetime import timedelta
+import re
 from unittest.mock import patch
 from urllib.parse import quote
 
@@ -165,13 +166,22 @@ class ManagerCustomerWorkspaceTests(TestCase):
             self.assertEqual(response.data["customer"]["code"], self.other_customer.customer_code)
 
     def test_unavailable_html_and_api_do_not_disclose_existence(self):
+        def deterministic_html(response):
+            content, count = re.subn(
+                rb'(<input\b[^>]*\bname="csrfmiddlewaretoken"[^>]*\bvalue=")[A-Za-z0-9]{64}("[^>]*>)',
+                rb'\1[masked-csrf-token]\2', response.content,
+            )
+            # Preserve the form/field and every other HTML byte in the comparison.
+            self.assertEqual(count, 1)
+            return content
+
         self.client.force_login(self.user)
         for prefix in ("/customers/", "/api/customers/"):
             denied = self.page(prefix, customer_code=self.other_customer.customer_code)
             missing = self.page(prefix, customer_code="DOES-NOT-EXIST")
             self.assertEqual(denied.status_code, 404)
             self.assertEqual(missing.status_code, 404)
-            self.assertEqual(denied.content, missing.content)
+            self.assertEqual(deterministic_html(denied), deterministic_html(missing))
             self.assertNotContains(denied, self.other_customer.name, status_code=404)
             self.assertNotContains(denied, self.other_customer.customer_code, status_code=404)
         for prefix in ("/customers/v1/customer-360/", "/api/customers/v1/customer-360/"):

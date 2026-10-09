@@ -14,3 +14,11 @@
 .demo-image-info > summary { min-height: 44px; padding: var(--ds-space-2); width: fit-content; box-sizing: border-box; border-radius: var(--ds-radius-sm); cursor: pointer; color: var(--ds-brand); }
 .demo-image-info > summary:focus-visible { outline: 3px solid var(--ds-focus); outline-offset: 2px; }
 .demo-image-info > div { padding-block-end: var(--ds-space-2); }
+.demo-customer-identity { display: flex; align-items: flex-start; gap: var(--ds-space-4); min-width: 0; }
+.demo-customer-identity > div:not(.demo-store-image) { min-width: 0; flex: 1; }
+.demo-store-image { flex: 0 0 92px; width: 92px; height: 92px; border: 1px solid var(--ds-border); border-radius: 10px; overflow: hidden; background: var(--ds-surface-soft); }
+.demo-store-image svg { width: 100%; height: 100%; fill: none; stroke: var(--ds-border-strong); }
+.demo-store-caption { overflow-wrap: anywhere; line-height: 1.6; min-height: 3.2em; }
+.demo-store-info > summary { min-height: 0; padding-block: 0; font: inherit; cursor: pointer; color: var(--ds-brand); border-radius: var(--ds-radius-sm); }
+.demo-store-info > summary:focus-visible { outline: 3px solid var(--ds-focus); outline-offset: 2px; }
+@media (max-width: 600px) { .demo-store-caption { min-height: 4.8em; } }

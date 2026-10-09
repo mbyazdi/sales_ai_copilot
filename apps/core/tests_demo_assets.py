@@ -13,27 +13,33 @@ from apps.products.tests_catalog import CatalogBackendTests
 
 
 class DemoAssetRegistryTests(SimpleTestCase):
-    def test_only_selected_permitted_representatives_are_enabled(self):
+    def test_original_photos_and_owner_approved_generated_assets_are_distinct(self):
         enabled = {code for code, row in _manifest()["products"].items() if row["demo_enabled"]}
-        self.assertEqual(enabled, {"BRN001", "BRN002", "PHI002"})
+        self.assertEqual(len(enabled), 14)
         self.assertEqual(len(_manifest()["products"]), 14)
         self.assertEqual(len(_manifest()["stores"]), 10)
-        for code in enabled:
+        for code in {"BRN001", "BRN002", "PHI002"}:
             image = demo_image("products", code)
             self.assertEqual(image["state"], "REPRESENTATIVE")
             self.assertTrue(image["url"].startswith("/static/demo/products/"))
             self.assertIn("مدل دقیق تأیید نشده", image["label"])
             self.assertTrue(image["credit"]["source_url"].startswith("https://"))
             self.assertTrue(image["credit"]["author"])
+        for code in enabled - {"BRN001", "BRN002", "PHI002"}:
+            image = demo_image("products", code)
+            self.assertEqual(image["state"], "GENERATED_REPRESENTATIVE")
+            self.assertIn("/generated-v1/", image["url"])
+            self.assertIn("هوش مصنوعی", image["description"])
+            self.assertIsNone(image["credit"]["source_url"])
+            self.assertIsNone(image["credit"]["licence_url"])
 
-    def test_weak_missing_unknown_and_store_assets_keep_existing_fallback(self):
+    def test_unmapped_and_disabled_assets_keep_existing_fallback(self):
         missing = {"url": None, "state": "MISSING"}
         for code, entry in _manifest()["products"].items():
             if not entry["demo_enabled"]:
                 self.assertEqual(demo_image("products", code), missing)
-        for code in _manifest()["stores"]:
-            self.assertEqual(demo_image("stores", code), missing)
         self.assertEqual(demo_image("products", "not-a-demo-sku"), missing)
+        self.assertEqual(demo_image("stores", "not-a-demo-customer"), missing)
 
     def test_missing_or_altered_file_fails_closed(self):
         document = deepcopy(_manifest())
@@ -50,11 +56,21 @@ class DemoAssetRegistryTests(SimpleTestCase):
         with patch("apps.core.demo_assets._manifest", return_value=document):
             self.assertIsNone(demo_image("products", "BRN001")["url"])
 
-    def test_future_store_slot_is_labelled_as_sample_not_verified_premises(self):
-        document = deepcopy(_manifest())
-        document["stores"]["C0003"] = deepcopy(document["products"]["BRN001"])
-        with patch("apps.core.demo_assets._manifest", return_value=document):
-            self.assertEqual(demo_image("stores", "C0003")["label"], "تصویر نمونهٔ فروشگاه")
+    def test_store_slots_disclose_generated_samples_and_dutch_geography_difference(self):
+        for code in _manifest()["stores"]:
+            image = demo_image("stores", code)
+            self.assertEqual(image["label"], "تصویر نمونهٔ فروشگاه")
+            self.assertEqual(image["state"], "GENERATED_REPRESENTATIVE")
+            self.assertIn("محل واقعی مشتری در هلند نیست", image["description"])
+
+    def test_archived_real_image_checksums_remain_valid(self):
+        import json
+        import hashlib
+        from django.conf import settings
+        old = json.loads((settings.BASE_DIR / "static/demo/products/manifest.v1.json").read_text(encoding="utf-8"))
+        for entry in old["products"].values():
+            for file in entry["files"].values():
+                self.assertEqual(hashlib.sha256((settings.BASE_DIR / file["path"]).read_bytes()).hexdigest(), file["sha256"])
 
 
 class DemoAssetJourneyTests(TestCase):
@@ -106,3 +122,30 @@ class DemoAssetJourneyTests(TestCase):
         self.assertContains(response, 'class="gc-quantity-slot" aria-hidden="true"></div>')
         self.assertContains(response, 'class="gc-add-slot" aria-hidden="true"></div>')
         self.assertContains(response, "data-image-disclosure")
+
+    def test_generated_store_in_guided_and_customer_preserves_city_and_read_only_context(self):
+        self.customer.customer_code = "C0003"
+        self.customer.city = "Eindhoven"
+        self.customer.save(update_fields=["customer_code", "city"])
+        for url in (reverse("recommendation-presentation", args=["C0003"]), "/customers/"):
+            with CaptureQueriesContext(connection) as queries:
+                response = self.client.get(url, {"customer_code": "C0003", "visit_id": self.visit.pk})
+            self.assertContains(response, "demo/stores/C0003/thumb.webp")
+            self.assertContains(response, "تصویر نمونهٔ فروشگاه")
+            self.assertContains(response, "محل واقعی مشتری در هلند نیست")
+            self.assertContains(response, '<details class="demo-store-info">')
+            self.assertContains(response, '<summary>اطلاعات تصویر</summary>')
+            self.assertNotContains(response, '<details class="demo-store-info" open')
+            self.assertTrue(all(q["sql"].lstrip().upper().startswith("SELECT") for q in queries))
+        self.customer.refresh_from_db()
+        self.assertEqual(self.customer.city, "Eindhoven")
+
+    def test_generated_product_is_labelled_without_fabricated_model_or_price(self):
+        self.products[4].product_code = "PHD001"
+        self.products[4].save(update_fields=["product_code"])
+        response = self.client.get(reverse("product-commercial-brief", args=["PHD001"]),
+                                   {"customer_code": self.customer.customer_code, "visit_id": self.visit.pk})
+        self.assertContains(response, "generated-v1/hero.webp")
+        self.assertContains(response, "تصویر نمونه محصول؛ مدل دقیق تأیید نشده")
+        self.assertContains(response, "عکس محصول واقعی نیست")
+        self.assertNotContains(response, "قیمت نهایی")

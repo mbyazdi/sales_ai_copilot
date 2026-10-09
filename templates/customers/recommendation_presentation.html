@@ -17,13 +17,13 @@
         <h1 class="ds-title">فروش هوشمند</h1>
         {% include "components/salesperson_context.html" with salesperson=salesperson back_url=customer_url back_label="نمای مشتری" only %}
     </header>
-    <section class="gc-context" aria-label="مشتری و ویزیت انتخاب‌شده">
+    {% demo_asset "stores" customer.customer_code as store_image %}
+    <section class="gc-context" aria-label="مشتری و ویزیت انتخاب‌شده" data-demo-scope>
         <div class="gc-customer">
             {% if customer.grade %}<span class="gc-grade" aria-label="رتبه مشتری"><bdi>{{ customer.grade.code }}</bdi></span>{% endif %}
-            <div class="gc-customer-copy"><strong><bdi>{{ customer.name }}</bdi></strong><span class="gc-customer-code"><bdi>{{ customer.customer_code }}</bdi></span></div>
+            <div class="gc-customer-copy"><strong><bdi>{{ customer.name }}</bdi></strong><span class="gc-customer-code"><bdi>{{ customer.customer_code }}</bdi></span>{% include "components/demo_store_caption.html" with asset=store_image only %}</div>
         </div>
-        {% demo_asset "stores" customer.customer_code as store_image %}
-        <div class="gc-customer-image" data-demo-slot="store" aria-label="{% if store_image.url %}تصویر نمونهٔ فروشگاه{% else %}تصویر مشتری ثبت نشده است{% endif %}">{% if store_image.url %}<img data-demo-image src="{{ store_image.url }}" alt="تصویر نمونهٔ فروشگاه" width="92" height="92">{% endif %}<svg data-demo-fallback {% if store_image.url %}hidden{% endif %} viewBox="0 0 64 64" aria-hidden="true"><path d="M10 26h44v28H10zM7 26l6-15h38l6 15M7 26c0 6 10 6 10 0 0 6 10 6 10 0 0 6 10 6 10 0 0 6 10 6 10 0 0 6 10 6 10 0M18 54V37h13v17M39 37h8v9h-8z"/></svg></div>
+        <div class="gc-customer-image" data-demo-slot="store" aria-label="{% if store_image.url %}تصویر نمونهٔ فروشگاه{% else %}تصویر مشتری ثبت نشده است{% endif %}">{% if store_image.url %}<img data-demo-image src="{{ store_image.url }}" alt="{{ store_image.label }} — {{ store_image.description }}" width="92" height="92">{% endif %}<svg data-demo-fallback {% if store_image.url %}hidden{% endif %} viewBox="0 0 64 64" aria-hidden="true"><path d="M10 26h44v28H10zM7 26l6-15h38l6 15M7 26c0 6 10 6 10 0 0 6 10 6 10 0 0 6 10 6 10 0 0 6 10 6 10 0 0 6 10 6 10 0M18 54V37h13v17M39 37h8v9h-8z"/></svg></div>
         <div class="gs-visit">{% if current_visit %}<span>ویزیت <bdi>{{ current_visit.id }}</bdi> · <bdi>{{ current_visit.visit_date|date:"Y/m/d" }}</bdi></span><span class="ds-badge" data-status="{{ current_visit.status }}">{% if current_visit.status == 'IN_PROGRESS' %}در حال انجام{% elif current_visit.status == 'PLANNED' %}برنامه‌ریزی‌شده{% elif current_visit.status == 'COMPLETED' %}تکمیل‌شده{% else %}لغوشده{% endif %}</span>{% else %}<span class="ds-muted">بدون ویزیت انتخاب‌شده · فقط مشاهده</span>{% endif %}</div>
     </section>
     <main id="main-content" tabindex="-1">

@@ -51,18 +51,20 @@ def demo_image(kind, code, variant="thumb"):
     if not path or not checksum or not _verified_file(path, checksum):
         return missing
     credit = entry.get("attribution") or {}
+    generated = entry.get("image_type") == "AI_GENERATED_REPRESENTATIVE"
     label = ("تصویر نمونهٔ فروشگاه" if kind == "stores" else
              "تصویر نمونهٔ محصول؛ مدل دقیق تأیید نشده") if entry["status"] == "B" else ""
     return {
         "url": static(path.removeprefix("static/")),
-        "state": "REPRESENTATIVE" if entry["status"] == "B" else "VERIFIED",
+        "state": "GENERATED_REPRESENTATIVE" if generated else ("REPRESENTATIVE" if entry["status"] == "B" else "VERIFIED"),
         "label": label,
+        "description": entry.get("description", "") if generated else "",
         "credit": {
             "author": credit.get("author", ""),
             "source_url": _public_url(credit.get("source")),
             "licence": credit.get("licence", ""),
             "licence_url": _public_url(credit.get("licence_url")),
             "additional_source_url": _public_url(credit.get("additional_source_url")),
-            "changes": "اندازه و قالب تصویر تغییر کرده است.",
+            "changes": "نمونهٔ تولیدشده؛ مدل یا محل واقعی تأیید نشده است." if generated else "اندازه و قالب تصویر تغییر کرده است.",
         },
     }

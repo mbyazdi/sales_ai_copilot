@@ -85,13 +85,13 @@
             const imageURL = new URL(item.image.url, window.location.origin);
             if (['http:', 'https:'].includes(imageURL.protocol)) {
                 const image = field('image'), fallback = field('image-fallback');
-                image.alt = item.image.label ? `${item.image.label} — ${item.name}` : item.name;
+                image.alt = item.image.label ? `${item.image.label}${item.image.description ? ' · ' + item.image.description : ''} — ${item.name}` : item.name;
                 image.hidden = false; fallback.hidden = true;
                 const disclosure = field('image-disclosure'), credit = item.image.credit;
                 if (item.image.label) {
                     disclosure.hidden = false;
                     field('image-label').textContent = item.image.label;
-                    field('image-credit').textContent = [credit?.author, credit?.licence, credit?.changes].filter(Boolean).join(' · ');
+                    field('image-credit').textContent = [item.image.description, credit?.author, credit?.licence, credit?.changes].filter(Boolean).join(' · ');
                     for (const [name, value] of [['image-source', credit?.source_url], ['image-licence', credit?.licence_url], ['image-original', credit?.additional_source_url]]) {
                         const link = field(name);
                         link.hidden = !value;

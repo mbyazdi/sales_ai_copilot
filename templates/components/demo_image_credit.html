@@ -1,10 +1,11 @@
 {% if asset.url %}
 <div class="ds-caption ds-muted" data-demo-caption>
-    <p>{% if asset.state == "REPRESENTATIVE" %}تصویر نمونه محصول؛ مدل دقیق تأیید نشده{% else %}{{ asset.label }}{% endif %}</p>
+    <p>{% if asset.state == "REPRESENTATIVE" or asset.state == "GENERATED_REPRESENTATIVE" %}تصویر نمونه محصول؛ مدل دقیق تأیید نشده{% else %}{{ asset.label }}{% endif %}</p>
+    {% if asset.description %}<p>{{ asset.description }}</p>{% endif %}
     <details class="demo-image-info">
         <summary>اطلاعات تصویر</summary>
         <div>
-            {% if asset.credit.source_url %}<a href="{{ asset.credit.source_url }}" target="_blank" rel="noopener noreferrer">منبع: <bdi>{{ asset.credit.author }}</bdi></a>{% endif %}
+            {% if asset.credit.source_url %}<a href="{{ asset.credit.source_url }}" target="_blank" rel="noopener noreferrer">منبع: <bdi>{{ asset.credit.author }}</bdi></a>{% elif asset.credit.author %}<span>{{ asset.credit.author }}</span>{% endif %}
             {% if asset.credit.licence_url %} · <a href="{{ asset.credit.licence_url }}" target="_blank" rel="noopener noreferrer"><bdi>{{ asset.credit.licence }}</bdi></a>{% elif asset.credit.licence %} · <bdi>{{ asset.credit.licence }}</bdi>{% endif %}
             {% if asset.credit.additional_source_url %} · <a href="{{ asset.credit.additional_source_url }}" target="_blank" rel="noopener noreferrer">مرجع اصلی</a>{% endif %}
             <p>{{ asset.credit.changes }}</p>

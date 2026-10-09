@@ -1,49 +1,80 @@
 {
   "schema_version": 2,
-  "manifest_version": "demo-assets-2.0.0",
+  "manifest_version": "demo-assets-2.1.0",
   "prepared_on": "2026-10-09",
   "approval_scope": "Owner-authorized representative images for local demo only; no exact-model assertion.",
   "products": {
     "PHD001": {
       "asset_id": "product.PHD001.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing fallback",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "recorded_product": {
         "name": "Philips Hair Dryer 2100W",
         "brand": "Philips",
         "category": "Hair Dryer",
         "manufacturer_candidate_url": "https://www.documents.philips.com/assets/20220616/80b2a8e9169c44128b7daeb6011102ee.pdf"
       },
-      "pictured_model": "Philips Thermo Protect 2100W; model number unknown",
-      "model_match": "Exact database-SKU model not verified.",
-      "source_url": "https://commons.wikimedia.org/wiki/File:Philips_Thermo_Protect_2100W.jpg",
+      "pictured_model": null,
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "source_url": null,
       "permission": {
-        "status": "verified_open_grant",
-        "licence": "CC BY-SA 4.0",
-        "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
-        "evidence": "Own-work copyright holder grant on the individual Commons file page.",
-        "evidence_file": "docs/demo/product-permission-evidence.v1.json"
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
       },
       "attribution": {
-        "author": "Air fans",
-        "source": "https://commons.wikimedia.org/wiki/File:Philips_Thermo_Protect_2100W.jpg",
-        "licence": "CC BY-SA 4.0",
-        "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
-        "required": true,
-        "share_alike": true,
-        "changes": "Resized, neutral padded canvas, WebP conversion; original product/background retained."
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
+        "licence_url": null,
+        "required": false,
+        "share_alike": false
       },
-      "files": {},
+      "files": {
+        "hero": {
+          "path": "static/demo/products/PHD001/generated-v1/hero.webp",
+          "width": 800,
+          "height": 800,
+          "sha256": "6527947dee344efbd498cef5b6ffb6c112924a61249f44cbc641b1fe380b5fbc",
+          "bytes": 13400,
+          "handoff_original_path": "static/demo/products/PHD001/hero.webp"
+        },
+        "thumb": {
+          "path": "static/demo/products/PHD001/generated-v1/thumb.webp",
+          "width": 256,
+          "height": 256,
+          "sha256": "7a03accc1afeaaee2dbe8e9689fa652b7023a3b27fe85101a940a5edc89d489b",
+          "bytes": 2848,
+          "handoff_original_path": "static/demo/products/PHD001/thumb.webp"
+        }
+      },
       "held_files": {},
-      "generation_brief_id": "PHD001",
-      "gap_reason": "Bathroom/toilet background unsuitable; no public asset prepared. Acquire a permitted product-focused photograph; no automatic integration."
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "a_clean_product_photography_collage_on_a_white_lig.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویر تولیدشده با هوش مصنوعی؛ عکس محصول واقعی نیست."
     },
     "PHS001": {
       "asset_id": "product.PHS001.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing fallback",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "recorded_product": {
         "name": "Philips Hair Straightener",
         "brand": "Philips",
@@ -51,17 +82,59 @@
         "manufacturer_candidate_url": "https://www.philips.co.uk/c-p/BHS530_00/5000-series-straightener/support"
       },
       "pictured_model": null,
-      "model_match": "Exact database-SKU model not verified.",
-      "source_url": "https://www.philips.co.uk/c-p/BHS530_00/5000-series-straightener/support",
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "source_url": null,
       "permission": {
-        "status": "not_established",
-        "evidence": "Product page availability is not a reuse grant."
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
       },
-      "attribution": null,
-      "files": {},
+      "attribution": {
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
+        "licence_url": null,
+        "required": false,
+        "share_alike": false
+      },
+      "files": {
+        "hero": {
+          "path": "static/demo/products/PHS001/generated-v1/hero.webp",
+          "width": 800,
+          "height": 800,
+          "sha256": "9412ca1a77c5296eaaf903db3303926bd4a2391cedea018568b178b90136db60",
+          "bytes": 15590,
+          "handoff_original_path": "static/demo/products/PHS001/hero.webp"
+        },
+        "thumb": {
+          "path": "static/demo/products/PHS001/generated-v1/thumb.webp",
+          "width": 256,
+          "height": 256,
+          "sha256": "95a0594fe9cd212a024be359812d1cf5fe9e6da336725681f5651b1076db8c6a",
+          "bytes": 2990,
+          "handoff_original_path": "static/demo/products/PHS001/thumb.webp"
+        }
+      },
       "held_files": {},
-      "generation_brief_id": "PHS001",
-      "gap_reason": "Obtain supplier/manufacturer written permission and model evidence, or an independently licensed correctly branded photograph."
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "a_clean_product_photography_collage_on_a_white_lig.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویر تولیدشده با هوش مصنوعی؛ عکس محصول واقعی نیست."
     },
     "BRN001": {
       "asset_id": "product.BRN001.v1",
@@ -165,9 +238,9 @@
     },
     "PAN001": {
       "asset_id": "product.PAN001.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing fallback",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "recorded_product": {
         "name": "Panasonic Hair Curler",
         "brand": "Panasonic",
@@ -175,17 +248,59 @@
         "manufacturer_candidate_url": "https://www.panasonic.com/sg/consumer/personal-care/hair-care/hair-styler/eh-ht40.html"
       },
       "pictured_model": null,
-      "model_match": "Exact database-SKU model not verified.",
-      "source_url": "https://www.panasonic.com/sg/consumer/personal-care/hair-care/hair-styler/eh-ht40.html",
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "source_url": null,
       "permission": {
-        "status": "not_established",
-        "evidence": "Product page availability is not a reuse grant."
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
       },
-      "attribution": null,
-      "files": {},
+      "attribution": {
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
+        "licence_url": null,
+        "required": false,
+        "share_alike": false
+      },
+      "files": {
+        "hero": {
+          "path": "static/demo/products/PAN001/generated-v1/hero.webp",
+          "width": 800,
+          "height": 800,
+          "sha256": "4a4790a190f39b3bf0afa65fe51a6ef08221ca569cee7e4f93259ec6a53c9f6e",
+          "bytes": 13280,
+          "handoff_original_path": "static/demo/products/PAN001/hero.webp"
+        },
+        "thumb": {
+          "path": "static/demo/products/PAN001/generated-v1/thumb.webp",
+          "width": 256,
+          "height": 256,
+          "sha256": "c5a8680fe73fa23e2d8845a5707c4cdf881f743cfa561fefe8adae885453671d",
+          "bytes": 2794,
+          "handoff_original_path": "static/demo/products/PAN001/thumb.webp"
+        }
+      },
       "held_files": {},
-      "generation_brief_id": "PAN001",
-      "gap_reason": "Obtain supplier/manufacturer written permission and model evidence, or an independently licensed correctly branded photograph."
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "a_clean_product_photography_collage_on_a_white_lig.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویر تولیدشده با هوش مصنوعی؛ عکس محصول واقعی نیست."
     },
     "PHI002": {
       "asset_id": "product.PHI002.v1",
@@ -240,44 +355,75 @@
     },
     "BOS001": {
       "asset_id": "product.BOS001.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing fallback",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "recorded_product": {
         "name": "Bosch Vacuum Cleaner",
         "brand": "Bosch",
         "category": "Vacuum Cleaner",
         "manufacturer_candidate_url": "https://www.bosch-home.co.uk/en/productservice/BGB41HYGGB-12"
       },
-      "pictured_model": "Bosch Serie 4 ProHygienic; E-number unknown",
-      "model_match": "Exact database-SKU model not verified.",
-      "source_url": "https://commons.wikimedia.org/wiki/File:Bosch_Serie_4_ProHygienic.jpg",
+      "pictured_model": null,
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "source_url": null,
       "permission": {
-        "status": "verified_open_grant",
-        "licence": "CC0",
-        "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
-        "evidence": "Own-work copyright holder grant on the individual Commons file page.",
-        "evidence_file": "docs/demo/product-permission-evidence.v1.json"
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
       },
       "attribution": {
-        "author": "Air fans",
-        "source": "https://commons.wikimedia.org/wiki/File:Bosch_Serie_4_ProHygienic.jpg",
-        "licence": "CC0",
-        "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
+        "licence_url": null,
         "required": false,
-        "share_alike": false,
-        "changes": "Resized, neutral padded canvas, WebP conversion; original product/background retained."
+        "share_alike": false
       },
-      "files": {},
+      "files": {
+        "hero": {
+          "path": "static/demo/products/BOS001/generated-v1/hero.webp",
+          "width": 800,
+          "height": 800,
+          "sha256": "e332ed78fcb27e6ec3f085fab64725d6dee81380d580796cba615fc5cf86ea44",
+          "bytes": 26230,
+          "handoff_original_path": "static/demo/products/BOS001/hero.webp"
+        },
+        "thumb": {
+          "path": "static/demo/products/BOS001/generated-v1/thumb.webp",
+          "width": 256,
+          "height": 256,
+          "sha256": "6650f11807173dd2e1dcc395cc6e1e7cb1978f716d575016a86a42fb34d4947d",
+          "bytes": 4850,
+          "handoff_original_path": "static/demo/products/BOS001/thumb.webp"
+        }
+      },
       "held_files": {},
-      "generation_brief_id": "BOS001",
-      "gap_reason": "Overhead floor scene gives insufficient product emphasis; no public asset prepared. Acquire a permitted product-focused photograph; no automatic integration."
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "a_clean_product_photography_collage_on_a_white_lig.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویر تولیدشده با هوش مصنوعی؛ عکس محصول واقعی نیست."
     },
     "TEF001": {
       "asset_id": "product.TEF001.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing fallback",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "recorded_product": {
         "name": "Tefal Steam Iron",
         "brand": "Tefal",
@@ -285,23 +431,65 @@
         "manufacturer_candidate_url": "https://www.tefal.com/Linen-Care/Steam-Irons/TURBO-PRO-ANTI-CALC-FV5645/p/1830006357?scc=steam%2Birons"
       },
       "pictured_model": null,
-      "model_match": "Exact database-SKU model not verified.",
-      "source_url": "https://www.tefal.com/Linen-Care/Steam-Irons/TURBO-PRO-ANTI-CALC-FV5645/p/1830006357?scc=steam%2Birons",
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "source_url": null,
       "permission": {
-        "status": "not_established",
-        "evidence": "Product page availability is not a reuse grant."
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
       },
-      "attribution": null,
-      "files": {},
+      "attribution": {
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
+        "licence_url": null,
+        "required": false,
+        "share_alike": false
+      },
+      "files": {
+        "hero": {
+          "path": "static/demo/products/TEF001/generated-v1/hero.webp",
+          "width": 800,
+          "height": 800,
+          "sha256": "17a2e608e65d2c520af1a9defbe44a2c085e7455d544d6f90123f7ffa0affb51",
+          "bytes": 26254,
+          "handoff_original_path": "static/demo/products/TEF001/hero.webp"
+        },
+        "thumb": {
+          "path": "static/demo/products/TEF001/generated-v1/thumb.webp",
+          "width": 256,
+          "height": 256,
+          "sha256": "3dc3fff2ae8cb1246c3d9fd3647473b0fcfdff48aa2b68d11b81a15e7fa06513",
+          "bytes": 5158,
+          "handoff_original_path": "static/demo/products/TEF001/thumb.webp"
+        }
+      },
       "held_files": {},
-      "generation_brief_id": "TEF001",
-      "gap_reason": "Obtain supplier/manufacturer written permission and model evidence, or an independently licensed correctly branded photograph."
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "premium_kitchen_appliance_catalog_grid.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویر تولیدشده با هوش مصنوعی؛ عکس محصول واقعی نیست."
     },
     "BOS002": {
       "asset_id": "product.BOS002.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing fallback",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "recorded_product": {
         "name": "Bosch Blender",
         "brand": "Bosch",
@@ -309,49 +497,106 @@
         "manufacturer_candidate_url": "https://www.bosch-home.co.uk/en/product/small-appliances/blenders/blenders/MMB6174SG"
       },
       "pictured_model": null,
-      "model_match": "Exact database-SKU model not verified.",
-      "source_url": "https://www.bosch-home.co.uk/en/product/small-appliances/blenders/blenders/MMB6174SG",
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "source_url": null,
       "permission": {
-        "status": "not_established",
-        "evidence": "Product page availability is not a reuse grant."
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
       },
-      "attribution": null,
-      "files": {},
+      "attribution": {
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
+        "licence_url": null,
+        "required": false,
+        "share_alike": false
+      },
+      "files": {
+        "hero": {
+          "path": "static/demo/products/BOS002/generated-v1/hero.webp",
+          "width": 800,
+          "height": 800,
+          "sha256": "0809acce1d2e9d830419a18c5cb3729910768ce59133f61c530dda27fa7189f0",
+          "bytes": 23528,
+          "handoff_original_path": "static/demo/products/BOS002/hero.webp"
+        },
+        "thumb": {
+          "path": "static/demo/products/BOS002/generated-v1/thumb.webp",
+          "width": 256,
+          "height": 256,
+          "sha256": "7abb30da10f8b96de4f49a300910b34b7acf3a66c25d9fed2263d5f9ac07de6e",
+          "bytes": 4454,
+          "handoff_original_path": "static/demo/products/BOS002/thumb.webp"
+        }
+      },
       "held_files": {},
-      "generation_brief_id": "BOS002",
-      "gap_reason": "Obtain supplier/manufacturer written permission and model evidence, or an independently licensed correctly branded photograph."
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "bosch_philips_and_tefal_blender_comparison.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویر تولیدشده با هوش مصنوعی؛ عکس محصول واقعی نیست."
     },
     "PHI003": {
       "asset_id": "product.PHI003.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing fallback",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "recorded_product": {
         "name": "Philips Electric Kettle",
         "brand": "Philips",
         "category": "Electric Kettle",
         "manufacturer_candidate_url": "https://www.philips.co.uk/c-p/HD9352_31/5000-series-kettle-in-black-copper"
       },
-      "pictured_model": "Philips Cucina electric kettle; HD model unknown",
-      "model_match": "Exact database-SKU model not verified.",
-      "source_url": "https://commons.wikimedia.org/wiki/File:Electric_kettle_phillips_white.JPG",
+      "pictured_model": null,
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "source_url": null,
       "permission": {
-        "status": "verified_open_grant",
-        "licence": "Public domain",
-        "licence_url": null,
-        "evidence": "Copyright holder explicitly releases own photograph to public domain (PD-self/PD-user-de).",
-        "evidence_file": "docs/demo/product-permission-evidence.v1.json"
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
       },
       "attribution": {
-        "author": "Rafa",
-        "source": "https://commons.wikimedia.org/wiki/File:Electric_kettle_phillips_white.JPG",
-        "licence": "Public domain",
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
         "licence_url": null,
         "required": false,
-        "share_alike": false,
-        "changes": "Resized, neutral padded canvas, WebP conversion; original product/background retained."
+        "share_alike": false
       },
-      "files": {},
+      "files": {
+        "hero": {
+          "path": "static/demo/products/PHI003/generated-v1/hero.webp",
+          "width": 800,
+          "height": 800,
+          "sha256": "0e6421e7fa1d6b6ce9e35de97431fe1fa32f1a41d9a561d8ac05501e50d083f6",
+          "bytes": 13684,
+          "handoff_original_path": "static/demo/products/PHI003/hero.webp"
+        },
+        "thumb": {
+          "path": "static/demo/products/PHI003/generated-v1/thumb.webp",
+          "width": 256,
+          "height": 256,
+          "sha256": "f96823391828e05b2f3e306d3d5f37420309e5bc20330459e12572d6b6a02da6",
+          "bytes": 2638,
+          "handoff_original_path": "static/demo/products/PHI003/thumb.webp"
+        }
+      },
       "held_files": {
         "hero": {
           "path": "static/demo/products/PHI003/hero.webp",
@@ -368,40 +613,71 @@
           "sha256": "997e3087d84e1e6455acd487183325cddb898fe28a784f78af40a16d449a6b14"
         }
       },
-      "generation_brief_id": "PHI003",
-      "gap_reason": "Approve representative model/appearance and quality; carry sample label and attribution into later UI integration."
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "premium_kitchen_appliance_catalog_grid.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویر تولیدشده با هوش مصنوعی؛ عکس محصول واقعی نیست."
     },
     "TEF002": {
       "asset_id": "product.TEF002.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing fallback",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "recorded_product": {
         "name": "Tefal Air Fryer",
         "brand": "Tefal",
         "category": "Air Fryer",
         "manufacturer_candidate_url": "https://www.tefal.com/instructions-for-use/Products-/Electrical-Cooking/Oilless-Fryer/Easy-Fry-Mega--Air-fryer--Extra-Large-Capacity-7-5-L--8-Preset-Programs/csp/1510002620"
       },
-      "pictured_model": "Tefal drawer air fryer; exact model unknown",
-      "model_match": "Exact database-SKU model not verified.",
-      "source_url": "https://commons.wikimedia.org/wiki/File:Airfryer.jpg",
+      "pictured_model": null,
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "source_url": null,
       "permission": {
-        "status": "verified_open_grant",
-        "licence": "CC BY-SA 4.0",
-        "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
-        "evidence": "Own-work copyright holder grant on the individual Commons file page.",
-        "evidence_file": "docs/demo/product-permission-evidence.v1.json"
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
       },
       "attribution": {
-        "author": "Djsgmnd",
-        "source": "https://commons.wikimedia.org/wiki/File:Airfryer.jpg",
-        "licence": "CC BY-SA 4.0",
-        "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
-        "required": true,
-        "share_alike": true,
-        "changes": "Resized, neutral padded canvas, WebP conversion; original product/background retained."
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
+        "licence_url": null,
+        "required": false,
+        "share_alike": false
       },
-      "files": {},
+      "files": {
+        "hero": {
+          "path": "static/demo/products/TEF002/generated-v1/hero.webp",
+          "width": 800,
+          "height": 800,
+          "sha256": "b5be1f165b2d62def301fb520cc5bc0b40171b7c0ff90bc633885043f1887d48",
+          "bytes": 14010,
+          "handoff_original_path": "static/demo/products/TEF002/hero.webp"
+        },
+        "thumb": {
+          "path": "static/demo/products/TEF002/generated-v1/thumb.webp",
+          "width": 256,
+          "height": 256,
+          "sha256": "2eb8786d940d5d9843a40af45141a32345552fbce5599819b20eb347a30ac82f",
+          "bytes": 2432,
+          "handoff_original_path": "static/demo/products/TEF002/thumb.webp"
+        }
+      },
       "held_files": {
         "hero": {
           "path": "static/demo/products/TEF002/hero.webp",
@@ -418,40 +694,71 @@
           "sha256": "72298c2176e95957683752873b303e3d417d7944f336aa3a743700660d82f399"
         }
       },
-      "generation_brief_id": "TEF002",
-      "gap_reason": "Approve representative model/appearance and quality; carry sample label and attribution into later UI integration."
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "premium_kitchen_appliance_catalog_grid.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویر تولیدشده با هوش مصنوعی؛ عکس محصول واقعی نیست."
     },
     "ROW001": {
       "asset_id": "product.ROW001.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing fallback",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "recorded_product": {
         "name": "Rowenta Coffee Maker",
         "brand": "Rowenta",
         "category": "Coffee Maker",
         "manufacturer_candidate_url": "https://www.rowenta.com/instructions-for-use/csp/1500636237"
       },
-      "pictured_model": "Rowenta FK5401 filter coffee maker; file identifier",
-      "model_match": "Exact database-SKU model not verified.",
-      "source_url": "https://commons.wikimedia.org/wiki/File:FK5401.jpg",
+      "pictured_model": null,
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "source_url": null,
       "permission": {
-        "status": "verified_open_grant",
-        "licence": "CC BY-SA 3.0",
-        "licence_url": "https://creativecommons.org/licenses/by-sa/3.0",
-        "evidence": "Groupe SEB supplied photograph; Commons PermissionTicket 2010060110010948; CC BY-SA 3.0.",
-        "evidence_file": "docs/demo/product-permission-evidence.v1.json"
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
       },
       "attribution": {
-        "author": "Groupe SEB",
-        "source": "https://commons.wikimedia.org/wiki/File:FK5401.jpg",
-        "licence": "CC BY-SA 3.0",
-        "licence_url": "https://creativecommons.org/licenses/by-sa/3.0",
-        "required": true,
-        "share_alike": true,
-        "changes": "Resized, neutral padded canvas, WebP conversion; original product/background retained."
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
+        "licence_url": null,
+        "required": false,
+        "share_alike": false
       },
-      "files": {},
+      "files": {
+        "hero": {
+          "path": "static/demo/products/ROW001/generated-v1/hero.webp",
+          "width": 800,
+          "height": 800,
+          "sha256": "0a620ba81ef6cbd96ef1b05550d7ea3f38bdfb50a6dc0e8da403ae5457952d34",
+          "bytes": 16192,
+          "handoff_original_path": "static/demo/products/ROW001/hero.webp"
+        },
+        "thumb": {
+          "path": "static/demo/products/ROW001/generated-v1/thumb.webp",
+          "width": 256,
+          "height": 256,
+          "sha256": "46eba9641223627b9e6e98e902b0f90adf98c57d3d8986ec1e92a4d30d702268",
+          "bytes": 3312,
+          "handoff_original_path": "static/demo/products/ROW001/thumb.webp"
+        }
+      },
       "held_files": {
         "hero": {
           "path": "static/demo/products/ROW001/hero.webp",
@@ -468,49 +775,96 @@
           "sha256": "aae5232a97f1f06a737d9a1a6c91278e08207baef4b8eae1acbed4f3ef8eeace"
         }
       },
-      "generation_brief_id": "ROW001",
-      "gap_reason": "Approve representative model/appearance and quality; carry sample label and attribution into later UI integration."
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "premium_kitchen_appliance_catalog_grid.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویر تولیدشده با هوش مصنوعی؛ عکس محصول واقعی نیست."
     },
     "PHI004": {
       "asset_id": "product.PHI004.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing fallback",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "recorded_product": {
         "name": "Philips Blender",
         "brand": "Philips",
         "category": "Blender",
         "manufacturer_candidate_url": "https://www.philips.com/c-p/HR2223_00/series-5000-blender-core"
       },
-      "pictured_model": "White Philips jug blender; HR model unknown",
-      "model_match": "Exact database-SKU model not verified.",
-      "source_url": "https://commons.wikimedia.org/wiki/File:Juice_Blender.jpg",
+      "pictured_model": null,
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "source_url": null,
       "permission": {
-        "status": "verified_open_grant",
-        "licence": "CC0",
-        "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
-        "evidence": "Own-work copyright holder grant on the individual Commons file page.",
-        "evidence_file": "docs/demo/product-permission-evidence.v1.json"
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
       },
       "attribution": {
-        "author": "Nana Pearls",
-        "source": "https://commons.wikimedia.org/wiki/File:Juice_Blender.jpg",
-        "licence": "CC0",
-        "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
+        "licence_url": null,
         "required": false,
-        "share_alike": false,
-        "changes": "Resized, neutral padded canvas, WebP conversion; original product/background retained."
+        "share_alike": false
       },
-      "files": {},
+      "files": {
+        "hero": {
+          "path": "static/demo/products/PHI004/generated-v1/hero.webp",
+          "width": 800,
+          "height": 800,
+          "sha256": "6fcc9d722d5724c6946359d1028ede72cab7073f261a6849995e57cf30bd41d4",
+          "bytes": 22074,
+          "handoff_original_path": "static/demo/products/PHI004/hero.webp"
+        },
+        "thumb": {
+          "path": "static/demo/products/PHI004/generated-v1/thumb.webp",
+          "width": 256,
+          "height": 256,
+          "sha256": "980d6eddccd93e34ec0f1eb64837f1ba801614752e0efb65c91d2f541a41946c",
+          "bytes": 4146,
+          "handoff_original_path": "static/demo/products/PHI004/thumb.webp"
+        }
+      },
       "held_files": {},
-      "generation_brief_id": "PHI004",
-      "gap_reason": "Disassembled appliance and outdoor background unsuitable; no public asset prepared. Acquire a permitted product-focused photograph; no automatic integration."
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "bosch_philips_and_tefal_blender_comparison.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویر تولیدشده با هوش مصنوعی؛ عکس محصول واقعی نیست."
     },
     "TEF003": {
       "asset_id": "product.TEF003.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing fallback",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "recorded_product": {
         "name": "Tefal Blender",
         "brand": "Tefal",
@@ -518,149 +872,697 @@
         "manufacturer_candidate_url": "https://www.tefal.com/instructions-for-use/Products-/Food-preparation/Blender-%26-Smoothie-maker/Blendforce/csp/7211003003"
       },
       "pictured_model": null,
-      "model_match": "Exact database-SKU model not verified.",
-      "source_url": "https://www.tefal.com/instructions-for-use/Products-/Food-preparation/Blender-%26-Smoothie-maker/Blendforce/csp/7211003003",
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "source_url": null,
       "permission": {
-        "status": "not_established",
-        "evidence": "Product page availability is not a reuse grant."
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
       },
-      "attribution": null,
-      "files": {},
+      "attribution": {
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
+        "licence_url": null,
+        "required": false,
+        "share_alike": false
+      },
+      "files": {
+        "hero": {
+          "path": "static/demo/products/TEF003/generated-v1/hero.webp",
+          "width": 800,
+          "height": 800,
+          "sha256": "eb81fa1cf218a53e2a9e1b565ab26470862b16b23e5959f6ede9e8c1f05a30a7",
+          "bytes": 22916,
+          "handoff_original_path": "static/demo/products/TEF003/hero.webp"
+        },
+        "thumb": {
+          "path": "static/demo/products/TEF003/generated-v1/thumb.webp",
+          "width": 256,
+          "height": 256,
+          "sha256": "04c7f14acc98929b181656cfa9b1854f18a9bff1b40deb55ddc6013eea9ebf76",
+          "bytes": 4246,
+          "handoff_original_path": "static/demo/products/TEF003/thumb.webp"
+        }
+      },
       "held_files": {},
-      "generation_brief_id": "TEF003",
-      "gap_reason": "Obtain supplier/manufacturer written permission and model evidence, or an independently licensed correctly branded photograph."
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "bosch_philips_and_tefal_blender_comparison.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویر تولیدشده با هوش مصنوعی؛ عکس محصول واقعی نیست."
     }
   },
   "stores": {
     "C0003": {
       "asset_id": "store.C0003.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing store icon",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "fictional_customer": true,
       "business_type": "electrical retailer",
       "city": "Eindhoven",
-      "label_requirement": "????? ?????? ???????",
-      "files": {},
-      "generation_brief_id": "C0003",
-      "gap_reason": "No suitable local image acquired. Licensed Pexels candidates remain research references; direct download unavailable."
+      "label_requirement": "تصویر نمونهٔ فروشگاه",
+      "files": {
+        "front": {
+          "path": "static/demo/stores/C0003/front.webp",
+          "width": 600,
+          "height": 980,
+          "sha256": "39f238bc547ae8c35360a7b2b579f9e375950406ae99cd8b409c603537c43d8c",
+          "bytes": 102450,
+          "handoff_original_path": "static/demo/stores/C0003/front.webp"
+        },
+        "thumb": {
+          "path": "static/demo/stores/C0003/thumb.webp",
+          "width": 184,
+          "height": 300,
+          "sha256": "091918fe5e9bbcf01e22027dcf071ce33fd3a516a26e4dbf98ba00948e881717",
+          "bytes": 21308,
+          "handoff_original_path": "static/demo/stores/C0003/thumb.webp"
+        }
+      },
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "attribution": {
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
+        "licence_url": null,
+        "required": false,
+        "share_alike": false
+      },
+      "source_url": null,
+      "pictured_model": null,
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "a_wide_high_resolution_grid_collage_of_10_realist.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویرسازی با هوش مصنوعی؛ محل واقعی مشتری در هلند نیست.",
+      "permission": {
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
+      }
     },
     "C0005": {
       "asset_id": "store.C0005.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing store icon",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "fictional_customer": true,
       "business_type": "electrical retailer",
       "city": "Eindhoven",
-      "label_requirement": "????? ?????? ???????",
-      "files": {},
-      "generation_brief_id": "C0005",
-      "gap_reason": "No suitable local image acquired. Licensed Pexels candidates remain research references; direct download unavailable."
+      "label_requirement": "تصویر نمونهٔ فروشگاه",
+      "files": {
+        "front": {
+          "path": "static/demo/stores/C0005/front.webp",
+          "width": 600,
+          "height": 980,
+          "sha256": "2bb748fde668f176f1d641eefadf8ad1f8552272bf1b5e1a0a570726545fd565",
+          "bytes": 88226,
+          "handoff_original_path": "static/demo/stores/C0005/front.webp"
+        },
+        "thumb": {
+          "path": "static/demo/stores/C0005/thumb.webp",
+          "width": 184,
+          "height": 300,
+          "sha256": "1e44e28adc0fc7eab6effb337178036f38fc8e92ec2532b4e2c362bd4aa4cb0e",
+          "bytes": 17850,
+          "handoff_original_path": "static/demo/stores/C0005/thumb.webp"
+        }
+      },
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "attribution": {
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
+        "licence_url": null,
+        "required": false,
+        "share_alike": false
+      },
+      "source_url": null,
+      "pictured_model": null,
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "a_wide_high_resolution_grid_collage_of_10_realist.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویرسازی با هوش مصنوعی؛ محل واقعی مشتری در هلند نیست.",
+      "permission": {
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
+      }
     },
     "C0013": {
       "asset_id": "store.C0013.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing store icon",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "fictional_customer": true,
       "business_type": "electrical retailer",
       "city": "The Hague",
-      "label_requirement": "????? ?????? ???????",
-      "files": {},
-      "generation_brief_id": "C0013",
-      "gap_reason": "No suitable local image acquired. Licensed Pexels candidates remain research references; direct download unavailable."
+      "label_requirement": "تصویر نمونهٔ فروشگاه",
+      "files": {
+        "front": {
+          "path": "static/demo/stores/C0013/front.webp",
+          "width": 600,
+          "height": 980,
+          "sha256": "6468644a9de4c95faba4d3709e1e27b85fe543bccfb28aeef1589df4273ecaa7",
+          "bytes": 69668,
+          "handoff_original_path": "static/demo/stores/C0013/front.webp"
+        },
+        "thumb": {
+          "path": "static/demo/stores/C0013/thumb.webp",
+          "width": 184,
+          "height": 300,
+          "sha256": "c2def310ae53e3f2992280d14fd2dab43a8e372b96525b4f66af9df8e422729e",
+          "bytes": 16364,
+          "handoff_original_path": "static/demo/stores/C0013/thumb.webp"
+        }
+      },
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "attribution": {
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
+        "licence_url": null,
+        "required": false,
+        "share_alike": false
+      },
+      "source_url": null,
+      "pictured_model": null,
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "a_wide_high_resolution_grid_collage_of_10_realist.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویرسازی با هوش مصنوعی؛ محل واقعی مشتری در هلند نیست.",
+      "permission": {
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
+      }
     },
     "C0011": {
       "asset_id": "store.C0011.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing store icon",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "fictional_customer": true,
       "business_type": "electrical retailer",
       "city": "Utrecht",
-      "label_requirement": "????? ?????? ???????",
-      "files": {},
-      "generation_brief_id": "C0011",
-      "gap_reason": "No suitable local image acquired. Licensed Pexels candidates remain research references; direct download unavailable."
+      "label_requirement": "تصویر نمونهٔ فروشگاه",
+      "files": {
+        "front": {
+          "path": "static/demo/stores/C0011/front.webp",
+          "width": 600,
+          "height": 980,
+          "sha256": "874653ed0ca0b9568e7562311919ff8f7ad327e75011a5607382b6383364284c",
+          "bytes": 80478,
+          "handoff_original_path": "static/demo/stores/C0011/front.webp"
+        },
+        "thumb": {
+          "path": "static/demo/stores/C0011/thumb.webp",
+          "width": 184,
+          "height": 300,
+          "sha256": "8e34689c9dec473d4eb243c2c9e4c558bee07d6f27015c0cfc270c4a4d06d64e",
+          "bytes": 17134,
+          "handoff_original_path": "static/demo/stores/C0011/thumb.webp"
+        }
+      },
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "attribution": {
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
+        "licence_url": null,
+        "required": false,
+        "share_alike": false
+      },
+      "source_url": null,
+      "pictured_model": null,
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "a_wide_high_resolution_grid_collage_of_10_realist.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویرسازی با هوش مصنوعی؛ محل واقعی مشتری در هلند نیست.",
+      "permission": {
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
+      }
     },
     "C0029": {
       "asset_id": "store.C0029.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing store icon",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "fictional_customer": true,
       "business_type": "home-appliance retailer",
       "city": "Rotterdam",
-      "label_requirement": "????? ?????? ???????",
-      "files": {},
-      "generation_brief_id": "C0029",
-      "gap_reason": "No suitable local image acquired. Licensed Pexels candidates remain research references; direct download unavailable."
+      "label_requirement": "تصویر نمونهٔ فروشگاه",
+      "files": {
+        "front": {
+          "path": "static/demo/stores/C0029/front.webp",
+          "width": 600,
+          "height": 980,
+          "sha256": "1c392f920cb751c61cc08a99601f6627baa369828e7446153550d1b165c3a8b0",
+          "bytes": 79702,
+          "handoff_original_path": "static/demo/stores/C0029/front.webp"
+        },
+        "thumb": {
+          "path": "static/demo/stores/C0029/thumb.webp",
+          "width": 184,
+          "height": 300,
+          "sha256": "196bef9c9f5666967cd2fd11bda0fb276b6a2e2ca7219e2ca703df2545aa2f42",
+          "bytes": 17770,
+          "handoff_original_path": "static/demo/stores/C0029/thumb.webp"
+        }
+      },
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "attribution": {
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
+        "licence_url": null,
+        "required": false,
+        "share_alike": false
+      },
+      "source_url": null,
+      "pictured_model": null,
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "a_wide_high_resolution_grid_collage_of_10_realist.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویرسازی با هوش مصنوعی؛ محل واقعی مشتری در هلند نیست.",
+      "permission": {
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
+      }
     },
     "C0008": {
       "asset_id": "store.C0008.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing store icon",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "fictional_customer": true,
       "business_type": "home-appliance retailer",
       "city": "The Hague",
-      "label_requirement": "????? ?????? ???????",
-      "files": {},
-      "generation_brief_id": "C0008",
-      "gap_reason": "No suitable local image acquired. Licensed Pexels candidates remain research references; direct download unavailable."
+      "label_requirement": "تصویر نمونهٔ فروشگاه",
+      "files": {
+        "front": {
+          "path": "static/demo/stores/C0008/front.webp",
+          "width": 600,
+          "height": 980,
+          "sha256": "907bf99adccd67f821207117841e475db09306b447fde4be72daecd53ab1f2c3",
+          "bytes": 87416,
+          "handoff_original_path": "static/demo/stores/C0008/front.webp"
+        },
+        "thumb": {
+          "path": "static/demo/stores/C0008/thumb.webp",
+          "width": 184,
+          "height": 300,
+          "sha256": "1c7a418293cc75b1072c648471363c3d5155bd56343d2540ca23a45ec96bb88d",
+          "bytes": 18660,
+          "handoff_original_path": "static/demo/stores/C0008/thumb.webp"
+        }
+      },
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "attribution": {
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
+        "licence_url": null,
+        "required": false,
+        "share_alike": false
+      },
+      "source_url": null,
+      "pictured_model": null,
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "a_wide_high_resolution_grid_collage_of_10_realist.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویرسازی با هوش مصنوعی؛ محل واقعی مشتری در هلند نیست.",
+      "permission": {
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
+      }
     },
     "C0009": {
       "asset_id": "store.C0009.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing store icon",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "fictional_customer": true,
       "business_type": "home-appliance retailer",
       "city": "Rotterdam",
-      "label_requirement": "????? ?????? ???????",
-      "files": {},
-      "generation_brief_id": "C0009",
-      "gap_reason": "No suitable local image acquired. Licensed Pexels candidates remain research references; direct download unavailable."
+      "label_requirement": "تصویر نمونهٔ فروشگاه",
+      "files": {
+        "front": {
+          "path": "static/demo/stores/C0009/front.webp",
+          "width": 600,
+          "height": 980,
+          "sha256": "2db016357eb0a113806a00ac26da225a3617a196d01238c3ec6d89ff2832d5b7",
+          "bytes": 105416,
+          "handoff_original_path": "static/demo/stores/C0009/front.webp"
+        },
+        "thumb": {
+          "path": "static/demo/stores/C0009/thumb.webp",
+          "width": 184,
+          "height": 300,
+          "sha256": "a7f362cbdc7a10549623e0aad603240540d4a0bdd2e89a55824dbb2b5e4bf328",
+          "bytes": 21760,
+          "handoff_original_path": "static/demo/stores/C0009/thumb.webp"
+        }
+      },
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "attribution": {
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
+        "licence_url": null,
+        "required": false,
+        "share_alike": false
+      },
+      "source_url": null,
+      "pictured_model": null,
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "a_wide_high_resolution_grid_collage_of_10_realist.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویرسازی با هوش مصنوعی؛ محل واقعی مشتری در هلند نیست.",
+      "permission": {
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
+      }
     },
     "C0014": {
       "asset_id": "store.C0014.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing store icon",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "fictional_customer": true,
       "business_type": "wholesaler",
       "city": "Eindhoven",
-      "label_requirement": "????? ?????? ???????",
-      "files": {},
-      "generation_brief_id": "C0014",
-      "gap_reason": "No suitable local image acquired. Licensed Pexels candidates remain research references; direct download unavailable."
+      "label_requirement": "تصویر نمونهٔ فروشگاه",
+      "files": {
+        "front": {
+          "path": "static/demo/stores/C0014/front.webp",
+          "width": 600,
+          "height": 980,
+          "sha256": "d962883fad15d9a9bd23dc1658ec6c2aff6085d9e1d642260d45ff3ab8742741",
+          "bytes": 79976,
+          "handoff_original_path": "static/demo/stores/C0014/front.webp"
+        },
+        "thumb": {
+          "path": "static/demo/stores/C0014/thumb.webp",
+          "width": 184,
+          "height": 300,
+          "sha256": "780c680f94f1c53d7eaa0ece915e1df0d3ee13f36694898c430b2ac6c51efce5",
+          "bytes": 17134,
+          "handoff_original_path": "static/demo/stores/C0014/thumb.webp"
+        }
+      },
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "attribution": {
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
+        "licence_url": null,
+        "required": false,
+        "share_alike": false
+      },
+      "source_url": null,
+      "pictured_model": null,
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "a_wide_high_resolution_grid_collage_of_10_realist.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویرسازی با هوش مصنوعی؛ محل واقعی مشتری در هلند نیست.",
+      "permission": {
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
+      }
     },
     "C0010": {
       "asset_id": "store.C0010.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing store icon",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "fictional_customer": true,
       "business_type": "wholesaler",
       "city": "Amsterdam",
-      "label_requirement": "????? ?????? ???????",
-      "files": {},
-      "generation_brief_id": "C0010",
-      "gap_reason": "No suitable local image acquired. Licensed Pexels candidates remain research references; direct download unavailable."
+      "label_requirement": "تصویر نمونهٔ فروشگاه",
+      "files": {
+        "front": {
+          "path": "static/demo/stores/C0010/front.webp",
+          "width": 600,
+          "height": 980,
+          "sha256": "61fc579b698e8129eefcedfee04ce9ba83588665d943b01fafd63b06335cad36",
+          "bytes": 97728,
+          "handoff_original_path": "static/demo/stores/C0010/front.webp"
+        },
+        "thumb": {
+          "path": "static/demo/stores/C0010/thumb.webp",
+          "width": 184,
+          "height": 300,
+          "sha256": "3f6c5fa8c1ec33e1b3a98777201cc50347dca881da00ccb755289cbe8e1429d4",
+          "bytes": 19972,
+          "handoff_original_path": "static/demo/stores/C0010/thumb.webp"
+        }
+      },
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "attribution": {
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
+        "licence_url": null,
+        "required": false,
+        "share_alike": false
+      },
+      "source_url": null,
+      "pictured_model": null,
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "a_wide_high_resolution_grid_collage_of_10_realist.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویرسازی با هوش مصنوعی؛ محل واقعی مشتری در هلند نیست.",
+      "permission": {
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
+      }
     },
     "C0006": {
       "asset_id": "store.C0006.v1",
-      "status": "GAP",
-      "demo_enabled": false,
-      "display": "existing store icon",
+      "status": "B",
+      "demo_enabled": true,
+      "display": "AI-generated representative demo illustration",
       "fictional_customer": true,
       "business_type": "distributor",
       "city": "Rotterdam",
-      "label_requirement": "????? ?????? ???????",
-      "files": {},
-      "generation_brief_id": "C0006",
-      "gap_reason": "No suitable local image acquired. Licensed Pexels candidates remain research references; direct download unavailable."
+      "label_requirement": "تصویر نمونهٔ فروشگاه",
+      "files": {
+        "front": {
+          "path": "static/demo/stores/C0006/front.webp",
+          "width": 600,
+          "height": 980,
+          "sha256": "14646793db4c19c86c5a4bfb8ded2be7e4f2c50010649e4f244f2da48c473625",
+          "bytes": 105102,
+          "handoff_original_path": "static/demo/stores/C0006/front.webp"
+        },
+        "thumb": {
+          "path": "static/demo/stores/C0006/thumb.webp",
+          "width": 184,
+          "height": 300,
+          "sha256": "9e71464eeb28cc26af97489389d64f8af83ad1a1f1cb492dfd72e6b86ebc0ffc",
+          "bytes": 20894,
+          "handoff_original_path": "static/demo/stores/C0006/thumb.webp"
+        }
+      },
+      "generation_brief_id": null,
+      "gap_reason": null,
+      "image_type": "AI_GENERATED_REPRESENTATIVE",
+      "match_class": "B",
+      "verified_exact_sku": false,
+      "verified_customer_premises": false,
+      "approval_status": "OWNER_AUTHORIZED_LOCAL_IN_APP_REVIEW",
+      "approved_for_public_launch": false,
+      "attribution": {
+        "author": "تصویرسازی با هوش مصنوعی؛ فایل ارائه‌شده توسط مالک",
+        "source": null,
+        "licence": null,
+        "licence_url": null,
+        "required": false,
+        "share_alike": false
+      },
+      "source_url": null,
+      "pictured_model": null,
+      "model_match": "Generated representative illustration; no verified model or premises identity.",
+      "provenance": {
+        "archive": "DEMO_05_approved_visual_assets.zip",
+        "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+        "handoff": "docs/demo/DEMO_05_ASSET_HANDOFF.json",
+        "source_collage": "a_wide_high_resolution_grid_collage_of_10_realist.png",
+        "provider": null,
+        "generation_id": null,
+        "authorization": "Owner DEMO-05 task: local demo activation for visual review; no verified SKU or premises claims."
+      },
+      "description": "تصویرسازی با هوش مصنوعی؛ محل واقعی مشتری در هلند نیست.",
+      "permission": {
+        "status": "OWNER_AUTHORIZED_LOCAL_DEMO",
+        "evidence": "Owner DEMO-05 instruction approves local integration for visual review.",
+        "public_redistribution": "NOT_ESTABLISHED",
+        "generation_provider_terms": "NOT_SUPPLIED"
+      }
     }
+  },
+  "approved_generated_handoff": {
+    "archive_sha256": "cfff8219bc5d10b59abe84122496f3d106967de439a196e7009cc6e52ba2a5c1",
+    "image_count": 42,
+    "owner_authorization": "DEMO-05 local integration; final in-app visual approval pending",
+    "geography_disclosure": "Generated store signs are Persian; stored Netherlands customer geography stays authoritative."
   }
 }
