@@ -1,0 +1,14 @@
+/* Read-only quote content inside existing commercial slots; no card/grid changes. */
+.cq-price { display: grid; gap: 2px; min-width: 0; font-variant-numeric: tabular-nums; }
+.cq-price p { margin: 0; overflow-wrap: anywhere; }
+.cq-price .cq-secondary, .cq-price .cq-caption, .cq-price .cq-demo { color: var(--ds-muted); font-size: .75rem; line-height: 1.6; }
+.cq-price .cq-final { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 4px; }
+.cq-caption { flex-basis: 100%; }
+.cq-price strong { color: var(--ds-text); font-size: .875rem; font-weight: var(--ds-weight-strong); line-height: 1.5; }
+.cq-price[data-state="AVAILABLE"] [data-quote-final] { color: var(--ds-brand); background: var(--ds-brand-soft); box-shadow: 0 0 0 2px var(--ds-brand-soft); border-radius: var(--ds-radius-sm); }
+.gc-price-slot .cq-price[data-state="AVAILABLE"] [data-quote-final] { color: var(--gc-navy); }
+.cq-price[data-state="AVAILABLE"] [data-quote-currency] { color: var(--ds-brand); }
+.cq-price small { color: var(--ds-muted); font-size: .75rem; }
+.cq-price[data-state="ERROR"] strong, .cq-price[data-state="UNAVAILABLE"] strong, .cq-price[data-state="CONFIGURATION_ERROR"] strong { color: var(--ds-muted); font-size: .8125rem; font-weight: var(--ds-weight-normal); }
+.cq-availability { color: var(--ds-muted); font-size: .75rem; line-height: 1.6; overflow-wrap: anywhere; }
+.pb-quote { border-block-start: 1px solid var(--ds-border); padding-block-start: var(--ds-space-3); }

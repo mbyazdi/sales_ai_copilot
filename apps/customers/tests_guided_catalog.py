@@ -77,7 +77,8 @@ class GuidedCatalogUITests(TestCase):
                       'class="gc-priority-star"', 'class="gc-section-heading"'):
             self.assertContains(response, value)
         self.assertContains(response, "قیمت پایه")
-        self.assertNotContains(response, "قیمت نهایی")
+        self.assertContains(response, "قیمت واحد برای این مشتری")
+        self.assertContains(response, "قیمت فرضی دمو؛ قیمت بازار نیست")
         self.assertContains(response, 'open hidden', count=2)
 
     def test_final_fidelity_uses_category_chips_separate_identity_and_unimplemented_footer_slots(self):

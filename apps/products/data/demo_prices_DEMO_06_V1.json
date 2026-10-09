@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "source": "DEMO_ONLY_FICTIONAL",
+  "source_version": "DEMO_06_V1",
+  "currency": "TOMAN",
+  "unit": "PCS",
+  "package_size": "1 PCS",
+  "price_scope": "Fictional demo base price per complete sellable unit; not a verified market price",
+  "prices": {
+    "BOS001": "11500000",
+    "BOS002": "5800000",
+    "BRN001": "4800000",
+    "BRN002": "2800000",
+    "PAN001": "2600000",
+    "PHD001": "2400000",
+    "PHI002": "2200000",
+    "PHI003": "2900000",
+    "PHI004": "4900000",
+    "PHS001": "3200000",
+    "ROW001": "5400000",
+    "TEF001": "4200000",
+    "TEF002": "9800000",
+    "TEF003": "5300000"
+  }
+}

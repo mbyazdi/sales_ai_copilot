@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{% static 'css/salesperson_journey.css' %}?v=002p-1">
     <link rel="stylesheet" href="{% static 'core/css/guided_catalog.css' %}?v=2b-final-1">
     <link rel="stylesheet" href="{% static 'demo/assets.css' %}?v=demo04-1">
+    <link rel="stylesheet" href="{% static 'products/css/commercial_quote.css' %}?v=3c3-1">
 </head>
 <body class="gs-page gc-page">
 <a class="gs-skip" href="#main-content">رفتن به فهرست محصولات</a>
@@ -28,7 +29,7 @@
     </section>
     <main id="main-content" tabindex="-1">
     {% if current_visit and current_visit.status == 'IN_PROGRESS' or current_visit and current_visit.status == 'PLANNED' %}
-        <div id="guidedCatalog" data-api-url="{% url 'product-catalog-v1' %}" data-customer-code="{{ customer.customer_code }}" data-visit-id="{{ current_visit.id }}" aria-busy="true">
+        <div id="guidedCatalog" data-api-url="{% url 'product-catalog-v1' %}" data-quote-url="{% url 'visit-quote-v1' current_visit.id %}" data-customer-code="{{ customer.customer_code }}" data-visit-id="{{ current_visit.id }}" aria-busy="true">
             <form id="catalogFilters" class="gc-filters" method="get" aria-label="جستجو و فیلتر محصولات">
                 <div id="catalogCategoryChips" class="gc-category-chips" aria-label="دسته‌بندی محصولات"></div>
                 <div class="gc-search"><label class="gc-sr-only" for="catalogSearch">جستجوی محصول</label><input id="catalogSearch" class="ds-control" name="q" type="search" maxlength="200" placeholder="جستجوی نام یا کد کالا…" disabled><button id="catalogApply" class="gc-search-submit" type="submit" aria-label="جستجوی محصولات" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg></button></div>
@@ -64,10 +65,10 @@
                 <span class="gc-badge"><svg class="gc-priority-star" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg><span data-priority></span></span>
                 <details data-cue-details class="gc-cue-details" hidden><summary><span class="gc-cue-dot" aria-hidden="true">●</span><span data-cue></span></summary><p data-reason class="gc-saved-reason" hidden></p></details>
                 </div>
-                <div class="gc-commercial-status"><div class="gc-stock-slot"><small class="gc-sr-only">موجودی قابل ارائه</small><p data-stock></p></div></div>
+                <div class="gc-commercial-status"><div class="gc-stock-slot"><small class="gc-sr-only">موجودی قابل ارائه</small><p data-stock data-quote-stock></p><p class="cq-availability" data-quote-availability></p></div></div>
                 <div class="gc-card-bottom">
                     <div class="gc-quantity-slot" aria-hidden="true"></div>
-                    <div class="gc-price-slot"><small>قیمت پایه</small><p data-price class="gc-price"></p></div>
+                    <div class="gc-price-slot">{% include "components/commercial_quote.html" only %}</div>
                     <div class="gc-add-slot" aria-hidden="true"></div>
                 </div>
                 <div class="gc-secondary-actions"><a data-detail aria-label="جزئیات محصول" class="ds-button ds-button--secondary gc-detail"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12C5 7 8 5 12 5s7 2 10 7c-3 5-6 7-10 7s-7-2-10-7z"/><circle cx="12" cy="12" r="3"/></svg>جزئیات</a><details data-image-disclosure class="gc-image-credit" hidden><summary aria-label="اطلاعات تصویر نمونه محصول">تصویر نمونه</summary><p data-image-label></p><p data-image-credit></p><a data-image-source target="_blank" rel="noopener noreferrer">منبع تصویر</a> · <a data-image-licence target="_blank" rel="noopener noreferrer">مجوز تصویر</a><a data-image-original target="_blank" rel="noopener noreferrer" hidden> · مرجع اصلی</a></details></div>
@@ -79,7 +80,8 @@
     {% if current_visit %}<footer class="gc-footer"><a class="ds-button ds-button--quiet" href="{{ end_url }}">مرور ویزیت</a></footer>{% endif %}
     </main>
 </div>
-<script src="{% static 'core/js/guided_catalog.js' %}?v=demo04-1" defer></script>
+<script src="{% static 'products/js/commercial_quotes.js' %}?v=3c3-1" defer></script>
+<script src="{% static 'core/js/guided_catalog.js' %}?v=3c3-1" defer></script>
 <script src="{% static 'demo/assets.js' %}?v=demo04-1" defer></script>
 </body>
 </html>

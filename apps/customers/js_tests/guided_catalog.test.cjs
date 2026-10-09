@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const source = fs.readFileSync(path.resolve(__dirname, '../../../static/core/js/guided_catalog.js'), 'utf8');
+const quoteSource = fs.readFileSync(path.resolve(__dirname, '../../../static/products/js/commercial_quotes.js'), 'utf8');
 class Element {
     constructor() {
         this.dataset = {}; this.listeners = {}; this.children = []; this.attributes = {};
@@ -31,6 +32,8 @@ function makeCard() {
     for (const name of ['name', 'code', 'meta', 'brand', 'category', 'meta-separator', 'priority', 'reason', 'cue', 'cue-details', 'stock', 'price', 'detail', 'image', 'image-fallback', 'image-disclosure', 'image-label', 'image-credit', 'image-source', 'image-licence', 'image-original']) card.fields[name] = new Element();
     card.fields.reason.hidden = true; card.fields['cue-details'].hidden = true; card.fields.image.hidden = true;
     card.fields['image-disclosure'].hidden = true;
+    for (const name of ['commercial-quote', 'quote-base-row', 'quote-discount-row', 'quote-base', 'quote-discount', 'quote-saving', 'quote-final', 'quote-currency', 'quote-demo', 'quote-availability']) card.fields[name] = new Element();
+    card.fields.price = card.fields['quote-final']; card.fields['quote-stock'] = card.fields.stock;
     return card;
 }
 function item(id, prioritized = false, stock = 'AVAILABLE') {
@@ -54,24 +57,35 @@ function fixture({query = '?visit_id=14', responses = [payload()]} = {}) {
         'catalogAllTab', 'catalogPriorityTab', 'catalogOrdinaryTab', 'catalogAllCount', 'catalogPriorityCount', 'catalogOrdinaryCount',
         'catalogSmartGroupCount', 'catalogOrdinaryGroupCount', 'catalogFiltersToggle', 'catalogFilterOptions', 'catalogCategoryChips'];
     const elements = Object.fromEntries(ids.map(id => [id, new Element()]));
-    elements.guidedCatalog.dataset = {apiUrl: '/api/products/v1/catalog/', customerCode: 'C', visitId: '14'};
+    elements.guidedCatalog.dataset = {apiUrl: '/api/products/v1/catalog/', quoteUrl: '/api/sales-requests/v1/visits/14/quote/', customerCode: 'C', visitId: '14'};
     for (const [id, filter] of [['catalogAllTab', 'all'], ['catalogPriorityTab', 'prioritized'], ['catalogOrdinaryTab', 'ordinary']]) elements[id].dataset.priorityFilter = filter;
     elements.catalogFilterOptions.hidden = true;
     elements.catalogFilters.controls = ['catalogSearch', 'catalogCategory', 'catalogPriority', 'catalogApply', 'catalogReset', 'catalogAllTab', 'catalogPriorityTab', 'catalogOrdinaryTab', 'catalogFiltersToggle'].map(id => elements[id]);
     elements.catalogCardTemplate.content = {firstElementChild: makeCard()};
-    const calls = [], history = [], listeners = {};
+    const calls = [], quoteCalls = [], history = [], listeners = {};
+    let currentCatalog;
     let location = new URL('http://localhost/customers/C/recommendations/presentation/' + query);
     const window = {get location() { return location; }, addEventListener(name, callback) { listeners[name] = callback; }, history: {}};
     for (const method of ['pushState', 'replaceState']) window.history[method] = (_state, _title, url) => { history.push({method, url}); location = new URL(url, location); };
     const fetch = async (url, options) => {
+        if (url.startsWith('/api/sales-requests/')) {
+            quoteCalls.push({url, options});
+            const requested = JSON.parse(new URL(url, location).searchParams.get('items'));
+            return {ok: true, json: async () => ({version: 1, currency: 'TOMAN', customer: {id: 7, code: 'C'}, visit: {id: 14}, items: requested.map(({product_id}) => {
+                const product = currentCatalog.items.find(item => item.product_id === product_id), available = product.pricing.has_demo_price;
+                return {product_id, quantity: 1, pricing: {state: available ? 'AVAILABLE' : 'UNAVAILABLE', quote: available ? {customer_id: 7, product_id, quantity: 1, currency: 'TOMAN', base_unit_price: '123', discount_percentage: '0', unit_discount: '0', final_unit_price: '123'} : null},
+                    inventory: {state: product.inventory_state, sellable_quantity: product.available_quantity}, can_add: false, non_addable_reason: available ? 'VISIT_NOT_ACTIVE' : 'PRICE_UNAVAILABLE'};
+            })})};
+        }
         calls.push({url, options});
         const response = responses.shift();
         if (response instanceof Error) throw response;
         if (response instanceof Promise) return response;
+        currentCatalog = response;
         return {ok: !response?.status, status: response?.status || 200, json: async () => response};
     };
-    vm.runInNewContext(source, {document: {getElementById: id => elements[id], createElement: () => new Element()}, window, fetch, URL, URLSearchParams, AbortController, Intl});
-    return {elements, calls, history, listeners, get location() { return location; }, responses};
+    vm.runInNewContext(quoteSource + '\n' + source, {document: {getElementById: id => elements[id], createElement: () => new Element(), querySelectorAll: () => []}, window, fetch, URL, URLSearchParams, AbortController, Intl});
+    return {elements, calls, quoteCalls, history, listeners, get location() { return location; }, responses};
 }
 const settle = () => new Promise(resolve => setImmediate(resolve));
 test('representative image has truthful visible label and credit, and failure restores fallback', async () => {
@@ -101,7 +115,7 @@ test('generated product imagery carries illustrative provenance without manufact
     assert.match(fields.image.alt, /هوش مصنوعی/);
     assert.match(fields['image-credit'].textContent, /عکس محصول واقعی نیست/);
     assert(fields['image-source'].hidden); assert(fields['image-licence'].hidden);
-    assert.equal(fields.price.textContent, 'در دسترس نیست');
+    assert.equal(fields.price.textContent, 'قیمت فعلی در دسترس نیست');
 });
 test('renders the complete server page, prioritized before ordinary, without a three-product limit', async () => {
     const f = fixture(); await settle();
@@ -122,14 +136,16 @@ test('zero and unknown stock remain visible with truthful price/image fallback',
     const f = fixture({responses: [payload([item(1, false, 'UNAVAILABLE'), item(2, false, 'UNKNOWN')])]}); await settle();
     const [zero, unknown] = f.elements.catalogOrdinaryItems.children;
     assert.match(zero.fields.stock.textContent, /ناموجود/); assert.match(unknown.fields.stock.textContent, /موجودی نامشخص/);
-    assert.equal(zero.fields.price.textContent, 'در دسترس نیست'); assert(zero.fields.image.hidden);
+    assert.equal(zero.fields.price.textContent, 'قیمت فعلی در دسترس نیست'); assert(zero.fields.image.hidden);
     assert.equal(unknown.fields.detail.href.includes('return_to=catalog'), true);
 });
-test('a registered price indicates availability without fabricated amount, discount or final price', async () => {
+test('only the Visit Quote API supplies registered price amounts and discount', async () => {
     const product = item(1); product.pricing.has_demo_price = true; product.unit = 'PCS';
     const f = fixture({responses: [payload([product])]}); await settle();
-    assert.equal(f.elements.catalogOrdinaryItems.children[0].fields.price.textContent, 'ثبت شده است');
-    assert.match(f.elements.catalogOrdinaryItems.children[0].fields.stock.textContent, /عدد/);
+    assert.equal(f.elements.catalogOrdinaryItems.children[0].fields.price.textContent, '۱۲۳');
+    assert.equal(f.elements.catalogOrdinaryItems.children[0].fields['quote-discount'].textContent, '۰');
+    assert.equal(f.quoteCalls.length, 1);
+    assert(f.quoteCalls.every(call => call.options.method === 'GET'));
 });
 test('search/category/priority use GET and keep signed context while resetting page', async () => {
     const f = fixture({responses: [payload(), payload()]}); await settle();

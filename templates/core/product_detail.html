@@ -3,7 +3,7 @@
 {% block title %}{{ product.name }} · بررسی محصول برای مشتری{% endblock %}
 {% block breadcrumb %}نمای محصول در زمینه مشتری{% endblock %}
 {% block body_class %}{% if not manager_inspection %}sj-shell{% endif %}{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/product_brief.css' %}?v=002h-2"><link rel="stylesheet" href="{% static 'demo/assets.css' %}?v=demo04-1">{% if not manager_inspection %}<link rel="stylesheet" href="{% static 'css/salesperson_journey.css' %}?v=002p-1">{% endif %}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/product_brief.css' %}?v=002h-2"><link rel="stylesheet" href="{% static 'demo/assets.css' %}?v=demo04-1"><link rel="stylesheet" href="{% static 'products/css/commercial_quote.css' %}?v=3c3-1">{% if not manager_inspection %}<link rel="stylesheet" href="{% static 'css/salesperson_journey.css' %}?v=002p-1">{% endif %}{% endblock %}
 {% block content %}
 <div class="pb-workspace ds-stack">
     <header class="ds-page-header">
@@ -47,6 +47,12 @@
                 </dl>
                 <p class="ds-caption ds-muted">آخرین به‌روزرسانی موجودی: {% if commercial.inventory.last_updated %}<bdi>{{ commercial.inventory.last_updated|date:"Y/m/d H:i" }}</bdi>{% else %}ثبت نشده{% endif %}</p>
                 {% else %}<p class="ds-state ds-state--empty">اطلاعات موجودی این محصول در دسترس نیست؛ نبود داده به معنی موجودی صفر نیست.</p>{% endif %}
+                {% if not manager_inspection and visit.status == 'IN_PROGRESS' or not manager_inspection and visit.status == 'PLANNED' %}
+                <div class="pb-quote ds-stack" data-product-quote data-quote-url="{% url 'visit-quote-v1' visit.id %}" data-customer-code="{{ customer.customer_code }}" data-visit-id="{{ visit.id }}" data-product-id="{{ product.id }}" role="status" aria-live="polite">
+                    {% include "components/commercial_quote.html" only %}
+                    <p class="cq-availability" data-quote-stock></p><p class="cq-availability" data-quote-availability></p>
+                </div>
+                {% endif %}
             </article>
             <article class="ds-card ds-stack" aria-labelledby="promotions-title">
                 <div class="ds-page-header"><h3 id="promotions-title" class="ds-heading">طرح‌های فعلی برای این مشتری</h3><span class="ds-badge">{{ commercial.promotions|length }} طرح</span></div>
@@ -110,4 +116,4 @@
     <footer class="pb-return ds-surface ds-page-header"><p class="ds-caption ds-muted">{% if manager_inspection %}این نما برای بررسی اطلاعات است. برای ادامه بررسی به نمای مشتری بازگردید.{% else %}برای ادامه تعامل یا ثبت نتیجه در ویزیت، به پیشنهادهای مشتری بازگردید.{% endif %}</p><a class="ds-button" href="{{ return_url }}">بازگشت</a></footer>
 </div>
 {% endblock %}
-{% block extra_js %}<script src="{% static 'demo/assets.js' %}?v=demo04-1" defer></script>{% endblock %}
+{% block extra_js %}<script src="{% static 'demo/assets.js' %}?v=demo04-1" defer></script><script src="{% static 'products/js/commercial_quotes.js' %}?v=3c3-1" defer></script>{% endblock %}

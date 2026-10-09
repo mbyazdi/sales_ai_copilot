@@ -76,9 +76,7 @@
             stock.textContent = 'ناموجود · فعلاً قابل افزودن نیست';
             stock.classList.add('gc-stock--unavailable');
         } else stock.textContent = 'موجودی نامشخص · فعلاً قابل افزودن نیست';
-        // Stage 2A supplies existence, not an amount. Never infer a quote or discount.
-        // The fixed "قیمت پایه" caption identifies this slot; no amount is supplied.
-        field('price').textContent = item.pricing?.has_demo_price ? 'ثبت شده است' : 'در دسترس نیست';
+        // Price amounts come only from the authorized, batched Visit Quote API.
         field('detail').href = localDetail(item.brief_url);
         field('detail').setAttribute('aria-label', `جزئیات محصول ${item.name}`);
         if (item.image?.url) {
@@ -181,6 +179,10 @@
             params.set('catalog_context', data.catalog_context);
             params.set('page', String(data.pagination.page)); params.set('page_size', String(data.pagination.page_size));
             busy(false); results.hidden = false; render(data); writeLocation(push);
+            const mounts = [...byId('catalogPrioritizedItems').children, ...byId('catalogOrdinaryItems').children];
+            window.CommercialQuotes.load({apiUrl: root.dataset.quoteUrl, customerCode: root.dataset.customerCode, visitId: root.dataset.visitId},
+                mounts.map(mount => ({productId: Number(mount.dataset.productId), mount})),
+                {signal: controller.signal, isCurrent: () => version === requestVersion});
         } catch (error) {
             if (version !== requestVersion || error.name === 'AbortError') return;
             if (error.message !== 'Handled response') {
