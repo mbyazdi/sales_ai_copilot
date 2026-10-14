@@ -1,0 +1,7 @@
+<dialog id="feedbackDialog" class="gf-dialog" dir="rtl" aria-labelledby="feedbackTitle" aria-describedby="feedbackDescription">
+    <form id="feedbackForm" class="ds-stack" method="dialog" novalidate>{% csrf_token %}
+        <h2 id="feedbackTitle" class="ds-heading">رد پیشنهاد</h2><p id="feedbackProduct" class="gf-product"></p><p id="feedbackDescription" class="ds-caption ds-muted"></p>
+        <div id="feedbackReasonRow"><label for="feedbackReason">دلیل تصمیم</label><select id="feedbackReason" class="ds-control" required><option value="">دلیل را انتخاب کنید</option><option value="NOT_INTERESTED">مشتری علاقه‌مند نبود</option><option value="PRICE">قیمت مناسب نبود</option><option value="STOCK">موجودی کافی نبود</option><option value="NO_CURRENT_NEED">فعلاً نیاز ندارد</option><option value="OTHER_BRAND">از برند یا مدل دیگری استفاده می‌کند</option><option value="LATER">بعداً بررسی می‌کنم</option><option value="OTHER">دلیل دیگر</option></select></div>
+        <p id="feedbackMessage" class="gf-message" role="status" aria-live="polite"></p><div class="gf-dialog-actions"><button id="feedbackConfirm" class="ds-button" type="submit">تأیید و ثبت تصمیم</button><button id="feedbackCancel" class="ds-button ds-button--secondary" type="button">انصراف</button></div>
+    </form>
+</dialog>

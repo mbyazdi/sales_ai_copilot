@@ -131,13 +131,16 @@ class ProductCommercialBriefTests(TestCase):
         response = self.page()
         self.assertEqual(response.status_code, 200)
         for value in (self.product.name, self.product.product_code, self.product.description,
-                      self.product.package_size, self.product.unit, self.product.brand.name,
+                      "6 عدد", "عدد", self.product.brand.name,
                       self.product.category.name, self.customer.name):
             self.assertContains(response, value)
         self.assertTemplateUsed(response, "base.html")
         self.assertContains(response, 'lang="fa" dir="rtl"')
         self.assertContains(response, "products/css/product_brief.css")
-        self.assertContains(response, "شرایط تجاری فعلی")
+        self.assertContains(response, "قیمت و موجودی")
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.unit, "PCS")
+        self.assertEqual(self.product.package_size, "6 PCS")
         self.assertNotContains(response, "outcome-btn")
 
     def test_customer_required_and_no_global_product_workspace(self):

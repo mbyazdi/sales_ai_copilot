@@ -1,7 +1,7 @@
 /* Explicit feedback only. D1 owns authorization, selection, history and replay. */
 (() => {
     'use strict';
-    const root = document.getElementById('guidedCatalog');
+    const root = document.getElementById('guidedCatalog') || document.getElementById('productFeedback');
     if (!root) return;
     const el = id => document.getElementById(id);
     const dialog = el('feedbackDialog'), form = el('feedbackForm'), reason = el('feedbackReason');
@@ -9,6 +9,7 @@
     const labels = Object.assign(Object.create(null), {NOT_INTERESTED: 'مشتری علاقه‌مند نبود', PRICE: 'قیمت مناسب نبود', STOCK: 'موجودی کافی نبود', NO_CURRENT_NEED: 'فعلاً نیاز ندارد', OTHER_BRAND: 'از برند یا مدل دیگری استفاده می‌کند', LATER: 'بعداً بررسی می‌کنم', OTHER: 'دلیل دیگر'});
     const key = `guided-feedback:v1:${root.dataset.actorId}:${root.dataset.customerCode}:${root.dataset.visitId}`;
     let state, choice, pending = null, sending = false;
+    let basketState = null, basketBusy = false, reportedPending = false;
     const field = (mount, name) => mount.querySelector(`[data-feedback-${name}]`);
     const compactReasons = {NOT_INTERESTED: 'عدم تمایل', PRICE: 'قیمت نامناسب', STOCK: 'موجودی ناکافی', NO_CURRENT_NEED: 'عدم نیاز فعلی', OTHER_BRAND: 'برند یا مدل دیگر', OTHER: 'دلیل دیگر'};
     const savedLabel = event => event.reason_code === 'LATER' ? 'بعداً بررسی می‌کنم' : `رد پیشنهاد · ${compactReasons[event.reason_code]}`;
@@ -39,10 +40,16 @@
         }
     } catch (_) { /* New commands must still be stored before any POST. */ }
     function controls() {
+        const feedbackPending = Boolean(pending) || sending;
+        if (reportedPending !== feedbackPending) { reportedPending = feedbackPending; window.GuidedBasket?.feedbackChanged(); }
         el('feedbackRecovery').hidden = !pending;
         if (!state) return;
+        if (basketState) {
+            state.request = basketState.request; state.visitStatus = basketState.visit.status;
+            for (const target of state.targets) target.selected = basketState.lines.some(line => line.product_id === target.productId);
+        }
         for (const target of state.targets) {
-            const active = state.ready && state.visitStatus === 'IN_PROGRESS' && (!state.request || state.request.status === 'DRAFT');
+            const active = state.ready && !basketBusy && state.visitStatus === 'IN_PROGRESS' && (!state.request || state.request.status === 'DRAFT');
             field(target.mount, 'reject').disabled = !active || Boolean(pending) || target.selected;
             field(target.mount, 'later').disabled = !active || Boolean(pending) || target.selected;
             field(target.mount, 'options').hidden = Boolean(target.hasDecision) && !target.changing;
@@ -59,7 +66,7 @@
             el('feedbackProduct').textContent = pending.name;
             reason.value = pending.payload.reason_code;
         } else {
-            if (!state?.ready || state.visitStatus !== 'IN_PROGRESS' || target.selected || state.request?.status === 'SUBMITTED') return;
+            if (!state?.ready || basketBusy || state.visitStatus !== 'IN_PROGRESS' || target.selected || state.request?.status === 'SUBMITTED') return;
             choice = {target, action};
             el('feedbackProduct').textContent = target.name;
             reason.value = action === 'LATER' ? 'LATER' : '';
@@ -97,7 +104,8 @@
             const actions = field(target.mount, 'actions');
             if (!target.recommendationId) { actions.remove(); continue; }
             actions.hidden = false;
-            target.mount.querySelector('.gc-secondary-actions').prepend(actions);
+            const secondary = target.mount.querySelector('.gc-secondary-actions');
+            if (secondary) secondary.prepend(actions);
             field(target.mount, 'reject').addEventListener('click', () => show(target, 'REJECTED'));
             field(target.mount, 'later').addEventListener('click', () => show(target, 'LATER'));
             field(target.mount, 'change').addEventListener('click', () => { target.changing = true; controls(); field(target.mount, 'reject').focus(); });
@@ -182,6 +190,8 @@
                 message.textContent = messages[data.code] || 'ثبت تصمیم تأیید نشد؛ دسترسی، نشست و زمینه ویزیت را بررسی کنید.';
                 if (response.status === 409 && data.code !== 'PRODUCT_ALREADY_SELECTED') { state.ready = false; state.readError = message.textContent; }
                 if (data.code === 'PRODUCT_ALREADY_SELECTED') { const target = state.targets.find(t => t.productId === command.productId); if (target) target.selected = true; }
+                if (['PRODUCT_ALREADY_SELECTED', 'REVISION_CONFLICT'].includes(data.code)) window.GuidedBasket?.refresh?.();
+                if (['PRODUCT_ALREADY_SELECTED', 'REVISION_CONFLICT'].includes(data.code)) window.ProductFeedback?.refreshSelection();
                 if ([403, 404].includes(response.status)) { state.ready = false; state.readError = 'دسترسی یا نشست بازخورد تأیید نشد؛ زمینه ویزیت را بررسی کنید.'; }
                 if (wasUncertain && [403, 404].includes(response.status)) throw new Error('Prior result still unknown');
                 window.sessionStorage.removeItem(key); pending = null; choice = null; confirm.disabled = true;
@@ -194,5 +204,6 @@
         }
     });
     controls();
-    window.GuidedFeedback = {load};
+    window.GuidedFeedback = {load, hasPending: () => Boolean(pending) || sending,
+        setBasket: (data, busy = false) => { basketState = data; basketBusy = busy; controls(); }};
 })();

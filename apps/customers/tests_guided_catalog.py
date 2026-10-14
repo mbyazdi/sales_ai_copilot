@@ -81,13 +81,15 @@ class GuidedCatalogUITests(TestCase):
         self.assertContains(response, "قیمت فرضی دمو؛ قیمت بازار نیست")
         self.assertContains(response, 'open hidden', count=2)
 
-    def test_final_fidelity_uses_category_chips_separate_identity_and_unimplemented_footer_slots(self):
+    def test_final_fidelity_uses_category_chips_separate_identity_and_original_footer_slots(self):
         response = self.page()
         for value in ('id="catalogCategoryChips"', '<legend>اولویت محصولات</legend>', 'data-code', 'data-brand', 'data-category',
                       'class="gc-commercial-status"', 'class="gc-secondary-actions"', 'data-cue-details'):
             self.assertContains(response, value)
-        self.assertContains(response, '<div class="gc-quantity-slot" aria-hidden="true"></div>')
-        self.assertContains(response, '<div class="gc-add-slot" aria-hidden="true"></div>')
+        self.assertContains(response, '<div class="gc-quantity-slot">')
+        self.assertContains(response, '<div class="gc-add-slot">')
+        self.assertContains(response, 'data-basket-quantity')
+        self.assertContains(response, 'data-basket-add class="ds-button gb-add" type="button" disabled')
         css = (Path(settings.BASE_DIR) / "static/core/css/guided_catalog.css").read_text(encoding="utf-8")
         self.assertIn("grid-template-areas: 'add price quantity'", css)
         self.assertIn("repeat(2, minmax(0, 1fr))", css)
@@ -134,7 +136,7 @@ class GuidedCatalogUITests(TestCase):
                 returned = self.client.get(back.split("#")[0])
                 self.assertContains(returned, 'id="guidedCatalog"')
                 self.assertEqual(returned.context["current_visit"].pk, self.visit.pk)
-                self.assertContains(detail, "بازگشت</a>", count=2)
+                self.assertContains(detail, "بازگشت</a>", count=1)
 
     def test_customer_only_and_closed_visits_have_safe_read_only_presentation(self):
         self.assertContains(self.page(visit_id=""), "ویزیت را انتخاب کنید")

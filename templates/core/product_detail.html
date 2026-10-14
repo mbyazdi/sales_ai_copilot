@@ -3,8 +3,11 @@
 {% block title %}{{ product.name }} · بررسی محصول برای مشتری{% endblock %}
 {% block breadcrumb %}نمای محصول در زمینه مشتری{% endblock %}
 {% block body_class %}{% if not manager_inspection %}sj-shell{% endif %}{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/product_brief.css' %}?v=002h-2"><link rel="stylesheet" href="{% static 'demo/assets.css' %}?v=demo04-1"><link rel="stylesheet" href="{% static 'products/css/commercial_quote.css' %}?v=3c3-1">{% if not manager_inspection %}<link rel="stylesheet" href="{% static 'css/salesperson_journey.css' %}?v=002p-1">{% endif %}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/product_brief.css' %}?v=002h-2"><link rel="stylesheet" href="{% static 'demo/assets.css' %}?v=demo04-1"><link rel="stylesheet" href="{% static 'products/css/commercial_quote.css' %}?v=3c3-1">{% if not manager_inspection %}<link rel="stylesheet" href="{% static 'css/salesperson_journey.css' %}?v=002p-1"><link rel="stylesheet" href="{% static 'core/css/guided_feedback.css' %}?v=ui04-1"><link rel="stylesheet" href="{% static 'products/css/product_hero.css' %}?v=ui04-1">{% endif %}{% endblock %}
 {% block content %}
+{% if not manager_inspection %}
+{% include "products/product_hero_detail.html" %}
+{% else %}
 <div class="pb-workspace ds-stack">
     <header class="ds-page-header">
         <div><p class="pb-eyebrow">بررسی پیش از ارائه محصول</p><h1 class="ds-title">نمای محصول برای این مشتری</h1><p class="ds-muted">موجودی و طرح‌های فعلی را کنار دلیل ثبت‌شده پیشنهاد بررسی کنید.</p></div>
@@ -115,5 +118,6 @@
     </section>
     <footer class="pb-return ds-surface ds-page-header"><p class="ds-caption ds-muted">{% if manager_inspection %}این نما برای بررسی اطلاعات است. برای ادامه بررسی به نمای مشتری بازگردید.{% else %}برای ادامه تعامل یا ثبت نتیجه در ویزیت، به پیشنهادهای مشتری بازگردید.{% endif %}</p><a class="ds-button" href="{{ return_url }}">بازگشت</a></footer>
 </div>
+{% endif %}
 {% endblock %}
-{% block extra_js %}<script src="{% static 'demo/assets.js' %}?v=demo04-1" defer></script><script src="{% static 'products/js/commercial_quotes.js' %}?v=3c3-1" defer></script>{% endblock %}
+{% block extra_js %}<script src="{% static 'demo/assets.js' %}?v=demo04-1" defer></script><script src="{% static 'products/js/commercial_quotes.js' %}?v=3c3-1" defer></script>{% if not manager_inspection %}<script src="{% static 'core/js/guided_feedback.js' %}?v=ui04-1" defer></script><script src="{% static 'products/js/product_feedback.js' %}?v=ui04-1" defer></script>{% endif %}{% endblock %}

@@ -52,7 +52,7 @@
         field(mount, 'availability').textContent = item.can_add ? '' : (reasons[item.non_addable_reason] || 'فعلاً قابل افزودن نیست.');
         region.setAttribute('aria-busy', 'false');
     }
-    async function load(context, targets, {signal, isCurrent = () => true} = {}) {
+    async function load(context, targets, {signal, isCurrent = () => true, onResult = () => {}} = {}) {
         if (!targets.length) return;
         for (const {mount} of targets) pending(mount);
         try {
@@ -85,9 +85,11 @@
             if (!isCurrent() || signal?.aborted) return;
             const byProduct = new Map(items.map(item => [item.product_id, item]));
             for (const target of targets) display(target.mount, byProduct.get(target.productId));
+            onResult(items);
         } catch (error) {
             if (!isCurrent() || signal?.aborted || error.name === 'AbortError') return;
             for (const {mount} of targets) failed(mount, error.terminal);
+            onResult([]);
             // No automatic retry, persistent quote cache or mutation POST.
         }
     }

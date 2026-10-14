@@ -1,0 +1,50 @@
+{% load static demo_assets product_display %}
+{% demo_asset "products" product.product_code "hero" as product_image %}
+<div class="ph-page ds-stack">
+    <figure class="ph-hero" aria-label="تصویر محصول" data-demo-scope>
+        <div class="ph-hero-image" data-demo-slot="product">
+            {% if product_image.url %}<img data-demo-image src="{{ product_image.url }}" alt="تصویر {{ product.name }}" width="800" height="440"><div data-demo-fallback class="ph-fallback" hidden>{% else %}<div class="ph-fallback" data-demo-fallback>{% endif %}<svg viewBox="0 0 120 120" aria-hidden="true"><rect x="22" y="20" width="76" height="80" rx="12"/><path d="M22 75 45 52 62 70 76 58 98 80"/><circle cx="78" cy="42" r="7"/></svg><span>تصویر محصول در دسترس نیست</span></div>
+        </div>
+        <figcaption class="ph-brand"><bdi>{{ product.brand.name }}</bdi></figcaption>
+    </figure>
+    {% if product_image.credit.source_url or product_image.credit.licence_url %}
+    <details class="ph-credit demo-image-info"><summary>اطلاعات تصویر</summary><div>{% if product_image.credit.author %}<bdi>{{ product_image.credit.author }}</bdi>{% endif %} · <a href="{{ product_image.credit.source_url }}" target="_blank" rel="noopener noreferrer">منبع تصویر</a>{% if product_image.credit.licence_url %} · <a href="{{ product_image.credit.licence_url }}" target="_blank" rel="noopener noreferrer"><bdi>{{ product_image.credit.licence }}</bdi></a>{% endif %}{% if product_image.credit.additional_source_url %} · <a href="{{ product_image.credit.additional_source_url }}" target="_blank" rel="noopener noreferrer">مرجع اصلی</a>{% endif %}<p>{{ product_image.credit.changes }}</p></div></details>
+    {% endif %}
+    <section class="ph-card ph-identity" aria-labelledby="product-title">
+        <div class="ph-title-row"><h1 id="product-title"><bdi>{{ product.name }}</bdi></h1><span class="ph-code"><bdi>{{ product.product_code }}</bdi></span></div>
+        <div class="ph-metadata"><bdi>{{ product.brand.name }}</bdi><span>{{ product.category }}</span></div>
+        <dl class="ph-context"><div><dt>مشتری</dt><dd><bdi>{{ customer.name }}</bdi><small><bdi>{{ customer.customer_code }}</bdi></small></dd></div><div><dt>ویزیت</dt><dd>{% if visit %}<bdi>{{ visit.id }} · {{ visit.visit_date|date:"Y/m/d" }}</bdi>{% else %}انتخاب نشده{% endif %}</dd></div><div><dt>وضعیت ویزیت</dt><dd><span class="ds-badge" data-status="{{ visit.status }}">{% if visit.status == 'IN_PROGRESS' %}در حال انجام{% elif visit.status == 'PLANNED' %}برنامه‌ریزی‌شده{% elif visit.status == 'COMPLETED' %}تکمیل‌شده{% elif visit %}لغوشده{% else %}فقط مشاهده{% endif %}</span></dd></div></dl>
+    </section>
+    <section class="ph-card ph-commercial ds-stack" aria-labelledby="commercial-title">
+        <header class="ph-section-header"><h2 id="commercial-title">قیمت و موجودی</h2><span class="ds-badge{% if commercial.inventory.is_low_stock %} ds-badge--warning{% elif commercial.inventory.is_in_stock %} ds-badge--success{% elif commercial.inventory.has_record %} ds-badge--danger{% endif %}">{% if not commercial.inventory.has_record %}موجودی نامشخص{% elif not commercial.inventory.is_in_stock %}ناموجود برای فروش{% elif commercial.inventory.is_low_stock %}موجودی کم{% else %}موجودی قابل فروش{% endif %}</span></header>
+        {% if visit.status == 'IN_PROGRESS' or visit.status == 'PLANNED' %}
+        <div class="ph-price" data-product-quote data-quote-url="{% url 'visit-quote-v1' visit.id %}" data-customer-code="{{ customer.customer_code }}" data-visit-id="{{ visit.id }}" data-product-id="{{ product.id }}" role="status" aria-live="polite">
+            {% include "components/commercial_quote.html" with hide_demo_labels=True only %}
+            <p class="ph-stock-current" data-quote-stock></p><p class="ph-availability" data-quote-availability></p>
+        </div>
+        {% else %}<p class="ph-availability">{% if visit %}قیمت این ویزیت در دسترس نیست؛ ویزیت دیگر فعال نیست.{% else %}برای مشاهده قیمت این مشتری، ویزیت معتبر را انتخاب کنید.{% endif %}</p>{% endif %}
+        {% if commercial.inventory.has_record %}
+        <dl class="ph-stock-facts"><div><dt>موجودی ثبت‌شده</dt><dd><bdi>{{ commercial.inventory.available_quantity }}</bdi><small>{{ product.unit|unit_label }}</small></dd></div><div><dt>رزروشده</dt><dd><bdi>{{ commercial.inventory.reserved_quantity }}</bdi><small>{{ product.unit|unit_label }}</small></dd></div><div><dt>حداقل موجودی ثبت‌شده</dt><dd><bdi>{{ commercial.inventory.minimum_stock }}</bdi><small>{{ product.unit|unit_label }}</small></dd></div></dl>
+        <p class="ph-caption">موجودی قابل فروش <strong>{{ commercial.inventory.sellable_quantity }}</strong> <bdi>{{ product.unit|unit_label }}</bdi> · آخرین به‌روزرسانی {% if commercial.inventory.last_updated %}<bdi>{{ commercial.inventory.last_updated|date:"Y/m/d H:i" }}</bdi>{% else %}ثبت نشده{% endif %}</p>
+        {% else %}<p class="ph-availability">اطلاعات موجودی در دسترس نیست؛ نبود داده به معنی موجودی صفر نیست.</p>{% endif %}
+    </section>
+    {% include "products/product_hero_evidence.html" %}
+    <section id="productFeedback" class="ph-card ph-feedback ds-stack" aria-labelledby="product-feedback-title" data-catalog-url="{% url 'product-catalog-v1' %}" data-feedback-url="{% if visit %}{% url 'recommendation-feedback-v1' visit.id %}{% endif %}" data-actor-id="{{ request.user.pk }}" data-customer-code="{{ customer.customer_code }}" data-visit-id="{{ visit.id|default:'' }}" data-visit-status="{{ visit.status }}" data-product-id="{{ product.id }}" data-product-code="{{ product.product_code }}" data-product-name="{{ product.name }}" data-recommendation-id="{{ recommendation.id|default:'' }}">
+        <h2 id="product-feedback-title">بازخورد شما</h2><p class="ph-caption">تصمیم خود را درباره این پیشنهاد ثبت کنید.</p>
+        <p id="productSelection" class="ph-selection" role="status" hidden></p><p id="productFeedbackStatus" class="ph-caption" role="status">{% if recommendation and visit %}در حال بررسی امکان ثبت بازخورد…{% elif not recommendation %}این محصول بدون اولویت ویژه است؛ بازخورد پیشنهاد برای آن ثبت نمی‌شود.{% else %}ثبت بازخورد نیاز به ویزیت معتبر دارد.{% endif %}</p>
+        {% if recommendation %}
+        <details data-feedback-actions class="gf-actions ph-feedback-actions"><summary data-feedback-summary>ثبت بازخورد</summary><div class="gf-panel"><p data-feedback-history hidden></p><ul data-feedback-history-list class="gf-history" hidden></ul><p id="productFeedbackEmptyHistory" class="ph-caption" hidden>بازخورد قبلی ثبت نشده است.</p><p data-feedback-guidance></p><button data-feedback-change class="ds-button ds-button--secondary" type="button" hidden disabled>تغییر تصمیم</button><div data-feedback-options class="gf-buttons"><button data-feedback-reject class="ds-button ph-reject" type="button" disabled>رد پیشنهاد</button><button data-feedback-later class="ds-button ds-button--secondary" type="button" disabled>بعداً بررسی می‌کنم</button></div></div></details>
+        {% else %}<div data-feedback-actions hidden></div>{% endif %}
+        <p id="feedbackNotice" class="ph-caption" role="status" aria-live="polite"></p>
+        <div id="feedbackRecovery" class="gf-recovery" hidden><p>نتیجه فرمان قبلی مشخص نیست؛ ارسال خودکار انجام نمی‌شود.</p><button id="feedbackResume" class="ds-button ds-button--secondary" type="button">بررسی دوباره نتیجه تصمیم قبلی</button></div>
+    </section>
+    <details class="ph-card ph-support"><summary>اطلاعات محصول و طرح‌های فعلی</summary><div class="ds-stack ph-support-content">
+        {% if show_product_description %}<p class="pb-description">{{ product.description|linebreaksbr }}</p>{% elif not product.description %}<p>توضیحات محصول ثبت نشده است.</p>{% endif %}
+        <dl class="pb-facts pb-facts--inline"><div><dt>واحد ثبت‌شده</dt><dd><bdi>{{ product.unit|unit_label }}</bdi></dd></div><div><dt>بسته‌بندی ثبت‌شده</dt><dd><bdi>{{ product.package_size|package_label|default:"ثبت نشده" }}</bdi></dd></div></dl>
+        <h2 id="promotions-title">طرح‌های فعلی برای این مشتری</h2>
+        {% for promotion in commercial.promotions %}<div class="pb-promotion ds-stack"><strong>{{ promotion.name }}</strong><bdi>{{ promotion.code }}</bdi><p>{% if promotion.promotion_type == 'PERCENTAGE' %}تخفیف درصدی{% elif promotion.promotion_type == 'FIXED_AMOUNT' %}تخفیف مبلغی{% elif promotion.promotion_type == 'BUY_X_GET_Y' %}طرح خرید و هدیه{% else %}طرح فروش{% endif %}{% if promotion.discount_percent != None %} · {{ promotion.discount_percent|floatformat:"-2" }}٪{% endif %}</p>{% if promotion.description %}<p>{{ promotion.description|linebreaksbr }}</p>{% endif %}<dl class="pb-facts"><div><dt>حداقل تعداد</dt><dd>{{ promotion.minimum_quantity }}</dd></div>{% if promotion.maximum_quantity != None %}<div><dt>حداکثر تعداد</dt><dd>{{ promotion.maximum_quantity }}</dd></div>{% endif %}{% if promotion.discount_amount != None %}<div><dt>مبلغ تخفیف ثبت‌شده</dt><dd>{{ promotion.discount_amount|floatformat:"-2" }} <small>واحد پول مشخص نشده</small></dd></div>{% endif %}</dl><p>اعتبار طرح: <bdi>{{ promotion.start_date|date:"Y/m/d" }} — {{ promotion.end_date|date:"Y/m/d" }}</bdi></p></div>{% empty %}<p>در تاریخ بررسی، طرح واجد شرایطی برای این محصول و مشتری موجود نیست.</p>{% endfor %}
+        <p class="ph-caption">طرح‌ها اطلاعات زمینه‌ای هستند؛ با تخفیف رتبه جمع نمی‌شوند و تأیید اعتبار مالی مشتری محسوب نمی‌شوند.</p>
+    </div></details>
+    <footer class="ph-return"><a class="ds-button ds-button--secondary" href="{{ return_url }}">بازگشت</a><span class="ph-caption">برای تغییر انتخاب محصول، از مسیر فروش هوشمند استفاده کنید.</span></footer>
+</div>
+{% include "products/product_feedback_dialog.html" %}

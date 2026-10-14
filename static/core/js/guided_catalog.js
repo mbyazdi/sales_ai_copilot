@@ -180,9 +180,13 @@
             params.set('page', String(data.pagination.page)); params.set('page_size', String(data.pagination.page_size));
             busy(false); results.hidden = false; render(data); writeLocation(push);
             const mounts = [...byId('catalogPrioritizedItems').children, ...byId('catalogOrdinaryItems').children];
-            window.CommercialQuotes.load({apiUrl: root.dataset.quoteUrl, customerCode: root.dataset.customerCode, visitId: root.dataset.visitId},
+            const refreshQuotes = () => window.CommercialQuotes.load({apiUrl: root.dataset.quoteUrl, customerCode: root.dataset.customerCode, visitId: root.dataset.visitId},
                 mounts.map(mount => ({productId: Number(mount.dataset.productId), mount})),
-                {signal: controller.signal, isCurrent: () => version === requestVersion});
+                {signal: controller.signal, isCurrent: () => version === requestVersion, onResult: items => window.GuidedBasket?.quotes(items)});
+            window.GuidedBasket?.load({catalogContext: data.catalog_context}, mounts.map(mount => ({mount,
+                ...data.items.find(item => item.product_id === Number(mount.dataset.productId))})),
+                {signal: controller.signal, isCurrent: () => version === requestVersion, refreshQuotes});
+            refreshQuotes();
             window.GuidedFeedback?.load({apiUrl: root.dataset.feedbackUrl, catalogContext: data.catalog_context},
                 mounts.map(mount => ({mount, productId: Number(mount.dataset.productId), recommendationId: mount.dataset.recommendationId ? Number(mount.dataset.recommendationId) : null,
                     name: data.items.find(item => item.product_id === Number(mount.dataset.productId)).name})),

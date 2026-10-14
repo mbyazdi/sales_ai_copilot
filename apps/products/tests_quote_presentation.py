@@ -48,7 +48,10 @@ class CommercialQuotePresentationTests(TestCase):
             self.assertContains(response, f'data-customer-code="{self.customer.customer_code}"')
             for binding in ("data-quote-base", "data-quote-discount", "data-quote-saving", "data-quote-final", "data-quote-stock", "data-quote-availability"):
                 self.assertContains(response, binding)
-            self.assertContains(response, "قیمت فرضی دمو؛ قیمت بازار نیست")
+            if "productFeedback" in response.content.decode():
+                self.assertNotContains(response, "قیمت فرضی دمو؛ قیمت بازار نیست")
+            else:
+                self.assertContains(response, "قیمت فرضی دمو؛ قیمت بازار نیست")
             self.assertContains(response, "products/js/commercial_quotes.js")
 
     def test_single_unit_quotes_match_for_guided_and_detail(self):

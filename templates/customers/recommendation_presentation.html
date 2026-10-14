@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{% static 'demo/assets.css' %}?v=demo04-1">
     <link rel="stylesheet" href="{% static 'products/css/commercial_quote.css' %}?v=3c3-1">
     <link rel="stylesheet" href="{% static 'core/css/guided_feedback.css' %}?v=3d2-1">
+    <link rel="stylesheet" href="{% static 'core/css/guided_basket.css' %}?v=3e2-1">
 </head>
 <body class="gs-page gc-page">
 <a class="gs-skip" href="#main-content">رفتن به فهرست محصولات</a>
@@ -30,7 +31,7 @@
     </section>
     <main id="main-content" tabindex="-1">
     {% if current_visit and current_visit.status == 'IN_PROGRESS' or current_visit and current_visit.status == 'PLANNED' %}
-        <div id="guidedCatalog" data-api-url="{% url 'product-catalog-v1' %}" data-quote-url="{% url 'visit-quote-v1' current_visit.id %}" data-feedback-url="{% url 'recommendation-feedback-v1' current_visit.id %}" data-actor-id="{{ request.user.pk }}" data-customer-code="{{ customer.customer_code }}" data-visit-id="{{ current_visit.id }}" aria-busy="true">
+        <div id="guidedCatalog" data-api-url="{% url 'product-catalog-v1' %}" data-quote-url="{% url 'visit-quote-v1' current_visit.id %}" data-feedback-url="{% url 'recommendation-feedback-v1' current_visit.id %}" data-basket-url="{% url 'visit-basket-v1' current_visit.id %}" data-actor-id="{{ request.user.pk }}" data-customer-code="{{ customer.customer_code }}" data-visit-id="{{ current_visit.id }}" aria-busy="true">
             <form id="catalogFilters" class="gc-filters" method="get" aria-label="جستجو و فیلتر محصولات">
                 <div id="catalogCategoryChips" class="gc-category-chips" aria-label="دسته‌بندی محصولات"></div>
                 <div class="gc-search"><label class="gc-sr-only" for="catalogSearch">جستجوی محصول</label><input id="catalogSearch" class="ds-control" name="q" type="search" maxlength="200" placeholder="جستجوی نام یا کد کالا…" disabled><button id="catalogApply" class="gc-search-submit" type="submit" aria-label="جستجوی محصولات" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg></button></div>
@@ -46,6 +47,10 @@
                     <button id="catalogReset" class="ds-button ds-button--quiet" type="button" disabled>پاک‌کردن فیلترها</button>
                 </div>
             </form>
+            <details id="basketPanel" class="gb-panel"><summary id="basketSummary">درخواست فروش · در حال دریافت…</summary><p id="basketGuidance" class="gb-guidance"></p><ul id="basketLines" class="gb-lines"></ul></details>
+            <p id="basketNotice" class="gb-notice" role="status" aria-live="polite"></p>
+            <div id="basketRecovery" class="gb-recovery" hidden><p>نتیجه فرمان قبلی مشخص نیست؛ ارسال خودکار انجام نمی‌شود.</p><button id="basketStatus" class="ds-button ds-button--secondary" type="button">بررسی نتیجه</button><button id="basketRetryCommand" class="ds-button ds-button--quiet" type="button">تلاش دوباره همین فرمان</button></div>
+            <button id="basketRefresh" class="ds-button ds-button--quiet gb-refresh" type="button" hidden>دریافت دوباره درخواست</button>
             <p id="catalogStatus" class="gc-status" role="status" aria-live="polite">در حال دریافت فهرست محصولات…</p>
             <div id="catalogError" class="ds-state ds-state--error" role="alert" hidden><p id="catalogErrorText"></p><div class="gc-error-actions"><button id="catalogRetry" class="ds-button ds-button--secondary" type="button">تلاش دوباره</button><a class="ds-button ds-button--quiet" href="{{ customer_url }}">بازگشت به نمای مشتری</a></div></div>
             <div id="catalogResults" hidden>
@@ -70,10 +75,11 @@
                 </div>
                 <div class="gc-commercial-status"><div class="gc-stock-slot"><small class="gc-sr-only">موجودی قابل ارائه</small><p data-stock data-quote-stock></p><p class="cq-availability" data-quote-availability></p></div></div>
                 <div class="gc-card-bottom">
-                    <div class="gc-quantity-slot" aria-hidden="true"></div>
+                    <div class="gc-quantity-slot"><label class="gc-sr-only" data-basket-label>تعداد محصول<input data-basket-quantity type="number" min="1" max="2147483647" step="1" inputmode="numeric" disabled></label></div>
                     <div class="gc-price-slot">{% include "components/commercial_quote.html" only %}</div>
-                    <div class="gc-add-slot" aria-hidden="true"></div>
+                    <div class="gc-add-slot"><button data-basket-add class="ds-button gb-add" type="button" disabled>افزودن</button></div>
                 </div>
+                <p data-basket-decision class="gb-decision" hidden></p>
                 <div class="gc-secondary-actions"><a data-detail aria-label="جزئیات محصول" class="ds-button ds-button--secondary gc-detail"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12C5 7 8 5 12 5s7 2 10 7c-3 5-6 7-10 7s-7-2-10-7z"/><circle cx="12" cy="12" r="3"/></svg>جزئیات</a><details data-image-disclosure class="gc-image-credit" hidden><summary aria-label="اطلاعات تصویر نمونه محصول">تصویر نمونه</summary><p data-image-label></p><p data-image-credit></p><a data-image-source target="_blank" rel="noopener noreferrer">منبع تصویر</a> · <a data-image-licence target="_blank" rel="noopener noreferrer">مجوز تصویر</a><a data-image-original target="_blank" rel="noopener noreferrer" hidden> · مرجع اصلی</a></details></div>
                 <details data-feedback-actions class="gf-actions" hidden><summary data-feedback-summary>بازخورد</summary><div class="gf-panel"><p data-feedback-history hidden></p><ul data-feedback-history-list class="gf-history" hidden></ul><p data-feedback-guidance></p><button data-feedback-change class="ds-button ds-button--quiet" type="button" hidden disabled>تغییر تصمیم</button><div data-feedback-options class="gf-buttons"><button data-feedback-reject class="ds-button ds-button--quiet" type="button" disabled>رد پیشنهاد</button><button data-feedback-later class="ds-button ds-button--quiet" type="button" disabled>بعداً بررسی می‌کنم</button></div></div></details>
             </article>
@@ -93,9 +99,16 @@
         <div class="gf-dialog-actions"><button id="feedbackConfirm" class="ds-button" type="submit">تأیید و ثبت تصمیم</button><button id="feedbackCancel" class="ds-button ds-button--secondary" type="button">انصراف</button></div>
     </form>
 </dialog>
-<script src="{% static 'products/js/commercial_quotes.js' %}?v=3c3-1" defer></script>
-<script src="{% static 'core/js/guided_feedback.js' %}?v=3d2-1" defer></script>
-<script src="{% static 'core/js/guided_catalog.js' %}?v=3c3-1" defer></script>
+<dialog id="basketDialog" class="gf-dialog gb-dialog" dir="rtl" aria-labelledby="basketTitle" aria-describedby="basketDescription">
+    <form id="basketForm" class="ds-stack" method="dialog" novalidate>{% csrf_token %}
+        <h2 id="basketTitle" class="ds-heading">تغییر درخواست فروش</h2><p id="basketDescription"></p><p id="basketQuoteTotal" class="gb-quote-total"></p><p class="ds-caption ds-muted">قیمت‌ها نمایشی و فرضی هستند. این کار فقط پیش‌نویس درخواست فروش را تغییر می‌دهد.</p>
+        <p id="basketMessage" role="status" aria-live="polite"></p><div class="gf-dialog-actions"><button id="basketConfirm" class="ds-button" type="submit">تأیید تغییر</button><button id="basketCancel" class="ds-button ds-button--secondary" type="button">انصراف</button></div>
+    </form>
+</dialog>
+<script src="{% static 'products/js/commercial_quotes.js' %}?v=3e2-1" defer></script>
+<script src="{% static 'core/js/guided_feedback.js' %}?v=3e2-1" defer></script>
+<script src="{% static 'core/js/guided_basket.js' %}?v=3e2-1" defer></script>
+<script src="{% static 'core/js/guided_catalog.js' %}?v=3e2-1" defer></script>
 <script src="{% static 'demo/assets.js' %}?v=demo04-1" defer></script>
 </body>
 </html>

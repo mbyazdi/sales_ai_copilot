@@ -94,18 +94,18 @@ class DemoAssetJourneyTests(TestCase):
         self.assertNotIn("final_price", selected)
         self.assertIsNone(next(row for row in catalog["items"] if row["product_code"] == "CAT-5")["image"]["url"])
 
-    def test_product_detail_uses_existing_slot_and_visible_label_credit(self):
+    def test_product_detail_hero_preserves_required_credit_without_demo_label(self):
         response = self.client.get(reverse("product-commercial-brief", args=["BRN001"]),
                                    {"customer_code": self.customer.customer_code, "visit_id": self.visit.pk})
         self.assertContains(response, "demo/products/BRN001/hero.webp")
-        self.assertContains(response, "تصویر نمونه محصول؛ مدل دقیق تأیید نشده")
-        self.assertContains(response, '<details class="demo-image-info">')
+        self.assertNotContains(response, "تصویر نمونه محصول؛ مدل دقیق تأیید نشده")
+        self.assertContains(response, '<details class="ph-credit demo-image-info">')
         self.assertContains(response, '<summary>اطلاعات تصویر</summary>')
         self.assertNotContains(response, '<details class="demo-image-info" open')
         self.assertContains(response, "Malcolm Koo")
         self.assertContains(response, "CC BY-SA 4.0")
-        self.assertContains(response, 'width="56" height="56"')
-        self.assertContains(response, "data-demo-fallback hidden")
+        self.assertContains(response, 'width="800" height="440"')
+        self.assertContains(response, 'data-demo-fallback class="ph-fallback" hidden')
         self.assertEqual(response.context["return_url"].split("#")[0],
                          f"/customers/?customer_code={self.customer.customer_code}&visit_id={self.visit.pk}")
 
@@ -119,8 +119,10 @@ class DemoAssetJourneyTests(TestCase):
         response = self.client.get(reverse("recommendation-presentation", args=[self.customer.customer_code]),
                                    {"visit_id": self.visit.pk})
         self.assertContains(response, "تصویر مشتری ثبت نشده است")
-        self.assertContains(response, 'class="gc-quantity-slot" aria-hidden="true"></div>')
-        self.assertContains(response, 'class="gc-add-slot" aria-hidden="true"></div>')
+        self.assertContains(response, 'class="gc-quantity-slot"')
+        self.assertContains(response, 'class="gc-add-slot"')
+        self.assertContains(response, 'data-basket-quantity')
+        self.assertContains(response, 'data-basket-add')
         self.assertContains(response, "data-image-disclosure")
 
     def test_generated_store_in_guided_and_customer_preserves_city_and_read_only_context(self):
@@ -140,12 +142,12 @@ class DemoAssetJourneyTests(TestCase):
         self.customer.refresh_from_db()
         self.assertEqual(self.customer.city, "Eindhoven")
 
-    def test_generated_product_is_labelled_without_fabricated_model_or_price(self):
+    def test_generated_product_hero_has_no_demo_copy_or_fabricated_model_or_price(self):
         self.products[4].product_code = "PHD001"
         self.products[4].save(update_fields=["product_code"])
         response = self.client.get(reverse("product-commercial-brief", args=["PHD001"]),
                                    {"customer_code": self.customer.customer_code, "visit_id": self.visit.pk})
         self.assertContains(response, "generated-v1/hero.webp")
-        self.assertContains(response, "تصویر نمونه محصول؛ مدل دقیق تأیید نشده")
-        self.assertContains(response, "عکس محصول واقعی نیست")
+        self.assertNotContains(response, "تصویر نمونه محصول؛ مدل دقیق تأیید نشده")
+        self.assertNotContains(response, "عکس محصول واقعی نیست")
         self.assertNotContains(response, "قیمت نهایی")

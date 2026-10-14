@@ -55,7 +55,7 @@ class GuidedFeedbackUITests(TestCase):
 
     def test_existing_product_slots_and_secondary_detail_are_preserved(self):
         response = self.page()
-        for value in ('class="gc-quantity-slot" aria-hidden="true"></div>', 'class="gc-add-slot" aria-hidden="true"></div>',
+        for value in ('class="gc-quantity-slot"', 'class="gc-add-slot"', 'data-basket-quantity', 'data-basket-add',
                       'data-image', 'data-price', 'gc-detail', 'catalogCategoryChips'):
             self.assertContains(response, value)
         self.assertContains(response, "بعداً بررسی می‌کنم")

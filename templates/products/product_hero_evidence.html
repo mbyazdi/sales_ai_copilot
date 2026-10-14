@@ -1,0 +1,39 @@
+    <section class="pb-evidence ph-card ph-recommendation ds-stack" aria-labelledby="evidence-title">
+        <div class="ds-page-header"><div><p class="pb-eyebrow">دلیل انتخاب محصول</p><h2 id="evidence-title" class="ds-heading">چرا این محصول برای این مشتری؟</h2></div><span class="ds-badge">شواهد ذخیره‌شده</span></div>
+        {% if recommendation %}
+        <div class="pb-evidence-preview ds-stack">
+        <div class="ds-row"><span class="ds-badge ds-badge--info">{% include "core/customer_360/_recommendation_type.html" %}</span><span class="ds-badge">{{ evidence_label }}</span><span class="ds-caption">اطمینان ثبت‌شده <strong>{{ recommendation.confidence_score|floatformat:"-2" }}٪</strong></span></div>
+        <p class="pb-reason">{% if recommendation.reason %}{{ recommendation.reason|linebreaksbr }}{% else %}دلیل متنی برای این پیشنهاد ثبت نشده است.{% endif %}</p>
+        </div>
+        <p class="ds-caption ds-muted">این دلیل و شواهد هنگام تولید پیشنهاد ذخیره شده‌اند؛ با موجودی و طرح‌های فعلی دوباره محاسبه نشده‌اند.</p>
+        <details class="pb-disclosure pb-business-disclosure">
+            <summary>مشاهده شواهد و جزئیات پیشنهاد</summary>
+            <div class="ds-stack pb-details pb-business-content">
+                <div class="ds-row"><span class="ds-badge ds-badge--info">{% include "core/customer_360/_recommendation_type.html" %}</span><span class="ds-badge">{{ evidence_label }}</span></div>
+                <p class="pb-reason">{% if recommendation.reason %}{{ recommendation.reason|linebreaksbr }}{% else %}دلیل متنی برای این پیشنهاد ثبت نشده است.{% endif %}</p>
+                <dl class="pb-facts">
+                    <div><dt>اطمینان ثبت‌شده</dt><dd>{{ recommendation.confidence_score|floatformat:"-2" }}٪</dd></div>
+                    <div><dt>رتبه ثبت‌شده پیشنهاد</dt><dd>{{ recommendation.rank }}</dd></div>
+                    <div class="pb-business-score"><dt>امتیاز نهایی ثبت‌شده</dt><dd>{{ recommendation.score|floatformat:"-4" }}</dd></div>
+                </dl>
+                <div class="pb-signal-summary ds-stack" aria-labelledby="business-signals-title">
+                    <h3 id="business-signals-title" class="ds-heading">شواهد فعال در این پیشنهاد</h3>
+                    <ul class="pb-signal-cards">{% for signal in active_signals %}<li><span>{{ signal.label }}</span><strong><bdi>{{ signal.score|floatformat:"-4" }}</bdi><small>اثر ثبت‌شده</small></strong></li>{% empty %}<li class="pb-signal-empty ds-muted">سیگنال فعال با اثر غیرصفر در شواهد ثبت‌شده موجود نیست.</li>{% endfor %}</ul>
+                </div>
+                <details class="pb-disclosure pb-technical-disclosure">
+                    <summary>جزئیات فنی امتیازدهی</summary>
+                    <div class="ds-stack pb-details pb-technical-content">
+                        <dl class="pb-facts">
+                            <div><dt>آخرین ثبت پیشنهاد</dt><dd><bdi>{{ recommendation.updated_at|date:"Y/m/d H:i" }}</bdi></dd></div>
+                            {% if active_signal_count != None %}<div><dt>تعداد سیگنال فعال ثبت‌شده</dt><dd>{{ active_signal_count }}</dd></div>{% endif %}
+                        </dl>
+                        <div class="pb-technical-signals ds-stack"><h3 class="ds-heading">فهرست کامل شواهد ثبت‌شده</h3><ul class="pb-signals">
+                            {% for signal in signals %}<li><span>{{ signal.label }} <small class="ds-muted">· {{ signal.state }}</small></span><strong>{% if signal.score != None %}{{ signal.score|floatformat:"-4" }}{% else %}ثبت نشده{% endif %}</strong></li>{% empty %}<li class="ds-muted">شواهد تفصیلی برای این پیشنهاد ثبت نشده است.</li>{% endfor %}
+                        </ul></div>
+                        {% if components %}<details class="pb-disclosure pb-score-composition"><summary>ترکیب امتیاز ثبت‌شده</summary><ul class="pb-signals pb-details">{% for component in components %}<li><span>{{ component.label }}</span><strong>{% if component.value != None %}{{ component.value|floatformat:"-4" }}{% else %}ثبت نشده{% endif %}</strong></li>{% endfor %}</ul></details>{% endif %}
+                    </div>
+                </details>
+            </div>
+        </details>
+        {% else %}<p class="ds-state ds-state--empty">پیشنهاد فعالی برای این محصول و مشتری ثبت نشده است؛ دلیل یا شواهدی برای آن ساخته نمی‌شود.</p>{% endif %}
+    </section>

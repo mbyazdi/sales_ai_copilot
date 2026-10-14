@@ -1,0 +1,26 @@
+/* Activate the approved footer slots without changing card grid or image geometry. */
+.gc-quantity-slot label { display: block; }
+.gc-quantity-slot .gc-sr-only { position: static; width: auto; height: auto; margin: 0; padding: 0; overflow: visible; clip-path: none; white-space: normal; font-size: 0; }
+.gc-quantity-slot input, .gb-line input { min-height: 44px; width: 100%; min-width: 0; border: 1px solid var(--gc-border); border-radius: 10px; background: var(--gc-soft); color: var(--gc-navy); font: inherit; font-size: .875rem; text-align: center; }
+.gb-add { width: 100%; min-height: 44px; padding: 6px; border-radius: 10px; background: var(--gc-navy); font-size: .8125rem; }
+.gb-add:disabled { opacity: .55; }
+.gb-decision { color: var(--gc-green); font-size: .75rem; margin: 0; }
+.gb-panel, .gb-recovery { margin: 8px 12px; border: 1px solid var(--gc-border); border-radius: 12px; background: var(--gc-soft); padding: 8px 12px; }
+.gb-panel > summary { min-height: 44px; display: flex; align-items: center; color: var(--gc-navy); font-size: .8125rem; font-weight: var(--ds-weight-strong); cursor: pointer; overflow-wrap: anywhere; }
+.gb-panel > summary::after { content: '⌄'; margin-inline-start: auto; padding-inline-start: 8px; }
+.gb-panel[open] > summary::after { transform: rotate(180deg); }
+.gb-panel input:focus-visible, .gc-quantity-slot input:focus-visible { outline: 3px solid var(--ds-focus); outline-offset: 2px; }
+.gb-guidance, .gb-notice, .gb-recovery { font-size: .8125rem; line-height: 1.7; }
+.gb-guidance:empty, .gb-notice:empty { display: none; }
+.gb-notice { margin: 8px 12px; color: var(--gc-navy); }
+.gb-lines { display: grid; gap: 10px; list-style: none; padding: 0; margin: 8px 0; }
+.gb-line { display: grid; grid-template-columns: minmax(0, 1fr) 68px; gap: 6px 8px; align-items: center; border-block-start: 1px solid var(--gc-border); padding-block-start: 8px; }
+.gb-line > * { min-width: 0; }
+.gb-line bdi, .gb-line small { overflow-wrap: anywhere; }
+.gb-line small { font-size: .75rem; color: var(--gc-muted); }
+.gb-line-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; }
+.gb-line-actions button { min-height: 44px; font-size: .8125rem; }
+.gb-refresh { margin-inline: 12px; }
+.gb-quote-total { font-size: 1rem; font-weight: var(--ds-weight-strong); color: var(--gc-navy); }
+.gb-dialog :is(p, h2) { overflow-wrap: anywhere; }
+@media (min-width: 768px) { .gb-panel, .gb-notice, .gb-recovery { margin-inline: var(--ds-space-5); } }

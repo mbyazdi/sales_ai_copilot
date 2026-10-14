@@ -43,11 +43,21 @@ function fixture({read = () => history(), post = payload => success(payload), st
         return {status, ok: status < 400, headers: {get: () => data.replay ? 'true' : 'false'}, json: async () => data.body || data};
     };
     vm.runInNewContext(source,{window, document: {getElementById: id => elements[id], createElement: () => new Element()}, fetch, URL, URLSearchParams});
-    return {elements, calls, storage, load: window.GuidedFeedback.load,
+    return {elements, calls, storage, load: window.GuidedFeedback.load, setBasket: window.GuidedFeedback.setBasket,
         submit: () => elements.feedbackForm.listeners.submit({preventDefault() {}})};
 }
 const context = {apiUrl: '/api/recommendations/v1/visits/14/feedback/', catalogContext: 'signed-original'};
 const posts = f => f.calls.filter(c => c.options.method === 'POST');
+
+test('authoritative selected basket disables rejection and removal re-enables it with current revision', async () => {
+    const f=fixture(),t=target();await f.load(context,[t]);
+    // Exported binding is exercised inside the same fixture runtime below.
+    f.setBasket({visit:{status:'IN_PROGRESS'},request:{id:9,status:'DRAFT',revision:2},lines:[{product_id:1}]});
+    assert(t.fields.reject.disabled);assert(t.fields.later.disabled);assert.match(t.fields.guidance.textContent,/ابتدا/);
+    f.setBasket({visit:{status:'IN_PROGRESS'},request:{id:9,status:'DRAFT',revision:3},lines:[]});
+    assert(!t.fields.later.disabled);t.fields.later.click();await f.submit();
+    assert.equal(JSON.parse(posts(f)[0].options.body).expected_request_revision,3);
+});
 test('ordinary products have no controls and loading reads never POST', async () => {
     const f = fixture(), recommended = target(), ordinary = target(null,2);
     await f.load(context,[recommended,ordinary]);
