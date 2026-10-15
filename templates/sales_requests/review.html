@@ -1,0 +1,24 @@
+{% load static %}
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>مرور درخواست فروش · {{ customer.name }}</title>
+<link rel="stylesheet" href="{% static 'css/design-system.css' %}"><link rel="stylesheet" href="{% static 'css/salesperson_journey.css' %}"><link rel="stylesheet" href="{% static 'core/css/sales_request_review.css' %}?v=3f2-f1-1"></head>
+<body class="sr-page">
+<a class="sr-skip" href="#main-content">رفتن به درخواست فروش</a>
+<div class="sr-container">
+    <header class="sr-header"><h1 class="ds-title">مرور درخواست فروش</h1>{% include 'components/salesperson_context.html' with salesperson=salesperson back_url=basket_url back_label="بازگشت به سبد" only %}</header>
+    {% include 'sales_requests/context.html' %}
+    <main id="main-content" tabindex="-1" data-request-page="review" data-actor-id="{{ request.user.pk }}" data-customer-code="{{ customer.customer_code }}" data-visit-id="{{ visit.pk }}" data-catalog-context="{{ catalog_context }}" data-review-url="{{ review_api }}" data-submit-url="{{ submit_api }}" data-result-url="{{ result_url }}">
+        <p id="requestNotice" class="sr-notice" role="status" aria-live="polite">در حال دریافت درخواست…</p>
+        <section id="requestRecovery" class="sr-card sr-warning" aria-labelledby="recoveryTitle" hidden><h2 id="recoveryTitle">نتیجه ثبت قبلی نیاز به بررسی دارد</h2><p>ارسال خودکار انجام نمی‌شود. ابتدا وضعیت ثبت را بررسی کنید.</p><div class="sr-actions"><button id="requestRecover" class="ds-button ds-button--secondary" type="button">بررسی وضعیت ثبت</button><button id="requestRetry" class="ds-button ds-button--quiet" type="button">تلاش دوباره همان فرمان</button></div></section>
+        <section id="requestIssues" class="sr-card sr-warning" aria-labelledby="issuesTitle" hidden><h2 id="issuesTitle">پیش از ثبت بررسی کنید</h2><ul id="requestIssueList"></ul><a class="ds-button ds-button--secondary" href="{{ basket_url }}">اصلاح سبد درخواست</a></section>
+        <section class="sr-card" aria-labelledby="itemsTitle"><div class="sr-section-title"><h2 id="itemsTitle">اقلام درخواست</h2><span id="requestCount" class="ds-badge"></span></div><div id="requestLines" class="sr-lines"></div></section>
+        <section id="requestTotals" class="sr-card sr-commercial" aria-labelledby="totalTitle" hidden><h2 id="totalTitle">مبلغ درخواست فروش</h2><dl class="sr-totals"><div><dt>جمع قیمت پایه</dt><dd id="requestBase"></dd></div><div><dt>تخفیف مشتری</dt><dd id="requestDiscount"></dd></div><div class="sr-final"><dt>مبلغ نهایی</dt><dd><strong id="requestFinal"></strong><span>تومان</span></dd></div></dl></section>
+        <p class="sr-caption">این مرحله درخواست فروش را ثبت می‌کند؛ ثبت درخواست به معنی خرید نهایی یا پایان ویزیت نیست.</p>
+        <div class="sr-actions sr-primary-actions"><button id="requestPrepare" class="ds-button" type="button" disabled>تأیید و ثبت درخواست</button><button id="requestRefresh" class="ds-button ds-button--secondary" type="button">دریافت بازبینی جدید</button></div>
+        <noscript><p class="sr-notice">برای بازبینی و ثبت درخواست، جاوااسکریپت مرورگر را فعال کنید.</p></noscript>
+    </main>
+</div>
+<dialog id="requestConfirmDialog" class="sr-dialog" aria-labelledby="confirmTitle" aria-describedby="confirmDescription" dir="rtl"><form id="requestConfirmForm" method="dialog">{% csrf_token %}<h2 id="confirmTitle">ثبت درخواست فروش؟</h2><p id="confirmDescription"></p><p>این کار فقط درخواست فروش را ثبت می‌کند و به معنی خرید نهایی نیست.</p><p id="requestConfirmNotice" role="status" aria-live="polite"></p><div class="sr-actions"><button id="requestConfirm" class="ds-button" type="submit">ثبت درخواست فروش</button><button id="requestCancel" class="ds-button ds-button--secondary" type="button">بازگشت به مرور</button></div></form></dialog>
+<script src="{% static 'core/js/sales_request_review.js' %}?v=3f2-f1-1" defer></script>
+</body></html>

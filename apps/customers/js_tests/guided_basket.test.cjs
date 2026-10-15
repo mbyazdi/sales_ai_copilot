@@ -16,7 +16,7 @@ function state({lines=[],revision=lines.length?1:null,editable=true,valid=true}=
 }
 function line(id=1,quantity=3,source='RECOMMENDATION'){return {id:20+id,product_id:id,quantity,selection_source:source,product_snapshot:{name:'محصول ذخیره‌شده'}};}
 function fixture({initial=state(),mutation,quote,readError=false,readBasket,storage=new Map(),feedbackPending=false,receipt}={}){
- const ids=['basketPanel','guidedCatalog','basketDialog','basketForm','basketNotice','basketRecovery','basketSummary','basketGuidance','basketLines','basketRefresh','basketTitle','basketDescription','basketQuoteTotal','basketMessage','basketConfirm','basketCancel','basketStatus','basketRetryCommand'];
+ const ids=['basketPanel','guidedCatalog','basketDialog','basketForm','basketNotice','basketRecovery','basketSummary','basketGuidance','basketLines','basketRefresh','basketTitle','basketDescription','basketQuoteTotal','basketMessage','basketConfirm','basketCancel','basketStatus','basketRetryCommand','basketReview'];
  const els=Object.fromEntries(ids.map(id=>[id,new Element()]));els.guidedCatalog.dataset={actorId:'1',customerCode:'C',visitId:'14'};els.basketForm.querySelector=()=>({value:els.csrf===undefined?'masked-csrf':els.csrf});
  let current=initial,serial=0;const calls=[],feedback=[];
  const window={location:new URL('http://localhost/'),crypto:{randomUUID:()=>`00000000-0000-4000-8000-${String(++serial).padStart(12,'0')}`},
@@ -40,6 +40,14 @@ const mutations=f=>f.calls.filter(c=>c.options.method!=='GET');
 async function ready(f,t=target()){await f.load(context,[t]);f.quotes([availability(t.product_id)]);return t;}
 test('initial reads never create browser-authoritative basket and eligible slots activate',async()=>{
  const f=fixture(),t=await ready(f);assert(!t.fields.add.disabled);assert.equal(t.fields.quantity.value,'1');assert.equal(mutations(f).length,0);assert.match(f.els.basketSummary.textContent,/درخواست فروش/);assert(f.calls.every(c=>c.options.cache==='no-store'));
+});
+test('review entry is shown only for a nonempty DRAFT and preserves signed selling context',async()=>{
+ const f=fixture({initial:state({lines:[line()]})});await ready(f);
+ assert(!f.els.basketReview.hidden);
+ const url=new URL(f.els.basketReview.href,'http://localhost');assert.equal(url.pathname,'/customers/C/visits/14/sales-request/review/');assert.equal(url.searchParams.get('catalog_context'),'signed-original');
+ const empty=fixture();await ready(empty);assert(empty.els.basketReview.hidden);
+ const submitted=state({lines:[line()],editable:false});submitted.request.status='SUBMITTED';
+ const closed=fixture({initial:submitted});await ready(closed);assert(closed.els.basketReview.hidden);
 });
 test('confirmed mutation refreshes visible server quote presentation without client arithmetic',async()=>{
  const f=fixture(),t=target();let refreshes=0;

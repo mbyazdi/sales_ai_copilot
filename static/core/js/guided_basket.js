@@ -76,6 +76,17 @@
     }
     function sync() {
         el('basketRecovery').hidden = !pending;
+        const review = el('basketReview');
+        if (review) {
+            review.hidden = !data?.request || data.request.status !== 'DRAFT' || !data.item_count || !state?.ready || sending || preparing || Boolean(pending) || window.GuidedFeedback?.hasPending();
+            if (!review.hidden) {
+                const url = new URL(`/customers/${encodeURIComponent(root.dataset.customerCode)}/visits/${root.dataset.visitId}/sales-request/review/`, window.location.origin);
+                const query = new URLSearchParams(window.location.search);
+                for (const name of ['q','category_id','priority','page','page_size']) if (query.has(name)) url.searchParams.set(name, query.get(name));
+                url.searchParams.set('catalog_context', state.context.catalogContext);
+                review.href = url.pathname + url.search;
+            }
+        }
         window.GuidedFeedback?.setBasket(data, !state?.ready || sending || preparing || Boolean(pending));
         if (!state) return;
         for (const target of state.targets) {

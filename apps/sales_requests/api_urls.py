@@ -2,9 +2,12 @@ from django.urls import path
 
 from .api_views import VisitQuoteAPIView
 from .basket_views import BasketAPIView, BasketAddAPIView, BasketLineAPIView, BasketQuoteAPIView, BasketCommandStatusAPIView
+from .submission_views import RequestReviewAPIView, RequestSubmitAPIView
 
 
 urlpatterns = [
+    path("v1/visits/<int:visit_id>/review/", RequestReviewAPIView.as_view(), name="visit-request-review-v1"),
+    path("v1/visits/<int:visit_id>/submit/", RequestSubmitAPIView.as_view(), name="visit-request-submit-v1"),
     path("v1/visits/<int:visit_id>/basket/", BasketAPIView.as_view(), name="visit-basket-v1"),
     path("v1/visits/<int:visit_id>/basket/quote/", BasketQuoteAPIView.as_view(), name="visit-basket-quote-v1"),
     path("v1/visits/<int:visit_id>/lines/", BasketAddAPIView.as_view(), name="visit-basket-add-v1"),
