@@ -26,6 +26,7 @@
             {% if not manager_inspection %}{% include "core/customer_360/_sales_context.htm" %}{% endif %}
             {% if not manager_inspection and current_visit.status == 'IN_PROGRESS' %}<details class="ds-surface c360-customer-background"><summary>اطلاعات مشتری و جستجو</summary><div class="ds-stack c360-detail-content">{% include "core/customer_360/_customer_hero.html" %}{% include "core/customer_360/_search.html" %}</div></details>{% endif %}
             <nav class="c360-links ds-row" aria-label="{% if manager_inspection %}ناوبری بررسی مشتری{% else %}ناوبری فضای کاری فروش{% endif %}">
+                {% if not manager_inspection and current_visit.status == 'IN_PROGRESS' %}<a href="{% url 'visit-finish' customer.customer_code current_visit.id %}">پایان ویزیت</a>{% endif %}
                 <a href="#workspace-decision">{% if manager_inspection %}پیشنهاد اصلی{% else %}اقدام پیشنهادی{% endif %}</a><a href="#workspace-copilot">{% if manager_inspection %}دستیار بررسی{% else %}دستیار فروش{% endif %}</a><a href="#workspace-recommendations">{% if manager_inspection %}پیشنهادها{% else %}پیشنهادها و نتیجه{% endif %}</a><a href="#workspace-kpis">شاخص‌ها</a><a href="#workspace-details">جزئیات</a>
             </nav>
             {% include "core/customer_360/_ai_command_center.html" %}

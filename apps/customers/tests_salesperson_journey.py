@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.html import format_html
 
 from apps.visits import tests_authorization
 from apps.visits.models import Visit
@@ -111,11 +112,24 @@ class SalespersonJourneyPresentationTests(TestCase):
     def test_brief_return_copy_is_truthful_and_target_is_unchanged(self):
         guided = self.guided()
         response = self.client.get(guided.context["brief_url"])
-        self.assertContains(response, "بازگشت</a>", count=2)
+        self.assertContains(response, "بازگشت</a>", count=1)
         self.assertNotContains(response, "بازگشت به نمای مشتری")
-        self.assertContains(response, response.context["return_url"].replace("&", "&amp;"), count=2)
+        self.assertContains(response, response.context["return_url"].replace("&", "&amp;"), count=1)
         self.assertIn("/recommendations/presentation/", response.context["return_url"])
-        self.assertContains(response, f"ویزیت <bdi>{self.visit.pk}</bdi>")
+        self.assertEqual(response.context["visit"].pk, self.visit.pk)
+        self.assertEqual(response.context["customer"].pk, self.customer.pk)
+        _, context_start, context_html = response.content.decode().partition('<dl class="ph-context">')
+        self.assertTrue(context_start)
+        context_html, context_end, _ = context_html.partition("</dl>")
+        self.assertTrue(context_end)
+        self.assertInHTML(format_html(
+            "<div><dt>ویزیت</dt><dd><bdi>{} · {}</bdi></dd></div>",
+            self.visit.pk, self.visit.visit_date.strftime("%Y/%m/%d"),
+        ), context_html)
+        self.assertInHTML(format_html(
+            "<div><dt>مشتری</dt><dd><bdi>{}</bdi><small><bdi>{}</bdi></small></dd></div>",
+            self.customer.name, self.customer.customer_code,
+        ), context_html)
 
     def test_manager_default_shell_does_not_opt_into_salesperson_chrome(self):
         self.client.force_login(self.staff)

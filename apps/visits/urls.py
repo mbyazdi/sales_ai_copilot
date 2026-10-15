@@ -2,6 +2,7 @@ from django.urls import path
 
 from .views import salesperson_dashboard
 from .outcome_views import VisitRecommendationOutcomesAPIView
+from .completion_views import VisitCompletionAPIView
 
 from .views import (
     SalesOutcomeCreateAPIView,
@@ -17,6 +18,7 @@ from .views import (
 
 
 urlpatterns = [
+    path("v1/visits/<int:visit_id>/completion/", VisitCompletionAPIView.as_view(), name="visit-completion-v1"),
     path(
         "v1/visits/<int:visit_id>/recommendation-outcomes/",
         VisitRecommendationOutcomesAPIView.as_view(),

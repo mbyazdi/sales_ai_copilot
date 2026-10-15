@@ -1,0 +1,43 @@
+{% load static %}
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>پایان ویزیت · {{ customer.name }}</title>
+<link rel="stylesheet" href="{% static 'css/design-system.css' %}"><link rel="stylesheet" href="{% static 'css/salesperson_journey.css' %}"><link rel="stylesheet" href="{% static 'core/css/sales_request_review.css' %}?v=3f2-f1-1"><link rel="stylesheet" href="{% static 'visits/css/visit_finish.css' %}?v=3g2-1"></head>
+<body class="sr-page vf-page"><a class="sr-skip" href="#main-content">رفتن به پایان ویزیت</a><div class="sr-container">
+    <header class="sr-header"><h1 class="ds-title">پایان ویزیت</h1>{% include 'components/salesperson_context.html' with salesperson=salesperson back_url=customer_url back_label="بازگشت به مشتری" only %}</header>
+    {% include 'sales_requests/context.html' %}
+    <main id="main-content" tabindex="-1" data-visit-finish data-actor-id="{{ request.user.pk }}" data-customer-code="{{ customer.customer_code }}" data-visit-id="{{ visit.pk }}" data-api-url="{% url 'visit-completion-v1' visit.pk %}">
+        <p id="finishNotice" class="sr-notice" role="status" aria-live="polite">در حال بررسی وضعیت ویزیت…</p>
+        <section id="finishReady" class="sr-card vf-stack" {% if not initial_state.can_complete %}hidden{% endif %} aria-labelledby="finishReadyTitle">
+            <h2 id="finishReadyTitle">آماده پایان ویزیت هستید؟</h2>
+            <p id="finishRequestText">{% if initial_state.request.status == 'SUBMITTED' %}درخواست فروش {{ initial_state.request.number }} ثبت شده است و بدون تغییر باقی می‌ماند.{% elif initial_state.request.status == 'DRAFT' %}درخواست فروش این ویزیت هنوز پیش‌نویس است.{% else %}برای این ویزیت درخواست فروشی ثبت نشده است. می‌توانید ویزیت را بدون درخواست فروش پایان دهید.{% endif %}</p>
+            <p id="finishDraftWarning" class="vf-warning" {% if initial_state.request.status != 'DRAFT' %}hidden{% endif %}>پیش‌نویس ثبت نمی‌شود و حذف نخواهد شد. پس از پایان ویزیت فقط قابل مشاهده است.</p>
+            <p class="sr-caption">پایان ویزیت، درخواست فروش را ثبت نمی‌کند و پیام یا پیگیری خودکاری ایجاد نمی‌کند.</p>
+            <div class="sr-actions"><button id="finishPrepare" class="ds-button" type="button" disabled>پایان ویزیت</button><a class="ds-button ds-button--secondary" href="{{ customer_url }}">ادامه ویزیت</a></div>
+        </section>
+        <section id="finishRecovery" class="sr-card sr-warning vf-stack" aria-labelledby="finishRecoveryTitle" hidden>
+            <h2 id="finishRecoveryTitle">نتیجه تلاش قبلی را بررسی کنید</h2><p id="finishRecoveryText">ارسال خودکار انجام نمی‌شود. ابتدا وضعیت ثبت‌شده ویزیت را دریافت کنید.</p>
+            <div class="sr-actions"><button id="finishRecover" class="ds-button ds-button--secondary" type="button">بررسی وضعیت ویزیت</button><button id="finishRetry" class="ds-button ds-button--quiet" type="button" disabled>تلاش دوباره همان فرمان</button></div>
+        </section>
+        <section id="finishSuccess" class="sr-card sr-success" aria-labelledby="finishSuccessTitle" {% if visit.status != 'COMPLETED' %}hidden{% endif %}>
+            <span class="ds-badge">تکمیل‌شده</span><h2 id="finishSuccessTitle" class="ds-title" tabindex="-1">ویزیت تکمیل شد</h2>
+            <p>این ویزیت پایان یافته است و از این مسیر دوباره پایان داده نمی‌شود.</p>
+            <p id="finishResultText" class="sr-caption">{% if initial_state.request.status == 'DRAFT' %}پیش‌نویس درخواست ثبت نشده است و فقط قابل مشاهده باقی می‌ماند.{% elif initial_state.request.status == 'SUBMITTED' %}درخواست فروش ثبت‌شده و سابقه تصمیم‌ها بدون تغییر باقی مانده‌اند.{% endif %}</p>
+            <a class="ds-button" href="{% url 'salesperson-dashboard' %}">بازگشت به برنامه روزانه</a>
+        </section>
+        <section id="finishUnavailable" class="sr-card vf-stack" {% if visit.status == 'IN_PROGRESS' or visit.status == 'COMPLETED' %}hidden{% endif %}>
+            <h2>این ویزیت در حال انجام نیست</h2><p>پایان ویزیت فقط برای ویزیت در حال انجام مجاز است.</p><a class="ds-button ds-button--secondary" href="{% url 'salesperson-dashboard' %}">برنامه روزانه</a>
+        </section>
+        <button id="finishRefresh" class="ds-button ds-button--quiet" type="button">دریافت وضعیت فعلی</button>
+        <noscript><p class="sr-notice">برای تأیید پایان ویزیت، جاوااسکریپت مرورگر را فعال کنید. مشاهده این صفحه ویزیت را پایان نمی‌دهد.</p></noscript>
+    </main>
+</div>
+<dialog id="finishDialog" class="sr-dialog" aria-labelledby="finishDialogTitle" aria-describedby="finishDescription" dir="rtl"><form id="finishForm" method="dialog">{% csrf_token %}
+    <h2 id="finishDialogTitle">ویزیت پایان یابد؟</h2><p id="finishDescription"><bdi>{{ customer.name }}</bdi> · ویزیت {{ visit.pk }}</p>
+    <p>پس از تأیید، ویزیت تکمیل می‌شود و تغییر درخواست از این ویزیت فعال نخواهد بود.</p>
+    <p id="finishConfirmDraft" class="vf-warning" {% if initial_state.request.status != 'DRAFT' %}hidden{% endif %}>پیش‌نویس ثبت نمی‌شود و حذف نخواهد شد. پس از پایان ویزیت فقط قابل مشاهده است.</p>
+    <p class="sr-caption">اگر پیش‌نویسی وجود داشته باشد، پایان ویزیت آن را ثبت نمی‌کند.</p>
+    <p id="finishDialogNotice" role="status" aria-live="polite"></p>
+    <div class="sr-actions"><button id="finishConfirm" class="ds-button" type="submit">تأیید پایان ویزیت</button><button id="finishCancel" class="ds-button ds-button--secondary" type="button">ادامه ویزیت</button></div>
+</form></dialog>
+{{ initial_state|json_script:'finishInitialState' }}<script src="{% static 'visits/js/visit_finish.js' %}?v=3g2-1" defer></script></body></html>

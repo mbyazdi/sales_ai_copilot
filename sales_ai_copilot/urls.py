@@ -3,9 +3,11 @@ from django.urls import include, path
 from django.contrib.auth import views as auth_views
 from apps.customers.presentation_views import recommendation_presentation
 from apps.visits.review_views import visit_completion_review
+from apps.visits.completion_page import visit_finish
 from apps.sales_requests.presentation_views import sales_request_review, sales_request_result
 
 urlpatterns = [
+    path("customers/<str:customer_code>/visits/<int:visit_id>/finish/", visit_finish, name="visit-finish"),
 
     path("customers/<str:customer_code>/visits/<int:visit_id>/sales-request/review/", sales_request_review, name="sales-request-review"),
     path("customers/<str:customer_code>/visits/<int:visit_id>/sales-request/result/", sales_request_result, name="sales-request-result"),

@@ -1,8 +1,10 @@
 """002-J review and optional completion guard; mutations use isolated fixtures."""
 from datetime import timedelta
+import re
 from unittest.mock import patch
 
 from django.db import connection
+from django.middleware.csrf import _does_token_match
 from django.test import Client, TestCase
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
@@ -222,6 +224,18 @@ class VisitCompletionReviewTests(TestCase):
         self.customer.is_active = False
         self.customer.save()
         inactive = self.review()
+        self.assertEqual(missing.status_code, 404)
         self.assertEqual(inactive.status_code, 404)
-        self.assertEqual(missing.content, inactive.content)
+        csrf_input = re.compile(
+            rb'(<input\b[^>]*\bname="csrfmiddlewaretoken"[^>]*\bvalue=")([A-Za-z0-9]{64})("[^>]*>)'
+        )
+
+        def stable_html(response):
+            fields = csrf_input.findall(response.content)
+            self.assertEqual(len(fields), 1)
+            self.assertTrue(_does_token_match(fields[0][1].decode("ascii"), self.client.cookies["csrftoken"].value))
+            # Preserve the complete HTML; only the random masked value varies.
+            return csrf_input.sub(rb'\1<csrf-token>\3', response.content)
+
+        self.assertEqual(stable_html(missing), stable_html(inactive))
         self.assertEqual(self.complete(customer_code=self.customer.customer_code).status_code, 404)

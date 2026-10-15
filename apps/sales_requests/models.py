@@ -272,6 +272,7 @@ class SalesRequestMutationReceipt(AppendOnlyModel):
         SET_QUANTITY = "SET_QUANTITY", "تغییر تعداد"
         REMOVE_PRODUCT = "REMOVE_PRODUCT", "حذف محصول"
         REJECT_RECOMMENDATION = "REJECT_RECOMMENDATION", "رد پیشنهاد"
+        COMPLETE_VISIT = "COMPLETE_VISIT", "پایان ویزیت"
 
     visit = models.ForeignKey("visits.Visit", on_delete=models.PROTECT, related_name="mutation_receipts")
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="sales_request_mutation_receipts")
@@ -292,7 +293,7 @@ class SalesRequestMutationReceipt(AppendOnlyModel):
         constraints = [
             models.UniqueConstraint(fields=["visit", "command_uuid"], name="srmr_unique_visit_command"),
             models.CheckConstraint(
-                condition=models.Q(operation__in=["ADD_PRODUCT", "SET_QUANTITY", "REMOVE_PRODUCT", "REJECT_RECOMMENDATION"]),
+                condition=models.Q(operation__in=["ADD_PRODUCT", "SET_QUANTITY", "REMOVE_PRODUCT", "REJECT_RECOMMENDATION", "COMPLETE_VISIT"]),
                 name="srmr_valid_operation",
             ),
             models.CheckConstraint(condition=~models.Q(intent_fingerprint=""), name="srmr_intent_not_empty"),

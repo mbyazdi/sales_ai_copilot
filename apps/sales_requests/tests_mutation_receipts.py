@@ -144,11 +144,11 @@ class MutationReceiptTests(TestCase):
             with self.subTest(database=changes), self.assertRaises(IntegrityError), transaction.atomic():
                 self.raw_insert(self.receipt(**changes))
 
-    def test_all_stage_three_operations_can_be_recorded(self):
+    def test_all_supported_operations_can_be_recorded(self):
         request = SalesRequest.objects.create(visit=self.visit)
         for operation in SalesRequestMutationReceipt.Operation.values:
             self.receipt(operation=operation, sales_request=request, applied_revision=0).save()
-        self.assertEqual(SalesRequestMutationReceipt.objects.count(), 4)
+        self.assertEqual(SalesRequestMutationReceipt.objects.count(), 5)
 
     def test_receipt_remains_unchanged_when_request_revision_advances(self):
         request = SalesRequest.objects.create(visit=self.visit)
