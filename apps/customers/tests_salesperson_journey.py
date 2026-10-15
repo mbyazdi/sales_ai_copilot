@@ -71,6 +71,40 @@ class SalespersonJourneyPresentationTests(TestCase):
         self.assertContains(response, 'class="ds-surface c360-customer-background"')
         self.assertContains(response, f'name="visit_id" value="{self.visit.pk}"')
 
+    def test_finish_navigation_is_actionable_only_for_an_active_owned_visit(self):
+        target = reverse("visit-finish", args=[self.customer.customer_code, self.visit.pk])
+        for status in ("PLANNED", "IN_PROGRESS", "COMPLETED", "CANCELLED"):
+            with self.subTest(status=status):
+                Visit.objects.filter(pk=self.visit.pk).update(status=status)
+                response = self.customer_page()
+                links = [attrs for tag, attrs in Elements(response).items
+                         if tag == "a" and attrs.get("id") == "visitFinishLink"]
+                if status in ("COMPLETED", "CANCELLED"):
+                    self.assertEqual(links, [])
+                    continue
+                self.assertEqual(len(links), 1)
+                self.assertEqual(links[0]["data-finish-url"], target)
+                if status == "PLANNED":
+                    self.assertIn("hidden", links[0])
+                    self.assertNotIn("href", links[0])
+                else:
+                    self.assertNotIn("hidden", links[0])
+                    self.assertEqual(links[0]["href"], target)
+
+    def test_finish_navigation_is_absent_for_foreign_manager_and_missing_visit(self):
+        Visit.objects.filter(pk=self.visit.pk).update(status="IN_PROGRESS")
+        foreign = self.client.get("/customers/", {
+            "customer_code": self.customer.customer_code, "visit_id": self.visits[1].pk,
+        })
+        self.assertNotContains(foreign, 'id="visitFinishLink"')
+        self.assertNotContains(self.client.get("/customers/", {
+            "customer_code": self.customer.customer_code,
+        }), 'id="visitFinishLink"')
+        self.client.force_login(self.staff)
+        self.assertNotContains(self.customer_page(), 'id="visitFinishLink"')
+        self.client.logout()
+        self.assertNotContains(self.customer_page(), 'id="visitFinishLink"', status_code=403)
+
     def test_non_active_and_invalid_visit_keep_the_existing_entry_order(self):
         for status in ("PLANNED", "COMPLETED", "CANCELLED"):
             with self.subTest(status=status):

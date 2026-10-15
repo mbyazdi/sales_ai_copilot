@@ -787,6 +787,15 @@
         );
     }
 
+    function syncFinishNavigation(visit) {
+        const link = document.getElementById("visitFinishLink");
+        if (!link) return;
+        const active = String(visit?.id) === String(visitId) && visit.status === "IN_PROGRESS";
+        link.hidden = !active;
+        if (active) link.setAttribute("href", link.dataset.finishUrl);
+        else link.removeAttribute("href");
+    }
+
     function updateVisitStatusBadge(
         status
     ) {
@@ -1166,6 +1175,7 @@
             updateVisitStatusBadge(
                 data.visit.status
             );
+            syncFinishNavigation(data.visit);
 
             updateVisitStateBanner(
                 data.visit.status
@@ -1247,6 +1257,7 @@
             updateVisitStatusBadge(
                 data.visit.status
             );
+            syncFinishNavigation(data.visit);
 
             updateVisitStateBanner(
                 data.visit.status
