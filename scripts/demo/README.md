@@ -9,6 +9,183 @@
 > See [B10](../../docs/checkpoints/SALESPERSON_JOURNEY_STAGE_3H3_B10_FINAL_PRECOMMIT_AUDIT.md)
 > for the exact prerequisite order and commit boundary.
 
+## Stage 3H4-B6: complete control-bundle readiness and isolated writer retirement
+
+`control_bundle.py` is the shared SELECT-only inspector used by startup,
+`gate_readiness.py` and disposable Prepare Day preflight. Its repository-owned
+`control_bundle_v1.json` fixes the reviewed PostgreSQL 17 Gate V2 / Prepare Day V1
+catalog contract: five tables, columns/defaults, keys/checks/FKs, seven indexes,
+ownership and exact schema/table/column ACLs. Private journals remain unreadable
+to runtime. Extra objects, elevated runtime roles/memberships, changed loaded
+source/contract, wrong DB/marker/generation or incompatible structure fail closed.
+Normal startup requires ACTIVE; the operator inspector may report PENDING but
+cannot serve, clear or recover it. No inspector creates or repairs anything.
+Health includes loaded bundle/source/contract evidence; it does not attest to
+every worker. Missing persistent V2 objects still mean NO-GO, not auto-install.
+
+Disposable-only validation (independent owner/V2 runtime and legacy/canary roles;
+only the exact newly created TEST backend may be terminated):
+
+```powershell
+& '.\venv\Scripts\python.exe' -B scripts/demo/verify_generation_postgres.py --control-bundle --gate-recovery
+& '.\venv\Scripts\python.exe' -B scripts/demo/verify_generation_postgres.py --prepare-day
+```
+
+No persistent role/profile change or deployment installer is included. A future
+rollout must separately authorize a trusted administrator window, durable old-
+credential retirement (LOGIN, table/column DML, sequences, capability EXECUTE),
+exact backend drain/outcome reconciliation and a distinct compatible runtime.
+NOLOGIN/CONNECT revocation alone cannot end old transactions. Unknown writers,
+prepared transactions, uncertain effects, PENDING without proven recovery, or
+missing signed deployment evidence are STOP conditions. Retain the fence across
+interruption; never restore ungated old authority as rollback.
+
+The persistent launcher/profile/registry/capability pins still require a reviewed
+versioned-role transition; changing a username must not omit middleware. Preserve
+generation, fixtures, sessions, user IDs, Django key and pending payloads. Install
+the reviewed bundle explicitly only after fencing/drain, verify catalog/ACL/source
+and reconcile evidence before starting certified workers. All-worker activation
+and PENDING release require a separately approved journalled rollout/recovery
+protocol; ordinary startup remains read-only. No Prepare Day is authorized.
+
+**Trust boundary:** owner/bootstrap/Docker administrators and holders of the new
+runtime credential can issue direct SQL outside middleware. The application gate
+does not prevent that. Protect credential distribution and privileged SQL access;
+an unacceptable trust boundary requires a separately approved DB-enforced design.
+See [B6 checkpoint](../../docs/checkpoints/SALESPERSON_JOURNEY_STAGE_3H4_B6_READINESS_WRITER_ISOLATION.md).
+
+## Stage 3H4-B2: recovery/readiness (isolated only, not deployed)
+
+The current source requires `DEMO_MAINTENANCE_V2`. V2 adds an owner-lifetime
+PostgreSQL lock, signed operation evidence, and atomic release/recovery audit.
+V1 pending state is NOT automatically adopted or upgraded. All gate objects in
+this work exist only in disposable databases. Persistent Demo still lacks them;
+do not deploy/restart it with this source without separate approval.
+
+Normal owner release holds both the owner lifetime lease and exclusive request
+admission. Recovery must acquire both without waiting/taking over, match the
+exact operation/evidence/DB/generation/source, verify HMAC with the protected
+control key, and compare every public table digest and sequence high-water state.
+A live owner, active request, mismatched or missing evidence, changed data or
+sequence state, or an uncertain outcome leaves PENDING. No PID/age-based unlock,
+automatic recovery, new baseline, password rotation or generation change occurs.
+
+This is deliberately gate-only maintenance: the exclusive helper rejects lasting
+public-data changes. If already-admitted work changes the announcement baseline
+before its owner dies, recovery refuses even when that work may be legitimate.
+Independent outcome review is required; no tool blesses or replaces the baseline.
+Prepare Day has an isolated-only H4-B3 signed write-set/outcome protocol below.
+No persistent executor or gate deployment is authorized.
+
+## Stage 3H4-B3: isolated Prepare Day executor
+
+`prepare_day.py` is callable ONLY against the runner's identity-verified,
+UUID-named disposable PostgreSQL database. There is no persistent apply CLI.
+The older `plan.py prepare-day --dry-run` remains diagnostic/read-only; it
+cannot authorize execution. The stronger `make_plan` signs the exact source,
+container/endpoint/database/OID, generation, fixture, actor, date, assignments,
+Visits/requests and full public-row/sequence before-state.
+
+The explicit executor requires that original signed plan, a stable operation
+UUID and an exact `PREPARE DEMO DAY ... PLAN ...` confirmation. Gate V2 retains
+the owner lifetime lease, commits PENDING, drains admitted requests, and rechecks
+all identities and the entire proposed write set under exclusive admission.
+An older same-salesperson/customer IN_PROGRESS Visit blocks the whole batch.
+Only missing PLANNED Visits are inserted; nothing is completed, replaced,
+redated, repriced or reset. Initial fixture evidence is never rewritten.
+
+The authoritative journal is owner-controlled PostgreSQL, separate from public
+business tables, initialization manifests and SalesRequest receipts. Runtime has
+no journal privileges. Its signed phases are PREPARING → ALLOCATED → COMMITTED.
+ID reservations are journalled before row insertion. The final Visit inserts,
+canonical signed result, gate audit and ACTIVE transition commit together.
+Filesystem publication is an exclusive, fsynced, byte-verified copy of the DB
+result, not a basis for deciding whether insertion committed. It is never
+overwritten, reconstructed from live rows or adopted from an unsigned file.
+
+After uncertainty, an operator retains the ORIGINAL plan/operation and explicitly
+confirms `RECOVER DEMO DAY ... PLAN ...`. Recovery must acquire the owner lease
+and exclusive request admission, verify original signed evidence and exact
+before-state (plus a committed ID reservation, if any), and journal its claim.
+Live ownership, changed assignments/data/source/date, missing/tampered evidence,
+or unexplained sequence advancement leaves PENDING for independent review.
+There is no automatic takeover, sequence reset, destructive rollback, new plan
+substitution or gate-only unlock. A crash between nextval and reservation commit
+is deliberately NOT auto-recoverable. A committed result replays across processes
+and republishes a missing copy without inserting again or clearing another gate.
+
+Focused validation (creates/removes only independently verified disposable DB
+and roles; private evidence is written under protected reports):
+
+```powershell
+& '.\venv\Scripts\python.exe' -B scripts/demo/verify_generation_postgres.py --prepare-day
+```
+
+No persistent installer/executor, current-day preparation, reset, generation
+switch, automatic date adjustment or startup seeding is introduced. Persistent
+deployment still requires separate approval, V2/control-journal installation,
+all-worker quiescence/restart proof, backup/recovery review and readiness checks.
+
+The recovery helper is callable ONLY for exact identity-verified disposable test
+databases; there is no persistent recovery executor or installation CLI. Inspect
+the existing Demo read-only without changing it:
+
+```powershell
+& '.\venv\Scripts\python.exe' -B scripts/demo/gate_readiness.py
+```
+
+NO_GO is expected until the separately approved V2 installation/all-worker rollout.
+One matching health response does not prove every worker is gated. New servers
+capture gate code/version at startup in health evidence; old listeners lack it.
+The inspector never authorizes execution or changes objects/grants/state.
+
+Disposable focused validation:
+
+```powershell
+& '.\venv\Scripts\python.exe' -B scripts/demo/verify_generation_postgres.py --lock-capabilities --gate-recovery
+```
+
+See [B2 recovery/deployment contract](../../docs/checkpoints/SALESPERSON_JOURNEY_STAGE_3H4_B2_GATE_RECOVERY_READINESS.md)
+for operator confirmation, crash/uncertainty handling, rollout and rollback gates.
+
+## Stage 3H4-B1: original isolated maintenance design (superseded by V2)
+
+The original B1 source required `DEMO_MAINTENANCE_V1` in addition to the existing
+reference-lock capabilities. **The persistent Demo does not have these gate
+objects. Do not restart/deploy this source there until a separate, approved
+installation and all-worker rollout is implemented and verified.** Its existing
+listener is unchanged. Original PostgreSQL deployment remains prohibited.
+
+`maintenance_gate.py` wraps all Django requests, outside session middleware, in
+one PostgreSQL transaction. Shared admission stays on that business connection
+through view writes and session persistence; failed responses roll back. A
+runtime-read-only control row binds database OID/generation/version. The owner
+commits PENDING before waiting for exclusive transaction admission. New requests
+fail closed without automatic retry; admitted requests must finish first.
+Connection/process loss rolls back its transaction and releases its locks.
+Maintenance failure leaves durable PENDING; there is no recovery/takeover CLI.
+No generation/session/key rotation occurs. Streaming responses and on_commit
+callbacks are unsupported and rejected before commit, since deferred writes
+would escape this boundary. The existing journey uses neither.
+
+Gate creation is available **only** to the exact-identity disposable test helper.
+Startup verifies readiness with SELECTs; it never creates a schema/table,
+changes grants, prepares dates or clears maintenance state. The existing fresh
+installation steps below describe the previous deployment; the new source's
+gate prerequisite requires separate installation approval before using them.
+
+Focused validation (creates/removes only an identity-verified disposable DB and
+independent roles, never writes persistent Demo or production):
+
+```powershell
+& '.\venv\Scripts\python.exe' -B scripts/demo/verify_generation_postgres.py --lock-capabilities --maintenance-gate
+```
+
+The B1 slice did not implement Prepare Day or recovery; later isolated-only
+protocols are documented above. No persistent executor, reset, candidate
+activation or persistent gate installer is provided. See
+[Stage 3H4-B1](../../docs/checkpoints/SALESPERSON_JOURNEY_STAGE_3H4_B1_MAINTENANCE_GATE.md).
+
 Owner-approved B1 infrastructure plus B2-A insert-only synthetic preparation.
 Windows reserves 8800–8899; the approved replacement is **8900**. No Windows
 reservation, firewall, global environment or production settings are changed.
@@ -350,7 +527,7 @@ Read-only/memory-only focused safety validation:
 node --test scripts/demo/generation_client.test.cjs
 ```
 
-There is still no executable reset, candidate creation/promotion, Prepare Day,
+There is still no persistent executable reset, candidate creation/promotion, Prepare Day,
 automatic completion/redating, credential rotation or cleanup operation.
 
 ### B6/B7 reference-lock capabilities

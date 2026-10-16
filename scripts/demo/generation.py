@@ -80,6 +80,8 @@ def install(profile, state):
     if middleware not in chain:
         chain.insert(chain.index("django.contrib.auth.middleware.AuthenticationMiddleware")+1,middleware)
     settings.MIDDLEWARE=chain
+    from scripts.demo.maintenance_gate import install as install_maintenance
+    install_maintenance(profile)
     from django.contrib.auth.signals import user_logged_in
     user_logged_in.connect(bind_login,dispatch_uid="sales-ai-demo-generation-binding",weak=False)
 

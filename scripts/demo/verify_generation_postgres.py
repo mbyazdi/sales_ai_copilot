@@ -23,7 +23,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--only", nargs="+", help="Exact focused test method names; default runs the B3 class.")
     parser.add_argument("--lock-capabilities", action="store_true", help="Install B6 capabilities only in the disposable DB and include their tests.")
+    parser.add_argument("--maintenance-gate", action="store_true", help="Include cross-process B1 maintenance admission tests in this disposable DB.")
+    parser.add_argument("--gate-recovery",action="store_true",help="Include B2 disposable-only recovery tests (also enables B1).")
+    parser.add_argument("--prepare-day",action="store_true",help="Run isolated H4-B3 synthetic Prepare Day tests only.")
+    parser.add_argument("--control-bundle",action="store_true",help="Include H4-B6 read-only readiness and disposable writer retirement tests.")
     args = parser.parse_args()
+    if args.gate_recovery:args.maintenance_gate=True
+    if args.prepare_day:args.lock_capabilities=args.maintenance_gate=True
+    if args.control_bundle:args.lock_capabilities=args.maintenance_gate=True
     import psycopg
     from psycopg import sql
     profile = load_profile()
@@ -32,6 +39,8 @@ def main():
     require(migration_fingerprint() == (50, profile["migration_fingerprint"]), "Migration baseline changed.")
     state = DEFAULT_STATE / "reports" / ("b2b3-" + uuid4().hex)
     state.mkdir()
+    (state/'credentials').mkdir()
+    (state/'credentials/control-token.key').write_text(secrets.token_urlsafe(64),encoding='ascii')
     before = preservation(profile)
     operation = record_before(state / 'before.json', profile, before, purpose='generation-postgres-tests')
     name = "test_stage3h3b3_" + uuid4().hex
@@ -121,8 +130,11 @@ def main():
             require(set(loader.applied_migrations) == set(loader.disk_migrations) and len(loader.disk_migrations) == 50,
                     "Disposable migrations mismatch.")
             from tests_generation_postgres import LiveGenerationTests, seed, endpoint_inventory
-            seed(LiveGenerationTests)
-            if args.lock_capabilities:
+            if args.prepare_day:
+                from tests_prepare_day import PrepareDayTests, seed as seed_preparation
+                seed_preparation(PrepareDayTests,state,identity,name)
+            else:seed(LiveGenerationTests)
+            if args.lock_capabilities and not args.prepare_day:
                 # Existing fixtures otherwise have no grade; C exercises the grade lock without a discount.
                 from apps.customers.models import CustomerGrade, Customer
                 grade = CustomerGrade.objects.create(code="C", name="Capability test grade")
@@ -181,7 +193,18 @@ def main():
             connections.close_all()
             connection.settings_dict.update(USER=RUNTIME, PASSWORD=runtime["password"])
             test_profile = {**profile, "identity": identity, "database": name, "database_oid": oid,
-                            "owner_role":OWNER,"runtime_role":RUNTIME}
+                            "owner_role":OWNER,"runtime_role":RUNTIME,"gate_test_marker":marker}
+            if args.prepare_day:
+                test_profile['capability_owner']=capability_owner
+                registry=dict(identity=identity,database_oid=oid,database=name,snapshot=receipt)
+                path=state/'lock-capabilities.json';write_json(path,registry)
+                path.with_suffix('.sha256').write_text(hashlib.sha256(path.read_bytes()).hexdigest(),encoding='ascii')
+            from scripts.demo.maintenance_gate import install_disposable
+            with psycopg.connect(host="127.0.0.1", port=5433, dbname=name, user=OWNER,
+                                 password=owner["password"], connect_timeout=5) as raw:
+                install_disposable(raw, test_profile)
+                from scripts.demo.prepare_day import install_disposable as install_preparation
+                install_preparation(raw,test_profile)
             write_json(state / "profile.json", test_profile)
             from scripts.demo import generation
             write_json(state / "generation-state.json", generation.initial_registry(test_profile))
@@ -193,11 +216,26 @@ def main():
             call_command("check")
             call_command("makemigrations", check=True, dry_run=True, verbosity=1)
             classes = [LiveGenerationTests]
-            if args.lock_capabilities:
+            if args.maintenance_gate:
+                from tests_maintenance_gate import MaintenanceTests
+                MaintenanceTests.profile = test_profile
+                MaintenanceTests.connection_values = dict(host="127.0.0.1",port=5433,dbname=name,
+                    connect_timeout=5,options="-c statement_timeout=15000 -c lock_timeout=4000")
+                MaintenanceTests.passwords = test_passwords
+                MaintenanceTests.state_dir = state
+                classes += [MaintenanceTests]
+                if args.prepare_day:classes=[PrepareDayTests]
+                if args.gate_recovery:
+                    from tests_gate_recovery import RecoveryTests
+                    classes += [RecoveryTests]
+            if args.lock_capabilities and not args.prepare_day:
                 from tests_lock_capabilities import CapabilitySecurityTests, CapabilityConcurrencyTests
                 classes += [CapabilitySecurityTests, CapabilityConcurrencyTests]
                 from tests_lock_deployment import DeploymentTests
                 classes += [DeploymentTests]
+            if args.control_bundle:
+                from tests_control_bundle import ControlBundleTests
+                classes += [ControlBundleTests]
             methods = {n: cls for cls in classes for n, value in cls.__dict__.items() if n.startswith("test_") and callable(value)}
             if args.only:
                 require(all(n in methods for n in args.only),

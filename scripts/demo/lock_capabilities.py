@@ -27,16 +27,17 @@ def source_sha():
     return value
 
 
-def inspect(conn, *, owner):
+def inspect(conn, *, owner, runtime=None):
     """SELECT-only exact security/body validation, usable by real runtime credentials."""
     source_sha()
+    runtime = runtime or RUNTIME
     roles = conn.execute("SELECT rolname,oid,rolcanlogin,rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls,rolinherit "
-                         "FROM pg_roles WHERE rolname IN (%s,%s) ORDER BY rolname", [owner, RUNTIME]).fetchall()
+                         "FROM pg_roles WHERE rolname IN (%s,%s) ORDER BY rolname", [owner, runtime]).fetchall()
     by_role = {r[0]: r for r in roles}
-    require(owner in by_role and RUNTIME in by_role, "Capability/runtime role is missing.")
+    require(owner in by_role and runtime in by_role, "Capability/runtime role is missing.")
     require(by_role[owner][2:] == (False,) * 7, "Unsafe capability owner flags.")
-    require(by_role[RUNTIME][2:] == (True,) + (False,) * 6, "Unsafe runtime role flags.")
-    owner_oid, runtime_oid = by_role[owner][1], by_role[RUNTIME][1]
+    require(by_role[runtime][2:] == (True,) + (False,) * 6, "Unsafe runtime role flags.")
+    owner_oid, runtime_oid = by_role[owner][1], by_role[runtime][1]
     require(conn.execute("SELECT count(*) FROM pg_auth_members WHERE roleid=%s OR member=ANY(%s)",
                          [owner_oid, [owner_oid, runtime_oid]]).fetchone()[0] == 0, "Unexpected role membership.")
     schema = conn.execute("SELECT oid,nspowner FROM pg_namespace WHERE nspname='sales_ai_locks'").fetchone()
@@ -47,7 +48,7 @@ def inspect(conn, *, owner):
     require(all(g in {owner_oid, runtime_oid} and (g != runtime_oid or (p == 'USAGE' and not grantable))
                 for g,p,grantable in schema_acl), "Unexpected capability schema grants.")
     require(conn.execute("SELECT has_schema_privilege(%s,'sales_ai_locks','USAGE'),"
-        "has_schema_privilege(%s,'sales_ai_locks','CREATE')", [RUNTIME, RUNTIME]).fetchone() == (True, False),
+        "has_schema_privilege(%s,'sales_ai_locks','CREATE')", [runtime, runtime]).fetchone() == (True, False),
         "Runtime schema privileges differ.")
     require(conn.execute("SELECT count(*) FROM pg_class WHERE relnamespace=%s", [schema[0]]).fetchone()[0] == 0,
             "Unexpected relations in capability schema.")
@@ -72,7 +73,7 @@ def inspect(conn, *, owner):
             "WHERE p.oid=%s ORDER BY 1,2", [oid]).fetchall()
         require(all(g in {owner_oid,runtime_oid} and p == 'EXECUTE' and (g != runtime_oid or not grantable)
                     for g,p,grantable in acl), "Unexpected function EXECUTE grants.")
-        require(conn.execute("SELECT has_function_privilege(%s,%s,'EXECUTE')", [RUNTIME,oid]).fetchone()[0],
+        require(conn.execute("SELECT has_function_privilege(%s,%s,'EXECUTE')", [runtime,oid]).fetchone()[0],
                 "Runtime EXECUTE is missing.")
         function_state.append(dict(oid=oid,name=name,body_sha256=hashlib.sha256(body.encode()).hexdigest(),acl=acl))
     columns = []
@@ -81,7 +82,7 @@ def inspect(conn, *, owner):
             "has_column_privilege(%s,c.oid,a.attnum,'UPDATE'),has_any_column_privilege(%s,c.oid,'UPDATE'),c.relowner "
             "FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace JOIN pg_attribute a ON a.attrelid=c.oid "
             "WHERE n.nspname='public' AND c.relname=%s AND a.attnum>0 AND NOT a.attisdropped ORDER BY a.attnum",
-            [owner,owner,RUNTIME,table]).fetchall()
+            [owner,owner,runtime,table]).fetchall()
         require({r[0] for r in rows if r[1]} == set(READ_COLUMNS[table]) and {r[0] for r in rows if r[2]} == {'id'}
                 and all(not r[3] and r[4] != owner_oid for r in rows), "Reference column protection differs.")
         require(conn.execute("SELECT has_table_privilege(%s,%s,'INSERT,DELETE,TRUNCATE,REFERENCES,TRIGGER')",
@@ -149,6 +150,6 @@ def validate_runtime(conn, profile, state, *, owner=PERSISTENT_OWNER):
             "Capability registry checksum mismatch.")
     require(manifest.get('identity') == profile['identity'] and manifest.get('database_oid') == profile['database_oid']
             and manifest.get('database') == profile['database'], "Capability registry identity mismatch.")
-    actual = inspect(conn, owner=owner)
+    actual = inspect(conn, owner=owner, runtime=profile['runtime_role'])
     require(actual == manifest.get('snapshot'), "Capability objects/owner/grants differ from protected registry.")
     return actual

@@ -46,6 +46,8 @@ def preflight(profile, state):
     with connect(profile, state) as conn:
         capabilities = validate_runtime(conn, profile, state)
         fixture_ready(conn,profile,state)
+        from scripts.demo.maintenance_gate import verify_ready
+        verify_ready(conn, profile)
     configure_django(profile, state)
     check_schema(profile)
     return capabilities
@@ -54,6 +56,8 @@ def preflight(profile, state):
 def serve(profile, state):
     port_free()
     capabilities = preflight(profile, state)
+    from scripts.demo.gate_readiness import worker_signature
+    loaded_gate_signature = worker_signature()  # Captured at startup, not recomputed from changed files.
     from django.core.wsgi import get_wsgi_application
     from django.contrib.staticfiles.handlers import StaticFilesHandler
     application = StaticFilesHandler(get_wsgi_application())
@@ -71,6 +75,7 @@ def serve(profile, state):
                 value = dict(identity=profile["identity"], database=DATABASE, role=RUNTIME, pid=os.getpid(), parent_pid=os.getppid(),
                              migration_fingerprint=profile["migration_fingerprint"],
                              capability_version=capabilities['version'], capability_sha256=capabilities['sha256'],
+                             maintenance_gate=loaded_gate_signature,
                              fixtures_ready=fixture.get("identity") == profile["identity"] and fixture.get("phase") == "complete")
                 start_response("200 OK", [("Content-Type", "application/json"), ("Cache-Control", "no-store")])
                 return [json.dumps(value).encode()]
