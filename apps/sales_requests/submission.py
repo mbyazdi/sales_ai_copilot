@@ -12,10 +12,9 @@ from django.db.models import F
 from django.http import Http404
 from django.utils import timezone
 
-from apps.customers.models import Customer, CustomerGrade
-from apps.inventory.models import Inventory
+from apps.core.reference_locks import lock_submission_references
+from apps.customers.models import Customer
 from apps.products.catalog_access import visit_customer_access
-from apps.products.models import Product
 from apps.products.quotes import MAX_QUANTITY
 from apps.visits.models import Visit
 from .basket import BasketConflict, _captured_context, _commercial, _hash, _lines, _read_selection, _totals
@@ -182,14 +181,10 @@ def _lock_commercial(access, lines):
     at the validation boundary; those versioned quotes are point-in-time terms,
     not a lock on future price configuration (or a future external provider).
     """
-    customer = Customer.objects.select_for_update().get(pk=access.customer.pk)
+    lock_submission_references(access.customer.pk, sorted(line.product_id for line in lines))
+    customer = Customer.objects.get(pk=access.customer.pk)
     if not customer.is_active:
         raise PermissionDenied
-    if customer.grade_id:
-        list(CustomerGrade.objects.select_for_update().filter(pk=customer.grade_id))
-    product_ids = sorted(line.product_id for line in lines)
-    list(Product.objects.select_for_update().filter(pk__in=product_ids).order_by("pk"))
-    list(Inventory.objects.select_for_update().filter(product_id__in=product_ids).order_by("product_id"))
     return replace(access, customer=customer)
 
 

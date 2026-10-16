@@ -10,13 +10,14 @@ const key='visit-completion:v1:1:C:14';
 const request=status=>status?{id:7,status,revision:3,number:status==='SUBMITTED'?'SR-00000007':null}:null;
 const state=(selected=null,status='IN_PROGRESS',recorded=null)=>({version:1,customer:{code:'C'},visit:{id:14,status},request:request(selected),can_complete:status==='IN_PROGRESS',recorded_result:recorded});
 const result=(payload,selected=null)=>({version:1,success:true,customer:{code:'C'},visit:{id:14,status:'COMPLETED'},command_uuid:payload.command_uuid,completed_at:'2026-10-15T09:00:00+00:00',request:request(selected),acknowledgement:selected==='SUBMITTED'?{id:9,sales_request_id:7,actor_id:2}:null});
-function fixture({initial=state(),read,mutation,storage=new Map(),storageError=false,setError=false,csrf='masked-csrf',apiUrl='/api/visits/v1/visits/14/completion/'}={}){
+function fixture({initial=state(),read,mutation,storage=new Map(),storageError=false,setError=false,csrf='masked-csrf',apiUrl='/api/visits/v1/visits/14/completion/',demoGeneration}={}){
  const ids=['main-content','finishNotice','finishDialog','finishForm','finishInitialState','finishPrepare','finishConfirm','finishCancel','finishRetry','finishRecover','finishRefresh','finishRecovery','finishReady','finishSuccess','finishUnavailable','finishDraftWarning','finishConfirmDraft','finishRequestText','finishResultText','finishSuccessTitle','finishDialogNotice','badge'];
  const els=Object.fromEntries(ids.map(id=>[id,new Element()]));const root=els['main-content'];root.dataset={actorId:'1',customerCode:'C',visitId:'14',apiUrl};
  els.finishInitialState.textContent=JSON.stringify(initial);els.finishForm.querySelector=()=>csrf?{value:csrf}:null;
  let current=initial,serial=0;const calls=[],events={};
  const window={location:{origin:'http://localhost'},crypto:{randomUUID:()=> '00000000-0000-4000-8000-'+String(++serial).padStart(12,'0')},sessionStorage:{getItem:k=>{if(storageError)throw Error('unavailable');return storage.get(k);},setItem:(k,v)=>{if(setError)throw Error('unavailable');storage.set(k,v);},removeItem:k=>storage.delete(k)},addEventListener:(name,fn)=>events[name]=fn};
  const fetch=async(url,options)=>{calls.push({url,options});if(options.method==='GET'){const response=read?await read(current):{status:200,body:current};return{ok:response.status<400,status:response.status,json:async()=>response.body};}const payload=JSON.parse(options.body);const response=mutation?await mutation(payload):{status:200,body:result(payload,current.request?.status)};return{status:response.status,json:async()=>response.body};};
+ window.DemoGeneration=demoGeneration;
  vm.runInNewContext(source,{window,document:{querySelector:s=>s==='[data-visit-finish]'?root:s==='.sr-context [data-status]'?els.badge:null,getElementById:id=>els[id]},fetch,URL,URLSearchParams});
  return{els,calls,storage,events,setState:value=>{current=value;},confirm:()=>els.finishForm.listeners.submit({preventDefault(){}})};
 }
@@ -33,8 +34,10 @@ test('pending confirmation never claims success, double submit and escape are bl
  let resolve;const f=fixture({mutation:()=>new Promise(r=>resolve=r)});await settle();f.els.finishPrepare.click();const applying=f.confirm();await f.confirm();assert(f.els.finishSuccess.hidden);assert.equal(posts(f).length,1);let prevented=false;f.els.finishDialog.listeners.cancel({preventDefault(){prevented=true;}});assert(prevented);assert(f.els.finishCancel.disabled);resolve({status:200,body:result(JSON.parse(posts(f)[0].options.body))});await applying;assert(!f.els.finishSuccess.hidden);
 });
 test('uncertain POST preserves exact wire payload across reload and retry requires explicit confirmation',async()=>{
- const f=fixture({mutation:()=>{throw Error('lost response');}});await settle();f.els.finishPrepare.click();await f.confirm();const wire=posts(f)[0].options.body;assert.equal(f.storage.size,1);assert.match(f.els.finishNotice.textContent,/خودکار/);
- const reload=fixture({storage:f.storage});await settle();assert.equal(posts(reload).length,0);assert(reload.els.finishPrepare.disabled);reload.els.finishRetry.click();assert(reload.els.finishDialog.open);assert.equal(posts(reload).length,0);await reload.confirm();assert.equal(posts(reload)[0].options.body,wire);assert.equal(reload.storage.size,0);
+ const generation=proof=>({bind:c=>{c.demoGeneration={proof};},headers:c=>({'X-Demo-Generation-Proof':c.demoGeneration?.proof||''})});
+ const f=fixture({demoGeneration:generation('g1'),mutation:()=>{throw Error('lost response');}});await settle();f.els.finishPrepare.click();await f.confirm();const wire=posts(f)[0].options.body;assert.equal(f.storage.size,1);assert.match(f.els.finishNotice.textContent,/خودکار/);
+ const reload=fixture({storage:f.storage,demoGeneration:generation('g2')});await settle();assert.equal(posts(reload).length,0);assert(reload.els.finishPrepare.disabled);reload.els.finishRetry.click();assert(reload.els.finishDialog.open);assert.equal(posts(reload).length,0);await reload.confirm();assert.equal(posts(reload)[0].options.body,wire);assert.equal(reload.storage.size,0);
+ assert.equal(posts(reload)[0].options.headers['X-Demo-Generation-Proof'],'g1');
 });
 test('GET recovery recognizes matching durable receipt without POST',async()=>{
  const f=fixture({mutation:()=>{throw Error('lost');}});await settle();f.els.finishPrepare.click();await f.confirm();const saved=JSON.parse(f.storage.get(key)),body=result(JSON.parse(saved.wire),'DRAFT');

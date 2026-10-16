@@ -10,17 +10,27 @@ class Element {
 const settle=()=>new Promise(r=>setImmediate(r));
 const quote={base_unit_price:'105',final_unit_price:'95',discount_percentage:'10',line_discount:'30',line_total:'285'};
 function state(status='DRAFT',issues=[]){return{version:1,currency:'TOMAN',customer:{code:'C'},visit:{id:14},request:{id:9,revision:status==='DRAFT'?1:2,status,number:status==='SUBMITTED'?'SR-9':null,submitted_at:status==='SUBMITTED'?'2026-10-15T00:00:00Z':null},item_count:1,total_units:3,lines:[{id:20,quantity:3,product_snapshot:{name:'<محصول>'},pricing_snapshot:quote,current:{inventory:{inventory_state:'AVAILABLE',available_quantity:8}},eligibility_snapshot:{inventory_state:'AVAILABLE',available_quantity:8}}],saved_totals:status==='DRAFT'?{base:'315',discount:'30',final:'285'}:undefined,totals:status==='SUBMITTED'?{base:'315',discount:'30',final:'285'}:undefined,prepared_message_snapshot:status==='SUBMITTED'?'درخواست فروش ثبت شد.':undefined,review_fingerprint:'a'.repeat(64),can_submit:status==='DRAFT'&&!issues.length,validation:{issues}};}
-function fixture({mode='review',initial=state(),mutation,storage=new Map(),storageFailure=false,readError=false}={}){
+function fixture({mode='review',initial=state(),mutation,storage=new Map(),storageFailure=false,readError=false,demoGeneration}={}){
  const ids=['main-content','requestNotice','requestLines','requestCount','requestTotals','requestBase','requestDiscount','requestFinal','requestIssues','requestIssueList','requestRecovery','requestPrepare','requestRefresh','requestRecover','requestRetry','requestConfirm','requestCancel','requestConfirmDialog','requestConfirmForm','confirmDescription','requestConfirmNotice','requestInitialState','requestCopy','requestCustomerMessage'];
  const els=Object.fromEntries(ids.map(id=>[id,new Element()]));const root=els['main-content'];root.dataset={requestPage:mode,actorId:'1',customerCode:'C',visitId:'14',catalogContext:'signed-context',reviewUrl:'/api/sales-requests/v1/visits/14/review/',submitUrl:'/api/sales-requests/v1/visits/14/submit/',resultUrl:'/customers/C/visits/14/sales-request/result/'};
  els.requestConfirmForm.querySelector=()=>({value:'csrf-masked'});els.requestInitialState.textContent=JSON.stringify(initial);els.requestCustomerMessage.value='متن ذخیره‌شده برای مشتری';
  const calls=[],navigation=[],copied=[];let current=initial,serial=0;
  const window={location:{origin:'http://localhost',assign:url=>navigation.push(url)},crypto:{randomUUID:()=>`00000000-0000-4000-8000-${String(++serial).padStart(12,'0')}`},sessionStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>{if(storageFailure)throw Error('storage denied');storage.set(k,v);},removeItem:k=>storage.delete(k)}};
  const fetch=async(url,options)=>{calls.push({url,options});if(options.method==='GET'){if(readError)throw Error('offline');return{ok:true,status:200,json:async()=>current};}const response=await(mutation?mutation(JSON.parse(options.body)): {status:201,body:state('SUBMITTED')});return{ok:response.status<400,status:response.status,json:async()=>response.body};};
+ window.DemoGeneration=demoGeneration;
  vm.runInNewContext(source,{window,document:{querySelector:()=>root,getElementById:id=>els[id],createElement:tag=>new Element(tag)},navigator:{clipboard:{writeText:async text=>copied.push(text)}},fetch,URL,URLSearchParams,Intl});
  return{els,calls,storage,navigation,copied,setState:body=>{current=body;},confirm:()=>els.requestConfirmForm.listeners.submit({preventDefault(){}})};
 }
 const posts=f=>f.calls.filter(c=>c.options.method==='POST');
+
+test('Demo submission retry retains original generation proof across reload',async()=>{
+ const generation=proof=>({bind:c=>{c.demoGeneration={proof};},headers:c=>({'X-Demo-Generation-Proof':c.demoGeneration?.proof||''})});
+ const first=fixture({demoGeneration:generation('g1'),mutation:()=>{throw Error('network');}});
+ await settle();first.els.requestPrepare.click();await first.confirm();const wire=posts(first)[0].options.body;
+ const reload=fixture({storage:first.storage,demoGeneration:generation('g2')});await settle();
+ assert.equal(posts(reload).length,0);reload.els.requestRetry.click();await reload.confirm();
+ assert.equal(posts(reload)[0].options.body,wire);assert.equal(posts(reload)[0].options.headers['X-Demo-Generation-Proof'],'g1');
+});
 test('read uses GET, shows authoritative prices/counts, never submits',async()=>{const f=fixture();await settle();assert(!f.els.requestPrepare.disabled);assert.match(f.els.requestFinal.textContent,/۲۸۵/);assert.equal(posts(f).length,0);assert.equal(f.els.requestLines.children[0].children[0].children[0].textContent,'<محصول>');});
 test('compact line keeps quantity/unit/final visible and retains supporting values in native disclosure',async()=>{
  const text=e=>e.textContent+e.children.map(text).join(' ');

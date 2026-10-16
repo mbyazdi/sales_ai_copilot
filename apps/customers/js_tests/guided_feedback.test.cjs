@@ -27,7 +27,7 @@ function history({status = 'IN_PROGRESS', events = [], request = null, page = 1,
 function success(payload, replay = false) {
     return {status: 201, replay, body: {version: 1, customer: {code: 'C'}, visit: {id: 14}, feedback: {id: 7, product_id: 1, recommendation_id: payload.recommendation_id, event_type: 'REJECTED', action: payload.action, reason_code: payload.reason_code}}};
 }
-function fixture({read = () => history(), post = payload => success(payload), storage = new Map()} = {}) {
+function fixture({read = () => history(), post = payload => success(payload), storage = new Map(), demoGeneration} = {}) {
     const ids = ['guidedCatalog','feedbackDialog','feedbackForm','feedbackReason','feedbackConfirm','feedbackCancel','feedbackMessage','feedbackRecovery','feedbackResume','feedbackProduct','feedbackReasonRow','feedbackTitle','feedbackDescription','feedbackNotice'];
     const elements = Object.fromEntries(ids.map(id => [id, new Element()]));
     elements.guidedCatalog.dataset = {actorId: '1', customerCode: 'C', visitId: '14'};
@@ -42,6 +42,7 @@ function fixture({read = () => history(), post = payload => success(payload), st
         const status = data.status || 200;
         return {status, ok: status < 400, headers: {get: () => data.replay ? 'true' : 'false'}, json: async () => data.body || data};
     };
+    window.DemoGeneration=demoGeneration;
     vm.runInNewContext(source,{window, document: {getElementById: id => elements[id], createElement: () => new Element()}, fetch, URL, URLSearchParams});
     return {elements, calls, storage, load: window.GuidedFeedback.load, setBasket: window.GuidedFeedback.setBasket,
         submit: () => elements.feedbackForm.listeners.submit({preventDefault() {}})};
@@ -105,10 +106,12 @@ test('ambiguous network failure never auto-retries; manual retry preserves entir
     await f.submit();assert.equal(posts(f).length,2);assert.equal(posts(f)[0].options.body,posts(f)[1].options.body);assert.match(f.elements.feedbackMessage.textContent,/نتیجه قبلی/);
 });
 test('reload restores uncertain command without POST and reuses old signed context', async () => {
-    const storage=new Map(),first=fixture({storage,post:()=>{throw Error('Network');}}),t=target();await first.load(context,[t]);t.fields.later.click();await first.submit();
+    const generation=proof=>({bind:c=>{c.demoGeneration={proof};},headers:c=>({'X-Demo-Generation-Proof':c.demoGeneration?.proof||''})});
+    const storage=new Map(),first=fixture({storage,demoGeneration:generation('g1'),post:()=>{throw Error('Network');}}),t=target();await first.load(context,[t]);t.fields.later.click();await first.submit();
     const original=posts(first)[0].options.body;
-    const resumed=fixture({storage}),other=target();await resumed.load({...context,catalogContext:'new-context'},[other]);
+    const resumed=fixture({storage,demoGeneration:generation('g2')}),other=target();await resumed.load({...context,catalogContext:'new-context'},[other]);
     assert.equal(posts(resumed).length,0);resumed.elements.feedbackResume.click();await resumed.submit();assert.equal(posts(resumed)[0].options.body,original);
+    assert.equal(posts(resumed)[0].options.headers['X-Demo-Generation-Proof'],'g1');
 });
 test('selected-product conflict disables actions and never reports success', async () => {
     const f=fixture({post:()=>({status:409,body:{code:'PRODUCT_ALREADY_SELECTED'}})}),t=target();await f.load(context,[t]);t.fields.later.click();await f.submit();

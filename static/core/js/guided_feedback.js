@@ -155,6 +155,7 @@
                     payload: {customer_code: root.dataset.customerCode, recommendation_id: choice.target.recommendationId,
                         action: code === 'LATER' ? 'LATER' : 'REJECTED', reason_code: code, note: '', command_uuid: window.crypto.randomUUID(),
                         catalog_context: state.context.catalogContext, expected_request_revision: state.request?.revision ?? null}};
+                window.DemoGeneration?.bind(pending);
                 window.sessionStorage.setItem(key, JSON.stringify(pending));
             } catch (_) { pending = null; message.textContent = 'آماده‌سازی فرمان انجام نشد؛ تنظیمات مرورگر را بررسی کنید.'; return; }
         }
@@ -167,7 +168,7 @@
             command.sent = true;
             window.sessionStorage.setItem(key, JSON.stringify(command));
             const url = endpoint(state.context);
-            const response = await fetch(url.pathname, {method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRFToken': csrf}, cache: 'no-store', body: JSON.stringify(command.payload)});
+            const response = await fetch(url.pathname, {method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRFToken': csrf, ...window.DemoGeneration?.headers(command)}, cache: 'no-store', body: JSON.stringify(command.payload)});
             const data = await response.json();
             if (response.status === 201) {
                 const feedback = data.feedback;

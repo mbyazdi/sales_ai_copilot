@@ -15,7 +15,7 @@ function state({lines=[],revision=lines.length?1:null,editable=true,valid=true}=
  current_quote:{valid,items:lines.map(l=>({product_id:l.product_id,quantity:l.quantity,quote:{quantity:l.quantity},inventory:{can_add:valid,catalog_visible:true,available_quantity:8},reason_code:valid?null:'PRICE_UNAVAILABLE'}))}};
 }
 function line(id=1,quantity=3,source='RECOMMENDATION'){return {id:20+id,product_id:id,quantity,selection_source:source,product_snapshot:{name:'محصول ذخیره‌شده'}};}
-function fixture({initial=state(),mutation,quote,readError=false,readBasket,storage=new Map(),feedbackPending=false,receipt}={}){
+function fixture({initial=state(),mutation,quote,readError=false,readBasket,storage=new Map(),feedbackPending=false,receipt,demoGeneration}={}){
  const ids=['basketPanel','guidedCatalog','basketDialog','basketForm','basketNotice','basketRecovery','basketSummary','basketGuidance','basketLines','basketRefresh','basketTitle','basketDescription','basketQuoteTotal','basketMessage','basketConfirm','basketCancel','basketStatus','basketRetryCommand','basketReview'];
  const els=Object.fromEntries(ids.map(id=>[id,new Element()]));els.guidedCatalog.dataset={actorId:'1',customerCode:'C',visitId:'14'};els.basketForm.querySelector=()=>({value:els.csrf===undefined?'masked-csrf':els.csrf});
  let current=initial,serial=0;const calls=[],feedback=[];
@@ -30,6 +30,7 @@ function fixture({initial=state(),mutation,quote,readError=false,readBasket,stor
   }else{const payload=JSON.parse(options.body);const result=await(mutation?mutation(payload,options):{body:state({lines:options.method==='DELETE'?[]:[line(payload.product_id||1,payload.quantity)],revision:(payload.expected_request_revision??0)+1}),status:options.method==='POST'?201:200});body=result.body;status=result.status; if(status<300)current=body;}
   return {ok:status<400,status,json:async()=>body,headers:{get:()=>null}};
  };
+ window.DemoGeneration=demoGeneration;
  vm.runInNewContext(source,{window,document:{getElementById:id=>els[id],createElement:()=>new Element()},fetch,URL,URLSearchParams,Intl});
  return {els,calls,storage,feedback,load:window.GuidedBasket.load,quotes:window.GuidedBasket.quotes,refresh:window.GuidedBasket.refresh,
   confirm:()=>els.basketForm.listeners.submit({preventDefault(){}}),setCurrent:data=>{current=data;}};
@@ -121,8 +122,10 @@ test('no success before server response and double confirmation cannot duplicate
  let resolve;const f=fixture({mutation:p=>new Promise(r=>{resolve=()=>r({body:state({lines:[line(1,p.quantity)]}),status:201});})}),t=await ready(f);t.fields.quantity.value='3';await t.fields.add.click();f.confirm();f.confirm();assert.equal(mutations(f).length,1);assert(t.fields.add.disabled);assert(t.fields.decision.hidden);resolve();await settle();assert(!t.fields.decision.hidden);
 });
 test('uncertain command survives reload, uses original context/UUID/payload, and never auto-retries',async()=>{
- const storage=new Map(),f=fixture({storage,mutation:()=>{throw Error('network');}}),t=await ready(f);t.fields.quantity.value='3';await t.fields.add.click();f.confirm();await settle();const original=mutations(f)[0].options.body;assert.equal(mutations(f).length,1);assert(!f.els.basketRecovery.hidden);
- const g=fixture({storage}),p=target();await g.load({catalogContext:'new-token'},[p]);g.quotes([availability()]);assert.equal(mutations(g).length,0);assert(p.fields.add.disabled);g.els.basketRetryCommand.click();g.confirm();await settle();assert.equal(mutations(g)[0].options.body,original);assert.equal(storage.size,0);
+ const generation=proof=>({bind:c=>{c.demoGeneration={proof};},headers:c=>({'X-Demo-Generation-Proof':c.demoGeneration?.proof||''})});
+ const storage=new Map(),f=fixture({storage,demoGeneration:generation('g1'),mutation:()=>{throw Error('network');}}),t=await ready(f);t.fields.quantity.value='3';await t.fields.add.click();f.confirm();await settle();const original=mutations(f)[0].options.body;assert.equal(mutations(f).length,1);assert(!f.els.basketRecovery.hidden);
+ const g=fixture({storage,demoGeneration:generation('g2')}),p=target();await g.load({catalogContext:'new-token'},[p]);g.quotes([availability()]);assert.equal(mutations(g).length,0);assert(p.fields.add.disabled);g.els.basketRetryCommand.click();g.confirm();await settle();assert.equal(mutations(g)[0].options.body,original);assert.equal(storage.size,0);
+ assert.equal(mutations(g)[0].options.headers['X-Demo-Generation-Proof'],'g1');
 });
 test('receipt recovery is GET-only and refreshes current rather than replayed old state',async()=>{
  const storage=new Map(),f=fixture({storage,mutation:()=>{throw Error('network');}}),t=await ready(f);t.fields.quantity.value='3';await t.fields.add.click();f.confirm();await settle();const command=JSON.parse([...storage.values()][0]);

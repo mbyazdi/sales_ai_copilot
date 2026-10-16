@@ -120,11 +120,12 @@
         event.preventDefault();if(sending||!plan)return;
         const command=pending||plan,retry=Boolean(pending),csrf=form.querySelector('input[name="csrfmiddlewaretoken"]').value;
         if(!csrf) {el('requestConfirmNotice').textContent='نشست معتبر نیست؛ صفحه را تازه کنید.';return;}
+        if(!pending)window.DemoGeneration?.bind(command);
         try {window.sessionStorage.setItem(key,JSON.stringify(command));pending=command;}
         catch(_) {el('requestConfirmNotice').textContent='ذخیره فرمان انجام نشد؛ هیچ درخواستی ارسال نشد.';return;}
         sending=true;sync();el('requestConfirmNotice').textContent='در حال ثبت درخواست…';
         try {
-            const response=await fetch(endpoint(root.dataset.submitUrl,'submit'),{method:'POST',credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json','Content-Type':'application/json','X-CSRFToken':csrf},body:command.wire});
+            const response=await fetch(endpoint(root.dataset.submitUrl,'submit'),{method:'POST',credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json','Content-Type':'application/json','X-CSRFToken':csrf,...window.DemoGeneration?.headers(command)},body:command.wire});
             const body=await response.json();
             if(response.status===201) {
                 valid(body);

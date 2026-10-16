@@ -122,6 +122,7 @@
         const command = plan, retry = Boolean(pending);
         if (!retry) {
             try {
+                window.DemoGeneration?.bind(command);
                 const envelope = JSON.stringify(command);
                 window.sessionStorage.setItem(key,envelope);
                 if (window.sessionStorage.getItem(key) !== envelope) throw Error('Storage failed');
@@ -137,7 +138,7 @@
             const csrf = el('finishForm').querySelector('[name=csrfmiddlewaretoken]')?.value;
             if (!csrf) throw Error('Missing CSRF');
             const response = await fetch(endpoint(),{method:'POST',credentials:'same-origin',cache:'no-store',
-                headers:{Accept:'application/json','Content-Type':'application/json','X-CSRFToken':csrf},body:command.wire});
+                headers:{Accept:'application/json','Content-Type':'application/json','X-CSRFToken':csrf,...window.DemoGeneration?.headers(command)},body:command.wire});
             const body = await response.json();
             if (response.status === 200) {
                 validResult(body);

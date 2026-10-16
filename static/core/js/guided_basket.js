@@ -214,6 +214,7 @@
         const csrf = form.querySelector('input[name="csrfmiddlewaretoken"]').value;
         if (!csrf) { el('basketMessage').textContent = 'نشست صفحه معتبر نیست؛ صفحه را تازه کنید.'; return; }
         const command = pending || plan, uncertain = Boolean(command.sent);
+        if (!pending) window.DemoGeneration?.bind(command);
         try { window.sessionStorage.setItem(key, JSON.stringify(command)); pending = command; }
         catch (_) { el('basketMessage').textContent = 'ذخیره امن فرمان انجام نشد؛ هیچ تغییری ارسال نشد.'; return; }
         sending = true; el('basketConfirm').disabled = true; el('basketCancel').disabled = true; sync(); if (data) showSummary();
@@ -221,7 +222,7 @@
         try {
             command.sent = true; window.sessionStorage.setItem(key, JSON.stringify(command));
             const response = await fetch(endpoint(command.url), {method: command.method, credentials: 'same-origin', cache: 'no-store',
-                headers: {'Accept': 'application/json', 'Content-Type': 'application/json', 'X-CSRFToken': csrf}, body: JSON.stringify(command.payload)});
+                headers: {'Accept': 'application/json', 'Content-Type': 'application/json', 'X-CSRFToken': csrf, ...window.DemoGeneration?.headers(command)}, body: JSON.stringify(command.payload)});
             const body = await response.json();
             if (response.status === (command.method === 'POST' ? 201 : 200)) {
                 confirmed(command, body);

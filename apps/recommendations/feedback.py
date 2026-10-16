@@ -6,6 +6,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError, transaction
 from django.http import Http404
 
+from apps.core.reference_locks import lock_feedback_references
 from apps.products.catalog_access import visit_customer_access
 from apps.sales_requests.models import SalesRequest, SalesRequestLine, SalesRequestMutationReceipt
 from apps.visits.models import Visit
@@ -64,7 +65,8 @@ def record_feedback(user, visit_id, command):
             revision = request.revision if request else None
             if command["expected_request_revision"] != revision:
                 raise FeedbackConflict("REVISION_CONFLICT", "وضعیت درخواست تغییر کرده است؛ وضعیت فعلی را دوباره بررسی کنید.")
-            recommendation = CustomerRecommendation.objects.select_for_update().select_related("product").filter(
+            lock_feedback_references(access.customer.pk, command["recommendation_id"])
+            recommendation = CustomerRecommendation.objects.select_related("product").filter(
                 pk=command["recommendation_id"], customer=access.customer,
             ).first()
             if recommendation is None:
