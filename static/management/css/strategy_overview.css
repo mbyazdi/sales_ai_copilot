@@ -1,0 +1,66 @@
+/* M-01-B only. The approved M-04 styling and shared shell are unchanged. */
+.strategy-overview .strategy-main { display: grid; gap: 14px; }
+.strategy-overview .strategy-heading, .strategy-overview .strategy-notice { margin-bottom: 0; }
+.strategy-overview #overviewContent { display: grid; gap: 16px; }
+.strategy-overview .strategy-sidebar nav { grid-template-columns: 1fr; }
+.strategy-overview .strategy-heading > a { white-space: nowrap; font-size: 13px; }
+.strategy-overview .overview-surface { min-width: 0; padding: 18px; border: 1px solid #dce5eb; border-radius: 14px; background: #fff; }
+.strategy-overview .overview-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.strategy-overview .overview-kpi { min-width: 0; padding: 16px; background: #fff; border: 1px solid #dce5eb; border-radius: 12px; }
+.strategy-overview .overview-kpi h2 { font-size: 13px; color: #526a7c; font-weight: 400; }
+.strategy-overview .overview-kpi p { font-size: 21px; font-weight: 700; color: #233e51; margin: 8px 0; overflow-wrap: anywhere; }
+.strategy-overview .overview-kpi span { font-size: 12px; color: #526a7c; }
+.strategy-overview .overview-kpi-active { background: #edf7f2; border-color: #bbd8cc; }
+.strategy-overview .overview-kpi-active p { color: #21614e; }
+.strategy-overview .overview-flow ol { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; padding: 0; margin: 14px 0 0; list-style: none; }
+.strategy-overview .overview-flow li { min-width: 0; padding: 12px; background: #f5f8fa; border-radius: 10px; border-inline-start: 3px solid #7da99a; }
+.strategy-overview .overview-flow strong { display: block; font-size: 14px; }
+.strategy-overview .overview-flow li span { display: block; color: #526a7c; font-size: 12px; margin-top: 6px; }
+.strategy-overview .overview-policy-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; }
+.strategy-overview .overview-rule-list { padding: 0; margin: 12px 0; list-style: none; display: grid; gap: 8px; }
+.strategy-overview .overview-rule { display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #e1e8ee; border-radius: 9px; padding: 12px; min-width: 0; }
+.strategy-overview .overview-rule > div { min-width: 0; }
+.strategy-overview .overview-rule h3 { font-size: 14px; overflow-wrap: anywhere; }
+.strategy-overview .overview-rule p { font-size: 12px; color: #526a7c; margin: 4px 0 0; }
+.strategy-overview .overview-rule > strong { background: #edf5f1; color: #21614e; border-radius: 8px; padding: 6px 10px; font-size: 14px; white-space: nowrap; }
+.strategy-overview .overview-empty { background: #f5f8fa; color: #526a7c; font-size: 13px; padding: 12px; border-radius: 9px; }
+.strategy-overview .overview-help summary { cursor: pointer; color: #315971; min-height: 44px; padding-block: 8px; font-size: 13px; }
+.strategy-overview .overview-help p { font-size: 13px; color: #526a7c; }
+.strategy-overview .overview-influence { display: flex; justify-content: space-between; align-items: center; gap: 12px; background: #f4f8fa; padding: 12px; border-radius: 10px; margin-top: 12px; }
+.strategy-overview .overview-influence h3, .strategy-overview .overview-subtitle { font-size: 14px; }
+.strategy-overview .overview-influence p { margin-bottom: 0; }
+.strategy-overview .overview-influence > strong { font-size: 21px; color: #245f61; white-space: nowrap; }
+.strategy-overview .overview-footnote { font-size: 13px; color: #526a7c; border-top: 1px solid #e1e8ee; padding-top: 12px; margin-bottom: 0; }
+.strategy-overview .overview-readiness dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 12px 0; }
+.strategy-overview .overview-readiness dt { font-size: 13px; color: #526a7c; }
+.strategy-overview .overview-readiness dd { margin: 6px 0 0; font-size: 14px; }
+.strategy-overview .overview-impact { padding: 4px 0; }
+.strategy-overview .overview-impact-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.strategy-overview .overview-impact-cards article { background: #f0f4f7; border: 1px dashed #c3d1dc; padding: 14px; border-radius: 10px; }
+.strategy-overview .overview-impact-cards h3 { font-size: 13px; }
+.strategy-overview .overview-impact-cards p { margin: 8px 0 0; color: #526a7c; font-size: 14px; }
+.strategy-overview .overview-history { list-style: none; padding: 0; margin: 12px 0; display: grid; gap: 8px; }
+.strategy-overview .overview-history li { border: 1px solid #e1e8ee; border-radius: 9px; padding: 12px; display: flex; justify-content: space-between; align-items: start; gap: 10px; }
+.strategy-overview .overview-history h3 { font-size: 14px; }
+.strategy-overview .overview-history p { font-size: 12px; color: #526a7c; margin: 5px 0 0; }
+.strategy-overview .overview-history-tags { display: flex; gap: 6px; flex-wrap: wrap; justify-content: end; }
+.strategy-overview .overview-footer { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.strategy-overview .overview-footer p { flex: 1 1 280px; margin: 0; }
+.strategy-overview #overviewHistoryError { color: #8b3145; font-size: 13px; }
+@media (max-width: 1100px) {
+    .strategy-overview .overview-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .strategy-overview .overview-flow ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .strategy-overview .overview-policy-grid { grid-template-columns: minmax(0, 1fr); }
+    .strategy-overview .overview-readiness dl { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+}
+@media (max-width: 760px) {
+    .strategy-overview .strategy-sidebar nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .strategy-overview .strategy-heading { flex-wrap: wrap; }
+    .strategy-overview .strategy-heading > a { min-height: 44px; }
+    .strategy-overview .overview-kpi { padding: 12px; }
+    .strategy-overview .overview-kpi p { font-size: 18px; }
+    .strategy-overview .overview-surface { padding: 14px; }
+    .strategy-overview .overview-impact-cards { grid-template-columns: minmax(0, 1fr); }
+    .strategy-overview .overview-history li { flex-wrap: wrap; }
+    .strategy-overview .overview-history-tags { justify-content: start; }
+}

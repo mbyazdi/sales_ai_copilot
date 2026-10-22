@@ -14,7 +14,7 @@ class Element {
     append(element) { this.children.push(element); }
     click() { if (!this.disabled) this.listeners.click?.({preventDefault() {}}); }
 }
-async function fixture({recommended = true, selected = false, status = 'IN_PROGRESS', failed = '', stale = false, visit = '19', events = [], conflict = false, savedCommand = null} = {}) {
+async function fixture({recommended = true, selected = false, status = 'IN_PROGRESS', failed = '', stale = false, visit = '19', events = [], conflict = false, savedCommand = null, freshEntry = false} = {}) {
     const ids = ['productFeedback','productFeedbackStatus','productSelection','feedbackDialog','feedbackForm','feedbackReason',
         'feedbackConfirm','feedbackCancel','feedbackMessage','feedbackRecovery','feedbackResume','feedbackProduct','feedbackReasonRow','feedbackTitle','feedbackDescription','feedbackNotice','productFeedbackEmptyHistory'];
     const elements = Object.fromEntries(ids.map(id => [id, new Element()]));
@@ -30,7 +30,8 @@ async function fixture({recommended = true, selected = false, status = 'IN_PROGR
     elements.feedbackForm.querySelector = () => ({value: 'valid-masked-csrf'});
     const storage = new Map(), calls = [];
     if (savedCommand) storage.set('guided-feedback:v1:1:C0003:19', JSON.stringify(savedCommand));
-    const window = {location: new URL('http://localhost/products/PHI002/?catalog_context=signed-entry'),
+    const window = {location: new URL('http://localhost/products/PHI002/' + (freshEntry ? '' : '?catalog_context=signed-entry')),
+        history: {replaceState(_state, _title, value) { window.location = new URL(value, window.location); }},
         crypto: {randomUUID: () => '00000000-0000-4000-8000-000000000001'},
         sessionStorage: {getItem: key => storage.get(key), setItem: (key,value) => storage.set(key,value), removeItem: key => storage.delete(key)}};
     const context = {version: 1, customer: {code: 'C0003'}, visit: {id: 19, status}};
@@ -47,12 +48,18 @@ async function fixture({recommended = true, selected = false, status = 'IN_PROGR
         else body = {...context, editable: status === 'IN_PROGRESS', request: {id: 1, revision: 7, status: 'DRAFT'}, lines: selected ? [{product_id: 6, selection_source: recommended ? 'RECOMMENDATION' : 'ORDINARY'}] : []};
         return {ok: !isFailure, status: isFailure ? 403 : options.method === 'POST' ? 201 : 200, headers: {get: () => null}, json: async () => body};
     };
-    const environment = {window, document: {getElementById: id => elements[id], createElement: () => new Element()}, fetch, URL, URLSearchParams};
+    const environment = {window, document: {getElementById: id => elements[id], createElement: () => new Element(), querySelectorAll: () => []}, fetch, URL, URLSearchParams};
     vm.runInNewContext(feedback, environment);
     vm.runInNewContext(source, environment);
     await new Promise(resolve => setImmediate(resolve));
-    return {elements, fields, calls, storage, submit: () => elements.feedbackForm.listeners.submit({preventDefault() {}})};
+    return {elements, fields, calls, storage, window, submit: () => elements.feedbackForm.listeners.submit({preventDefault() {}})};
 }
+
+test('standalone Product Detail retains its freshly issued context before reload', async () => {
+    const f = await fixture({freshEntry: true});
+    assert.equal(f.window.location.searchParams.get('catalog_context'), 'signed-entry');
+    assert(f.calls.every(call => call.options.method === 'GET'));
+});
 
 test('recommended Product Detail binds real shared feedback and signed context using zero-write reads', async () => {
     const f = await fixture();

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}نمای کلی راهبرد فروش | مدیریت{% endblock %}
+{% block breadcrumb %}مدیریت / راهبرد فروش / نمای کلی{% endblock %}
+{% block body_class %}strategy-overview-page{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'management/css/strategy.css' %}?v=me2">
+<link rel="stylesheet" href="{% static 'management/css/strategy_overview.css' %}?v=me3">
+{% endblock %}
+{% block content %}
+{% if access_denied %}
+<section class="ds-surface ds-stack" role="alert"><h1 class="ds-title">دسترسی مجاز نیست</h1><p>این صفحه به دسترسی مشاهدهٔ راهبرد نیاز دارد.</p></section>
+{% else %}
+<div id="strategyOverview" class="strategy-workspace strategy-overview">
+    <aside class="strategy-sidebar" aria-label="راهبری مدیریت راهبرد">
+        <div class="strategy-sidebar-brand"><span aria-hidden="true">ر</span><div><strong>راهبرد فروش</strong><small>فضای مدیریت</small></div></div>
+        <nav aria-label="بخش‌های راهبرد">
+            <a href="{% url 'strategy-overview' %}" aria-current="page"><span aria-hidden="true">◫</span> نمای کلی راهبرد</a>
+            {% if can_edit_strategy %}<a href="{% url 'strategy-control' %}"><span aria-hidden="true">⚙</span> مرکز تنظیم سیاست‌ها</a>{% endif %}
+            <a href="{% url 'strategy-comparison-create' %}"><span aria-hidden="true">⇄</span> مقایسهٔ پیشنهادها</a>
+        </nav>
+        <p class="strategy-sidebar-note">تنظیم اولویت، با حفظ شواهد<br>این صفحه فقط‌خواندنی است.</p>
+    </aside>
+    <div class="strategy-main">
+        <header class="strategy-heading">
+            <div><p class="strategy-eyebrow">مدیریت راهبرد فروش</p><h1>نمای کلی راهبرد فروش</h1><p class="strategy-muted">سیاست فعال، اولویت‌های مدیریتی و مسیر اثرگذاری بر پیشنهادها</p></div>
+            <a class="ds-button ds-button--secondary" href="{% url 'strategy-comparison-create' %}">مقایسهٔ پیشنهادها</a>
+        </header>
+        <div class="strategy-notice"><span aria-hidden="true">ⓘ</span><p><strong>پیکربندی سیاست، با اثر تجاری اندازه‌گیری‌شده متفاوت است.</strong><br>تغییر اولویت به معنای افزایش قطعی فروش، تغییر قیمت یا تخفیف نیست.</p></div>
+        <p id="overviewStatus" class="strategy-state" role="status" aria-live="polite">در حال دریافت وضعیت راهبرد…</p>
+        <section id="overviewError" class="strategy-state strategy-error" role="alert" hidden><h2>دریافت راهبرد ممکن نشد</h2><p id="overviewErrorText"></p><button id="overviewRetry" class="ds-button ds-button--secondary" type="button">دریافت دوباره</button><a id="overviewLogin" href="{% url 'login' %}?next={{ request.path|urlencode }}" hidden>ورود به حساب کاربری</a></section>
+        <div id="overviewContent" hidden aria-busy="true">
+            <section class="overview-kpis" aria-label="وضعیت سیاست">
+                <article class="overview-kpi overview-kpi-active"><h2>سیاست فعال</h2><p data-overview-field="active"></p><span>مبنای زمینه‌های فروش تازه</span></article>
+                <article class="overview-kpi"><h2>وضعیت پیش‌نویس</h2><p data-overview-field="draft"></p><span>پیش‌نویس، سیاست فعال نیست</span></article>
+                <article class="overview-kpi"><h2>مقایسه‌های ثبت‌شده</h2><p data-overview-field="comparisons"></p><span>شواهد ثابت؛ نه فروش تحقق‌یافته</span></article>
+                <article class="overview-kpi"><h2>بازبینی سیاست</h2><p data-overview-field="revision"></p><span>شناسهٔ وضعیت فعلی سیاست</span></article>
+            </section>
+            <section class="overview-flow overview-surface" aria-labelledby="flowTitle">
+                <div class="strategy-section-heading"><div><h2 id="flowTitle">راهبرد چگونه به پیشنهاد می‌رسد؟</h2><p class="strategy-muted">موتور فعلی و فهرست ذخیره‌شده حفظ می‌شوند؛ فقط ترتیب پیشنهادها تحت تأثیر سیاست قرار می‌گیرد.</p></div><span class="strategy-tag strategy-tag-neutral">بازچینی فهرست موجود</span></div>
+                <ol><li><strong>پیشنهادهای ذخیره‌شده</strong><span>امتیاز و شواهد موتور حفظ می‌شود</span></li><li><strong>اولویت‌های مدیریتی</strong><span>محصول، برند، گروه، هدف و ترویج</span></li><li><strong>ترتیب مؤثر</strong><span>اولویتی جدا از امتیاز موتور</span></li><li><strong>زمینهٔ فروش تازه</strong><span>زمینه‌های قبلی بازنویسی نمی‌شوند</span></li></ol>
+            </section>
+            <div class="overview-policy-grid">
+                <section class="overview-surface" aria-labelledby="priorityTitle">
+                    <div class="strategy-section-heading"><div><p class="strategy-eyebrow">پیکربندی سیاست فعال</p><h2 id="priorityTitle">اولویت محصول، برند و گروه</h2></div><span class="strategy-tag" data-overview-field="policy-label"></span></div>
+                    <p class="strategy-small strategy-muted" id="priorityBounds"></p>
+                    <ul id="overviewPriorities" class="overview-rule-list" aria-label="قواعد اولویت فعال"></ul>
+                    <p id="overviewPriorityEmpty" class="overview-empty" hidden>قاعدهٔ محصول، برند یا گروه در سیاست فعال تعریف نشده است.</p>
+                    <p id="overviewReferenceNotice" class="strategy-small strategy-muted" hidden>عنوان برخی مراجع در پاسخ فعلی موجود نیست؛ شناسهٔ معتبر نمایش داده می‌شود.</p>
+                    <details class="overview-help"><summary>قاعدهٔ اختصاصی‌تر چگونه عمل می‌کند؟</summary><p>قاعدهٔ محصول بر برند و قاعدهٔ برند بر گروه تقدم دارد؛ این امتیازها با هم جمع نمی‌شوند. مقدار صریح صفر نیز قاعده‌ای معتبر است و اولویت گسترده‌تر را کنار می‌زند.</p></details>
+                </section>
+                <section class="overview-surface" aria-labelledby="influenceTitle">
+                    <h2 id="influenceTitle">تأثیر هدف و تأکید ترویجی</h2>
+                    <div class="overview-influence"><div><h3>تأثیر هدف فروش</h3><p class="strategy-small strategy-muted">سقف سهم هدف‌های تعدادیِ واجد شرایط</p></div><strong data-overview-field="target"></strong></div>
+                    <p class="strategy-small strategy-muted" id="targetBounds"></p>
+                    <h3 class="overview-subtitle">تأکید برنامه‌های ترویجی</h3>
+                    <ul id="overviewPromotions" class="overview-rule-list" aria-label="تأکید ترویجی فعال"></ul>
+                    <p id="overviewPromotionEmpty" class="overview-empty" hidden>تأکید ترویجی در سیاست فعال تعریف نشده است.</p>
+                    <p class="strategy-small strategy-muted" id="promotionBounds"></p>
+                    <p class="overview-footnote">این مقادیر امتیاز سیاست‌اند، نه درصد تخفیف. سهم واقعی به شرایط مشتری، تاریخ و داده‌های واجد شرایط بستگی دارد.</p>
+                </section>
+            </div>
+            <section class="overview-surface overview-readiness" aria-labelledby="readinessTitle">
+                <h2 id="readinessTitle">دسترسی داده و اتصال به فروش</h2>
+                <dl><div><dt>داده‌های پیکربندی</dt><dd>از پاسخ معتبر سامانه دریافت شد</dd></div><div><dt>اتصال به زمینهٔ فروش</dt><dd data-overview-field="integration"></dd></div><div><dt>قیمت و موجودی مشتری</dt><dd>در این نما ارزیابی نمی‌شود؛ شواهد آن در مقایسهٔ مشتری دیده می‌شود.</dd></div></dl>
+                <p class="strategy-small strategy-muted" id="overviewLimitations"></p>
+            </section>
+            <section class="overview-impact" aria-labelledby="impactTitle">
+                <div class="strategy-section-heading"><div><h2 id="impactTitle">اثر تجاری؛ هنوز اندازه‌گیری نشده</h2><p class="strategy-muted">این نما داده‌ای برای ادعای اثر علّی یا فروش قطعی ارائه نمی‌کند.</p></div><span class="strategy-tag strategy-tag-neutral">دادهٔ اندازه‌گیری‌شده موجود نیست</span></div>
+                <div class="overview-impact-cards"><article><h3>افزایش علّی فروش</h3><p>اندازه‌گیری نشده</p></article><article><h3>سود منتسب به سیاست</h3><p>داده ارائه نشده</p></article><article><h3>نرخ تبدیل</h3><p>داده ارائه نشده</p></article></div>
+            </section>
+            <section class="overview-surface" aria-labelledby="historyTitle">
+                <div class="strategy-section-heading"><div><h2 id="historyTitle">تاریخچهٔ نسخه‌ها و وضعیت انتشار</h2><p class="strategy-muted">از قدیمی‌تر به تازه‌تر؛ زمان نمایش‌داده‌شده زمان ایجاد نسخه است، نه زمان انتشار.</p></div><span class="strategy-tag strategy-tag-neutral">کل نسخه‌ها: <bdi data-overview-field="versions"></bdi></span></div>
+                <ol class="overview-history" id="overviewHistory"></ol>
+                <p class="overview-empty" id="overviewHistoryEmpty" hidden>هنوز نسخه‌ای ثبت نشده است. نمایش این صفحه سیاستی را ایجاد نمی‌کند.</p>
+                <p class="strategy-small strategy-muted">علامت انتشار یعنی این نسخه سابقهٔ انتشار دارد؛ زمان دقیق انتشار و ترتیب رویدادهای بازگشت از این پاسخ در دسترس نیست.</p>
+                <button id="overviewMoreVersions" class="ds-button ds-button--secondary" type="button" hidden>نمایش نسخه‌های بیشتر</button>
+                <p id="overviewHistoryError" role="alert" hidden></p>
+            </section>
+            <div class="overview-footer"><p class="strategy-small strategy-muted">برای دیدن اثر سیاست بر یک مشتری، مقایسهٔ ثابت را باز کنید. درخواست‌ها و شواهد قبلی تغییر نمی‌کنند.</p><a class="ds-button" href="{% url 'strategy-comparison-create' %}">رفتن به مقایسهٔ پیشنهادها</a><button id="overviewRefresh" type="button" class="strategy-text-button">به‌روزرسانی وضعیت</button></div>
+        </div>
+        <noscript><p class="strategy-state">برای دریافت وضعیت راهبرد، جاوااسکریپت را فعال کنید. این صفحه فرمان تغییردهنده‌ای ارسال نمی‌کند.</p></noscript>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+{% block extra_js %}{% if not access_denied %}<script src="{% static 'management/js/strategy_overview.js' %}?v=me3" defer></script>{% endif %}{% endblock %}

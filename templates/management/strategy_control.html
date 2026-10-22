@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}مرکز تنظیم سیاست‌های فروش | مدیریت{% endblock %}
+{% block breadcrumb %}مدیریت / راهبرد فروش / مرکز تنظیم سیاست‌ها{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'management/css/strategy.css' %}?v=me4b">
+<link rel="stylesheet" href="{% static 'management/css/strategy_control.css' %}?v=me4b-polish1">
+{% endblock %}
+{% block content %}
+{% if access_denied %}
+<section class="ds-surface" role="alert"><h1>دسترسی مجاز نیست</h1><p>این صفحه به دسترسی مشاهدهٔ راهبرد نیاز دارد.</p></section>
+{% else %}
+<div id="strategyControl" class="strategy-workspace strategy-control" data-actor="{{ editor_actor_id }}" data-environment="{{ editor_environment }}" data-can-edit="{{ can_edit_strategy|yesno:'true,false' }}">
+    <aside class="strategy-sidebar" aria-label="راهبری مدیریت راهبرد">
+        <div class="strategy-sidebar-brand"><span aria-hidden="true">ر</span><div><strong>راهبرد فروش</strong><small>فضای مدیریت</small></div></div>
+        <details id="controlNavigation" class="control-navigation" open>
+        <summary id="controlNavigationSummary"><span>بخش‌های راهبرد</span><small>مرکز تنظیم سیاست‌ها</small></summary>
+        <nav aria-label="بخش‌های راهبرد">
+            <a href="{% url 'strategy-overview' %}">نمای کلی راهبرد</a>
+            <a href="{% url 'strategy-control' %}" aria-current="page">مرکز تنظیم سیاست‌ها</a>
+            <a href="{% url 'strategy-comparison-create' %}">مقایسهٔ پیشنهادها</a>
+        </nav>
+        </details>
+        <p class="strategy-sidebar-note">اولویت‌های روشن<br>تصمیم‌های قابل توضیح</p>
+    </aside>
+    <div class="strategy-main">
+        <header class="strategy-heading"><div><p class="strategy-eyebrow">مدیریت راهبرد فروش</p><h1>مرکز تنظیم سیاست‌های فروش</h1><p class="strategy-muted">تنظیم اولویت‌ها، ذخیرهٔ پیش‌نویس و سپس مقایسهٔ پیشنهادها</p></div><a class="ds-button ds-button--secondary" href="{% url 'strategy-overview' %}">نمای کلی</a></header>
+        <div class="strategy-notice"><span aria-hidden="true">ⓘ</span><p><strong>ذخیرهٔ پیش‌نویس، انتشار سیاست نیست.</strong><br>قیمت، تخفیف و درخواست‌های فروش تغییر نمی‌کنند. اثر واقعی بر فروش اندازه‌گیری نشده است.</p></div>
+        <p id="controlStatus" role="status" aria-live="polite" class="strategy-state">در حال دریافت سیاست و گزینه‌ها…</p>
+        <p id="controlError" role="alert" tabindex="-1" class="strategy-error" hidden></p>
+        <div class="control-summary" aria-label="وضعیت سیاست">
+            <article><span class="control-icon" aria-hidden="true">✓</span><div><h2>سیاست فعال</h2><strong id="controlActive">در حال دریافت</strong><p>مبنای زمینه‌های فروش تازه</p></div></article>
+            <article><span class="control-icon control-icon-draft" aria-hidden="true">✎</span><div><h2>پیش‌نویس فعلی</h2><strong id="controlDraft">در حال دریافت</strong><p id="controlRevision">تغییرات فرم هنوز ذخیره نشده‌اند</p></div></article>
+        </div>
+        {% if not can_edit_strategy %}<p class="strategy-notice">دسترسی شما فقط برای مشاهده است؛ ذخیرهٔ پیش‌نویس مجاز نیست.</p>{% endif %}
+        <form id="controlForm" novalidate>
+            {% csrf_token %}
+            <fieldset id="controlFields" disabled>
+                <legend class="control-sr">پیکربندی پیش‌نویس سیاست</legend>
+                <div class="control-intro"><h2>اولویت‌های مدیریتی</h2><p>امتیاز صفر یک قاعدهٔ صریح است؛ حذف قاعده با صفر کردن آن تفاوت دارد.</p></div>
+                <div id="prioritySections" class="control-editors"></div>
+                <section class="control-surface control-target" aria-labelledby="targetTitle">
+                    <div><p class="strategy-eyebrow">اهداف فروش</p><h2 id="targetTitle">تأثیر هدف فروش</h2><p>سقف تأثیر هدف‌های تعدادیِ واجد شرایط؛ مقدار هدف و عملکرد فروش تغییر نمی‌کند.</p></div>
+                    <label for="controlTarget">امتیاز تأثیر هدف <input id="controlTarget" type="number" inputmode="numeric" step="1" min="0" max="5" aria-describedby="targetHelp"></label>
+                    <p id="targetHelp" class="control-help">سهم هدف از بخش محقق‌نشدهٔ هدف‌های واجد شرایط محاسبه می‌شود؛ بیشترین سهم اعمال می‌شود. این فرم دادهٔ هدف را ارزیابی نمی‌کند.</p>
+                </section>
+                <div id="promotionSection"></div>
+            </fieldset>
+            <details class="control-surface control-help"><summary>قاعدهٔ اثرگذاری سیاست</summary><p>اولویت محصول بر برند و اولویت برند بر گروه تقدم دارد؛ این امتیازها با هم جمع نمی‌شوند. صفر صریح نیز قاعدهٔ گسترده‌تر را کنار می‌زند.</p><p id="controlCap"></p><p>تأکید ترویجی درصد تخفیف نیست. شرایط مشتری، تاریخ، محصول و خرید یک واحد در مقایسهٔ مشتری بررسی می‌شوند. پیشنهادهای ذخیره‌شده بازتولید نمی‌شوند.</p></details>
+            <div class="control-actions control-surface">
+                {% if can_edit_strategy %}<button id="controlSave" class="ds-button" type="submit" disabled>ذخیره پیش‌نویس</button>{% endif %}
+                <button id="controlCompare" class="ds-button ds-button--secondary" type="button" disabled>مقایسه پیش‌نویس</button>
+                {% if can_edit_strategy %}<button id="controlReset" class="strategy-text-button" type="button" disabled>بازنشانی تغییرات</button>{% endif %}
+                <span id="controlDirty">تغییرات محلی، سیاست فعال نیستند</span>
+            </div>
+        </form>
+        <div class="control-recovery" aria-label="بازیابی و بازبینی">
+            <button id="controlRefresh" type="button" class="ds-button ds-button--secondary">دریافت وضعیت تازه</button>
+            {% if can_edit_strategy %}<button id="controlRecover" type="button" class="ds-button ds-button--secondary" hidden>بررسی نتیجهٔ ذخیره</button><button id="controlRetry" type="button" class="ds-button ds-button--secondary" hidden>تکرار صریح همان فرمان</button>{% endif %}
+        </div>
+        <noscript><p class="strategy-state">برای دریافت و ویرایش سیاست، جاوااسکریپت را فعال کنید. هیچ پیش‌نویسی خودکار ساخته نمی‌شود.</p></noscript>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+{% block extra_js %}{% if not access_denied %}<script src="{% static 'management/js/strategy_control.js' %}?v=me4b-polish1" defer></script>{% endif %}{% endblock %}

@@ -78,6 +78,19 @@
                 const savedId = product.is_prioritized ? product.recommendation?.id : null;
                 if (savedId !== recommendationId) throw Error('Recommendation context changed');
                 token = catalog.catalog_context;
+                if (saved && saved !== token) throw Error('Signed context replaced');
+                if (!saved) {
+                    const destination = new URL(window.location.href);
+                    destination.searchParams.set('catalog_context', token);
+                    window.history.replaceState(null, '', destination.pathname + destination.search + destination.hash);
+                    for (const link of document.querySelectorAll('a[href*="/customers/"]')) {
+                        const target = new URL(link.href, destination);
+                        if (target.origin === destination.origin && target.searchParams.get('visit_id') === root.dataset.visitId) {
+                            target.searchParams.set('catalog_context', token);
+                            link.href = target.pathname + target.search + target.hash;
+                        }
+                    }
+                }
             }
             if (recommendationId) {
                 await window.GuidedFeedback.load({apiUrl: root.dataset.feedbackUrl, catalogContext: token}, [{mount: root, productId: Number(root.dataset.productId), recommendationId, name: root.dataset.productName}]);

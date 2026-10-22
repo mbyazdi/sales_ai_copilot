@@ -90,6 +90,8 @@ def record_feedback(user, visit_id, command):
                 "recommendation_updated_at": recommendation.updated_at.isoformat(),
                 "context_fingerprint": hashlib.sha256(priority.token.encode()).hexdigest(), "action": command["action"],
             }
+            if priority.strategy is not None:
+                lineage["strategy"] = priority.strategy_for(recommendation.pk)
             event = RecommendationFeedbackEvent.objects.create(
                 visit=access.visit, recommendation=recommendation, sales_request=request,
                 event_type=RecommendationFeedbackEvent.EventType.REJECTED,

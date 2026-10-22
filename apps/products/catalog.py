@@ -124,6 +124,7 @@ def build_catalog(user, customer_code, visit_id, query=None):
             "priority_label": "پیشنهاد اولویت‌دار" if rec else "بدون اولویت ویژه",
             "recommendation": {
                 "id": rec.pk, "rank": rec.rank, "type": rec.recommendation_type,
+                "base_score": str(rec.score), "strategy": priority.strategy_for(rec.pk),
                 "short_reason": " ".join(re.split(r"(?<=[.!؟])\s+", rec.reason.strip())[:2]),
                 "explanation_snapshot": rec.explanation_snapshot,
             } if rec else None,
@@ -138,6 +139,7 @@ def build_catalog(user, customer_code, visit_id, query=None):
         "version": 1, "customer": {"id": access.customer.pk, "code": access.customer.customer_code, "name": access.customer.name},
         "visit": {"id": access.visit.pk, "status": access.visit.status},
         "catalog_context": priority.token, "counts": {"overall": overall, "filtered": counts},
+        "strategy": priority.strategy,
         "categories": categories, "filters": {"q": options.q, "category_id": options.category_id, "priority": options.priority},
         "pagination": {"page": page.number, "page_size": options.page_size, "pages": paginator.num_pages, "has_next": page.has_next(), "has_previous": page.has_previous()},
         "items": items,

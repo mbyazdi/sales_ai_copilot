@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}مقایسهٔ پیشنهادها | مدیریت راهبرد فروش{% endblock %}
+{% block breadcrumb %}مدیریت / راهبرد فروش / مقایسهٔ پیشنهادها{% endblock %}
+{% block body_class %}strategy-comparison-page{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'management/css/strategy.css' %}?v=me2">{% endblock %}
+{% block content %}
+{% if access_denied or invalid_id %}
+<section class="ds-surface ds-stack" role="alert">
+    <h1 class="ds-title">{% if access_denied %}دسترسی مجاز نیست{% else %}مقایسه پیدا نشد{% endif %}</h1>
+    <p>{% if access_denied %}این صفحه فقط برای کاربران دارای دسترسی مشاهدهٔ راهبرد در دسترس است.{% else %}شناسهٔ مقایسه معتبر نیست.{% endif %}</p>
+</section>
+{% else %}
+<div class="strategy-workspace" id="strategyComparison"{% if comparison_id %} data-comparison-id="{{ comparison_id }}" data-api-url="{% url 'management_api:strategy:comparison' comparison_id=comparison_id %}"{% endif %}>
+    <aside class="strategy-sidebar" aria-label="راهنمای مقایسه">
+        <div class="strategy-sidebar-brand"><span aria-hidden="true">ر</span><div><strong>راهبرد فروش</strong><small>فضای مدیریت</small></div></div>
+        <nav aria-label="بخش‌های مقایسه">
+            <a href="{% if comparison_id %}#ranking{% else %}#comparisonCreation{% endif %}" aria-current="page"><span aria-hidden="true">⇄</span> مقایسهٔ پیشنهادها</a>
+            {% if comparison_id %}<a href="#explanation"><span aria-hidden="true">◎</span> چرایی تغییر رتبه</a>
+            <a href="#limitations"><span aria-hidden="true">ⓘ</span> ملاحظات و شواهد</a>{% endif %}
+        </nav>
+        <p class="strategy-sidebar-note">نمای تاریخی و فقط‌خواندنی<br>سیاستی از این صفحه منتشر نمی‌شود.</p>
+    </aside>
+    <div class="strategy-main">
+        <header class="strategy-heading">
+            <div><p class="strategy-eyebrow">مدیریت راهبرد فروش</p><h1>مقایسهٔ اولویت پیشنهادها</h1><p class="strategy-muted">اثر سیاست مدیریتی بر پیشنهادهای یک مشتری، با داده‌های یکسان</p></div>
+            {% if comparison_id %}<span class="strategy-tag">مقایسهٔ <bdi>{{ comparison_id }}</bdi></span>{% endif %}
+        </header>
+        <div class="strategy-notice"><span aria-hidden="true">◈</span><p><strong>شبیه‌سازی بر پایهٔ شواهد ثابت</strong><br>این مقایسه پیش‌بینی خرید یا اندازه‌گیری افزایش فروش نیست.</p></div>
+        {% include "management/_strategy_comparison_create.html" %}
+        {% if comparison_id %}
+        <div id="comparisonStatus" class="strategy-state" role="status" aria-live="polite">در حال دریافت مقایسهٔ ذخیره‌شده…</div>
+        <div id="comparisonError" class="strategy-state strategy-error" role="alert" hidden>
+            <h2>نمایش مقایسه ممکن نشد</h2><p id="comparisonErrorText"></p>
+            <button class="ds-button ds-button--secondary" type="button" id="comparisonRetry">دریافت دوباره</button>
+            <a id="comparisonLogin" href="{% url 'login' %}?next={{ request.path|urlencode }}" hidden>ورود به حساب کاربری</a>
+        </div>
+        <div id="comparisonContent" hidden aria-busy="true">
+            <section class="strategy-context" aria-label="زمینهٔ ثابت مقایسه">
+                <div class="strategy-context-person"><span class="strategy-avatar" aria-hidden="true">م</span><div><span class="strategy-label">مشتری</span><h2 data-field="customer-name"></h2><bdi class="strategy-code" data-field="customer-code"></bdi></div></div>
+                <dl class="strategy-context-meta">
+                    <div><dt>فروشنده</dt><dd data-field="salesperson-name"></dd><dd class="strategy-code" data-field="salesperson-code"></dd></div>
+                    <div><dt>تاریخ ارزیابی (میلادی)</dt><dd><bdi data-field="evaluation-date"></bdi></dd><dd class="strategy-muted">به وقت تهران</dd></div>
+                    <div><dt>نسخهٔ پیشین ← پیشنهادی</dt><dd data-field="versions"></dd><dd class="strategy-muted">بازبینی <span data-field="revision"></span></dd></div>
+                </dl>
+            </section>
+            <section id="ranking" class="strategy-section" aria-labelledby="rankingTitle">
+                <div class="strategy-section-heading"><div><h2 id="rankingTitle">چه چیزی تغییر کرده است؟</h2><p class="strategy-muted">پیش از تغییر: نتیجهٔ سیاست فعال در زمان ثبت؛ پس از تغییر: نتیجهٔ سیاست پیشنهادی روی همان داده‌ها.</p></div><span class="strategy-tag strategy-tag-neutral">شواهد ثابت</span></div>
+                <p class="strategy-small strategy-muted">برای دیدن جزئیات، یک محصول را انتخاب کنید. ترتیب‌ها مستقیماً از نتیجهٔ ذخیره‌شده نمایش داده می‌شوند.</p>
+                <div id="comparisonTabs" class="strategy-tabs" role="tablist" aria-label="نمای مقایسه" hidden>
+                    <button id="beforeTab" type="button" role="tab" aria-controls="beforePanel" aria-selected="false" tabindex="-1">قبل از تغییر</button>
+                    <button id="afterTab" type="button" role="tab" aria-controls="afterPanel" aria-selected="true" tabindex="0">بعد از تغییر</button>
+                </div>
+                <div class="strategy-rankings">
+                    <article id="beforePanel" class="strategy-panel strategy-panel-before" aria-labelledby="beforeTitle"><header><div><span class="strategy-panel-icon" aria-hidden="true">≡</span><h3 id="beforeTitle">پیش از تغییر</h3></div><span class="strategy-muted" data-field="before-version"></span></header><ol id="beforeRanking" aria-label="ترتیب سیاست پیشین"></ol></article>
+                    <article id="afterPanel" class="strategy-panel strategy-panel-after" aria-labelledby="afterTitle"><header><div><span class="strategy-panel-icon" aria-hidden="true">↗</span><h3 id="afterTitle">پس از تغییر</h3></div><span data-field="after-version"></span></header><ol id="afterRanking" aria-label="ترتیب سیاست پیشنهادی"></ol></article>
+                </div>
+                <p id="comparisonEmpty" class="strategy-state" hidden>در این مقایسه پیشنهاد ذخیره‌شده‌ای وجود ندارد.</p>
+            </section>
+            <section id="explanation" class="strategy-explanation strategy-section" aria-labelledby="explanationTitle" hidden>
+                <div class="strategy-section-heading"><div><p class="strategy-eyebrow">توضیح تغییر اولویت</p><h2 id="explanationTitle"></h2><p class="strategy-focus-movement" data-field="focus-movement"></p></div><span class="strategy-tag">توضیح‌پذیر و ثبت‌شده</span></div>
+                <dl class="strategy-focus-summary" id="focusSummary"></dl>
+                <p class="strategy-small strategy-muted">اولویت مؤثر با امتیاز موتور پیشنهاد متفاوت است؛ هیچ‌کدام در این صفحه احتمال خرید محسوب نمی‌شوند.</p>
+                <details id="focusDetails" class="strategy-factor-details" open>
+                    <summary>جزئیات رتبه و عوامل سیاست</summary>
+                    <dl class="strategy-rank-facts" id="focusRanks"></dl>
+                    <dl class="strategy-factors" id="focusFactors"></dl>
+                    <div class="strategy-formula">اولویت مؤثر = اولویت پایهٔ بازچینی + تعدیل سیاست <span>سقف تعدیل: ۳۰ امتیاز</span></div>
+                    <div class="strategy-reasons" id="focusReasons"></div>
+                </details>
+                <details class="strategy-commercial"><summary>شواهد قیمت و موجودی در زمان ثبت</summary><dl id="focusCommercial"></dl><p class="strategy-small strategy-muted">این شواهد برای یک واحد ثبت شده‌اند؛ مجوز افزودن کالا به سبد ویزیت نیستند.</p></details>
+            </section>
+            <details id="limitations" class="strategy-limitations strategy-section">
+                <summary id="limitationsTitle">مبنای خواندن این مقایسه</summary>
+                <ul><li>این صفحه شبیه‌سازی سیاست روی پیشنهادهای ذخیره‌شده است؛ فهرست محصولات گسترش نیافته است.</li><li>تغییر رتبه به معنای تغییر قیمت، تخفیف یا رزرو موجودی نیست.</li><li>نام‌ها، قیمت و موجودی از شواهد زمان ثبت‌اند؛ داده‌های فعلی جایگزین آن‌ها نمی‌شوند.</li><li>موجودی و قیمت ثبت‌شده، مجوز تغییر سبد ویزیت نیست.</li><li>اثر واقعی بر درآمد، فروش تحقق‌یافته یا رابطهٔ علّی اندازه‌گیری نشده است.</li></ul>
+            </details>
+        </div>
+        <noscript><p class="strategy-state">برای دریافت و نمایش شواهد مقایسه، جاوااسکریپت را فعال کنید. این صفحه فرمان تغییردهنده‌ای ارسال نمی‌کند.</p></noscript>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+{% block extra_js %}{% if comparison_id %}<script src="{% static 'management/js/strategy_comparison.js' %}?v=me2" defer></script>{% endif %}{% if can_create_comparison %}<script src="{% static 'management/js/strategy_comparison_create.js' %}?v=me2" defer></script>{% endif %}{% endblock %}

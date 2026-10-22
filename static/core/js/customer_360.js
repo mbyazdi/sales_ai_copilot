@@ -1,6 +1,30 @@
 (function () {
     "use strict";
 
+    const sellingRegion = document.getElementById('workspace-recommendations');
+    if (sellingRegion?.dataset.sellingContext) {
+        const destination = new URL(window.location.href);
+        if (!destination.searchParams.has('catalog_context')) {
+            destination.searchParams.set('catalog_context', sellingRegion.dataset.sellingContext);
+            window.history.replaceState(null, '', destination.pathname + destination.search + destination.hash);
+        }
+        const guidedLink = document.querySelector('.c360-guided-link');
+        if (guidedLink) {
+            const target = new URL(guidedLink.href, destination);
+            if (target.origin === destination.origin) {
+                target.searchParams.set('catalog_context', destination.searchParams.get('catalog_context'));
+                guidedLink.href = target.pathname + target.search + target.hash;
+            }
+        }
+        for (const link of document.querySelectorAll('.recommendation-outcome-card a[href*="/products/"]')) {
+            const target = new URL(link.href, destination);
+            if (target.origin === destination.origin) {
+                target.searchParams.set('catalog_context', destination.searchParams.get('catalog_context'));
+                link.href = target.pathname + target.search + target.hash;
+            }
+        }
+    }
+
 
     /* =========================================================
        GLOBAL CONTEXT

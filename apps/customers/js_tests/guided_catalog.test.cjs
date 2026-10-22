@@ -66,6 +66,7 @@ function fixture({query = '?visit_id=14', responses = [payload()]} = {}) {
     let currentCatalog;
     let location = new URL('http://localhost/customers/C/recommendations/presentation/' + query);
     const window = {get location() { return location; }, addEventListener(name, callback) { listeners[name] = callback; }, history: {}};
+    const customerLink = new Element(); customerLink.href = '/customers/?customer_code=C&visit_id=14';
     for (const method of ['pushState', 'replaceState']) window.history[method] = (_state, _title, url) => { history.push({method, url}); location = new URL(url, location); };
     const fetch = async (url, options) => {
         if (url.startsWith('/api/sales-requests/')) {
@@ -84,10 +85,24 @@ function fixture({query = '?visit_id=14', responses = [payload()]} = {}) {
         currentCatalog = response;
         return {ok: !response?.status, status: response?.status || 200, json: async () => response};
     };
-    vm.runInNewContext(quoteSource + '\n' + source, {document: {getElementById: id => elements[id], createElement: () => new Element(), querySelectorAll: () => []}, window, fetch, URL, URLSearchParams, AbortController, Intl});
-    return {elements, calls, quoteCalls, history, listeners, get location() { return location; }, responses};
+    vm.runInNewContext(quoteSource + '\n' + source, {document: {getElementById: id => elements[id], createElement: () => new Element(), querySelectorAll: () => [], querySelector: () => customerLink}, window, fetch, URL, URLSearchParams, AbortController, Intl});
+    return {elements, calls, quoteCalls, history, listeners, customerLink, get location() { return location; }, responses};
 }
 const settle = () => new Promise(resolve => setImmediate(resolve));
+
+test('strategy priority is distinct from base score and return preserves signed context', async () => {
+    const product = item(3, true);
+    product.recommendation.strategy = {effective_position: 1, base_score: '70.0000', effective_priority: '30.00',
+        priority: {reasons: [{text_fa: 'اولویت محصول'}]}, target: {reasons: []}, promotion: {reasons: []}};
+    const f = fixture({responses: [payload([product])]}); await settle();
+    const card = f.elements.catalogPrioritizedItems.children[0];
+    assert.match(card.fields.priority.textContent, /۱/);
+    assert.match(card.fields.reason.textContent, /امتیاز پایه: 70.0000/);
+    assert.match(card.fields.reason.textContent, /اولویت مؤثر: 30.00/);
+    assert.match(card.fields.reason.textContent, /اولویت محصول/);
+    assert.equal(new URL(f.customerLink.href, f.location).searchParams.get('catalog_context'), 'signed');
+    assert(f.calls.every(call => call.options.method === 'GET'));
+});
 test('representative image has truthful visible label and credit, and failure restores fallback', async () => {
     const product = item(1);
     product.image = {url: '/static/demo/products/BRN001/thumb.webp', label: 'تصویر نمونهٔ محصول؛ مدل دقیق تأیید نشده',

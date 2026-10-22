@@ -385,7 +385,9 @@ class CatalogBackendTests(TestCase):
             self.assertEqual(target.fragment, "workspace-recommendations")
 
     def test_catalog_query_count_is_bounded_for_larger_catalog_and_page(self):
-        with self.assertNumQueries(8):
+        # Fresh issuance adds one policy-head SELECT; token reuse must retain
+        # the legacy budget and must not consult the current policy.
+        with self.assertNumQueries(9):
             small = self.catalog(page_size="100")
         Product.objects.bulk_create([Product(product_code=f"MANY-{index:03}", name=f"کالای اضافی {index}", brand=self.brand, category=self.category) for index in range(80)])
         with self.assertNumQueries(8):

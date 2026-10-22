@@ -13,7 +13,8 @@ from django.views.decorators.http import require_safe
 from apps.core.commercial_context import build_product_commercial_context
 from apps.customers.access import customer_access_queryset
 from apps.recommendations.models import CustomerRecommendation
-from apps.recommendations.catalog_context import CatalogContextUnavailable
+from apps.recommendations.catalog_context import CatalogContextUnavailable, saved_priority
+from .catalog_access import visit_customer_access
 from apps.visits.models import Visit
 
 from .models import Product
@@ -97,6 +98,10 @@ def product_commercial_brief(request, product_code):
         catalog_return_url = None
         if request.GET.get("return_to") == "catalog":
             catalog_return_url = guided_catalog_return_url(request.user, customer, visit, product, request.GET)
+        elif request.GET.get("catalog_context"):
+            if visit is None:
+                raise Http404
+            saved_priority(visit_customer_access(request.user, customer.customer_code, visit.pk), request.GET["catalog_context"])
     except PermissionDenied:
         return render(request, "products/unavailable.html", status=403)
     except (Http404, ValidationError, CatalogContextUnavailable):
@@ -127,6 +132,8 @@ def product_commercial_brief(request, product_code):
     breakdown = recommendation.score_breakdown if recommendation else {}
     components = _display_components(breakdown)
     return_query = {"customer_code": customer.customer_code}
+    if request.GET.get("catalog_context"):
+        return_query["catalog_context"] = request.GET["catalog_context"]
     if visit:
         return_query["visit_id"] = visit.pk
     return_url = "/customers/?" + urlencode(return_query) + (
@@ -134,6 +141,8 @@ def product_commercial_brief(request, product_code):
     )
     if request.GET.get("return_to") == "presentation" and not request.user.is_staff and recommendation:
         query = {"recommendation_id": recommendation.pk}
+        if request.GET.get("catalog_context"):
+            query["catalog_context"] = request.GET["catalog_context"]
         if visit:
             query["visit_id"] = visit.pk
         return_url = reverse("recommendation-presentation", args=[customer.customer_code]) + "?" + urlencode(query) + f"#recommendation-{recommendation.pk}"

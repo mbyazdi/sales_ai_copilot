@@ -44,7 +44,7 @@
         node.setAttribute('aria-labelledby', field('name').id);
         const name = document.createElement('bdi'); name.textContent = item.name;
         field('name').append(name);
-        field('priority').textContent = item.is_prioritized ? `اولویت ${numeral(item.recommendation.rank)}` : item.priority_label;
+        field('priority').textContent = item.is_prioritized ? `اولویت ${numeral(item.recommendation.strategy?.effective_position ?? item.recommendation.rank)}` : item.priority_label;
         field('code').textContent = item.product_code;
         const brand = item.brand?.name || '', categoryName = item.category?.name || '';
         const identityText = item.name.toLocaleLowerCase();
@@ -65,6 +65,12 @@
             field('cue').textContent = firstSentence;
             field('reason').hidden = false;
             field('reason').textContent = savedReason;
+            const strategy = item.recommendation.strategy;
+            if (strategy) {
+                const explanation = [strategy.priority, strategy.target, strategy.promotion]
+                    .flatMap(factor => factor?.reasons || []).map(reason => reason.text_fa).filter(Boolean);
+                field('reason').textContent = `${savedReason}\nامتیاز پایه: ${strategy.base_score} · اولویت مؤثر: ${strategy.effective_priority}\n${explanation.join(' · ')}\nاولویت بازچینی است؛ احتمال خرید یا میزان اطمینان نیست.`;
+            }
             field('cue-details').title = savedReason;
         }
         const stock = field('stock');
@@ -177,6 +183,14 @@
             if (data.version !== 1 || !Array.isArray(data.items) || !data.catalog_context || String(data.visit?.id) !== root.dataset.visitId || data.customer?.code !== root.dataset.customerCode) throw new Error('Invalid response');
             // Accept the server's context; every later filter/page/detail read carries it.
             params.set('catalog_context', data.catalog_context);
+            const customerLink = document.querySelector('.gc-appbar a[href*="/customers/"]');
+            if (customerLink) {
+                const destination = new URL(customerLink.href, window.location.origin);
+                if (destination.origin === window.location.origin) {
+                    destination.searchParams.set('catalog_context', data.catalog_context);
+                    customerLink.href = destination.pathname + destination.search + destination.hash;
+                }
+            }
             params.set('page', String(data.pagination.page)); params.set('page_size', String(data.pagination.page_size));
             busy(false); results.hidden = false; render(data); writeLocation(push);
             const mounts = [...byId('catalogPrioritizedItems').children, ...byId('catalogOrdinaryItems').children];

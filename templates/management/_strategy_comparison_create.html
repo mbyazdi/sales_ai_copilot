@@ -1,0 +1,30 @@
+<details class="strategy-create" id="comparisonCreation"{% if not comparison_id %} open{% endif %}>
+    <summary>مقایسهٔ جدید <span class="strategy-small strategy-muted" id="creationHint">{% if can_create_comparison %}انتخاب مشتری و پیش‌نویس{% else %}دسترسی فقط‌خواندنی{% endif %}</span></summary>
+    {% if can_create_comparison %}
+    <div id="strategyCreation" data-actor-id="{{ creation_actor_id }}">
+        <p class="strategy-small strategy-muted">سیاست فعال فعلی با پیش‌نویس انتخاب‌شده، روی داده‌های یکسان مقایسه می‌شود. این کار سیاستی را منتشر نمی‌کند و مقایسه‌های قبلی را تغییر نمی‌دهد.</p>
+        <p id="creationStatus" role="status" aria-live="polite">در حال دریافت وضعیت سیاست…</p>
+        <p id="creationError" role="alert" hidden></p>
+        <form id="comparisonCreateForm">
+            {% csrf_token %}
+            <fieldset id="creationFields" disabled>
+                <legend class="strategy-small">زمینهٔ مقایسه</legend>
+                <div class="strategy-create-fields">
+                    <div><label for="creationSalesperson">فروشنده</label><select id="creationSalesperson" required><option value="">انتخاب فروشنده</option></select><button id="moreSalespersons" class="strategy-text-button" type="button" hidden>فروشندگان بیشتر</button></div>
+                    <div><label for="creationDate">تاریخ ارزیابی (میلادی؛ به وقت تهران)</label><input id="creationDate" type="date" value="{{ creation_date }}" required></div>
+                    <div><label for="creationCustomer">مشتریِ تخصیص‌یافته</label><select id="creationCustomer" required disabled><option value="">ابتدا فروشنده و تاریخ را انتخاب کنید</option></select><button id="moreCustomers" class="strategy-text-button" type="button" hidden>مشتریان بیشتر</button></div>
+                    <div><label for="creationDraft">پیش‌نویس سیاست</label><select id="creationDraft" required><option value="">پیش‌نویسی در دسترس نیست</option></select></div>
+                </div>
+            </fieldset>
+            <div class="strategy-create-actions">
+                <button class="ds-button ds-button--secondary" type="submit" id="prepareComparison" disabled>آماده‌سازی مقایسه</button>
+                <button class="ds-button" type="button" id="createComparison" hidden>ایجاد مقایسه</button>
+                <button class="ds-button ds-button--secondary" type="button" id="recoverComparison" hidden>بررسی نتیجهٔ فرمان</button>
+                <button class="ds-button ds-button--secondary" type="button" id="retryComparison" hidden>تلاش مجدد با همان فرمان</button>
+                <button class="strategy-text-button" type="button" id="reloadCreation">به‌روزرسانی گزینه‌ها</button>
+            </div>
+        </form>
+        <noscript><p>برای انتخاب زمینه و ایجاد مقایسه، جاوااسکریپت را فعال کنید.</p></noscript>
+    </div>
+    {% else %}<p class="strategy-small">مشاهدهٔ مقایسه‌های تاریخی مجاز است؛ ایجاد مقایسه به دسترسی مدیریت راهبرد نیاز دارد.</p>{% endif %}
+</details>

@@ -1,4 +1,7 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ValidationError
+from django.http import Http404
 from django.core.paginator import Paginator
 from django.db.models import Prefetch, Q
 
@@ -32,6 +35,8 @@ from apps.core.commercial_decision import (
     build_base_sales_session,
 )
 from apps.core.commercial_context import build_product_commercial_context
+from apps.recommendations.catalog_context import CatalogContextUnavailable
+from .selling_context import customer_selling_priority
 
 
 def _manager_customer_workspace(request, accessible_customers):
@@ -213,6 +218,29 @@ def customer_search(request):
             )
 
             context["recommendations"] = recommendations
+            priority = customer_selling_priority(request.user, customer, context.get("current_visit"),
+                                                 request.GET.get("catalog_context", ""))
+            if priority is not None:
+                if priority.strategy is None and not request.GET.get("catalog_context"):
+                    # Neutral pages keep legacy HTTP/render behavior. The same
+                    # browser-side URL retention used by Guided Sale binds this
+                    # token before later navigation; never swap it on publication.
+                    context["neutral_catalog_context"] = priority.token
+                if priority.strategy is not None and not request.GET.get("catalog_context"):
+                    # Stamp the browser URL once. Reload/back never implicitly
+                    # resolves a newer publication for this selling context.
+                    query = request.GET.copy()
+                    query["catalog_context"] = priority.token
+                    response = redirect(request.path + "?" + query.urlencode())
+                    response["Cache-Control"] = "no-store, private"
+                    return response
+                if priority.strategy is not None or request.GET.get("catalog_context"):
+                    recommendations = list(priority.recommendations)
+                    context["recommendations"] = recommendations
+                    context["catalog_context"] = priority.token
+                    context["strategy"] = priority.strategy
+                    for recommendation in recommendations:
+                        recommendation.strategy_priority = priority.strategy_for(recommendation.pk)
 
             # -----------------------------------------
             # SALES SESSION
@@ -463,6 +491,10 @@ def customer_search(request):
                     current_follow_up_time_state
                 )
 
+        except CatalogContextUnavailable:
+            return render(request, "customers/unavailable.html", status=409)
+        except PermissionDenied:
+            return render(request, "customers/unavailable.html", status=403)
         except Customer.DoesNotExist:
 
             context["not_found"] = True
@@ -728,12 +760,32 @@ class Customer360APIView(APIView):
         )
 
         recommendation_data = []
+        selling_priority = None
+        if request.query_params.get("catalog_context") and not request.query_params.get("visit_id"):
+            return Response({"code": "CATALOG_CONTEXT_UNAVAILABLE"}, status=409)
+        if request.query_params.get("visit_id"):
+            from apps.products.catalog import positive_id
+            from apps.products.catalog_access import catalog_access
+            try:
+                access = catalog_access(request.user, customer_code, positive_id(request.query_params["visit_id"], "visit_id"))
+                selling_priority = customer_selling_priority(request.user, customer, access.visit,
+                                                             request.query_params.get("catalog_context", ""))
+                recommendations = selling_priority.recommendations
+            except PermissionDenied:
+                return Response({"code": "ACCESS_DENIED"}, status=403)
+            except Http404:
+                return Response({"code": "NOT_FOUND"}, status=404)
+            except ValidationError:
+                return Response({"code": "INVALID_INPUT"}, status=400)
+            except CatalogContextUnavailable:
+                return Response({"code": "CATALOG_CONTEXT_UNAVAILABLE"}, status=409)
 
         for recommendation in recommendations:
 
             product = recommendation.product
 
             recommendation_data.append({
+                **({"strategy": selling_priority.strategy_for(recommendation.pk)} if selling_priority else {}),
 
                 "rank": (
                     recommendation.rank
@@ -769,6 +821,7 @@ class Customer360APIView(APIView):
         # =========================================
 
         return Response({
+            **({"catalog_context": selling_priority.token, "strategy": selling_priority.strategy} if selling_priority else {}),
 
             "customer": {
 

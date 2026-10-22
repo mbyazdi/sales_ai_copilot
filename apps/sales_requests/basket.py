@@ -260,6 +260,8 @@ def mutate_basket(user, visit_id, operation, command, *, request_id=None, line_i
                                    "reason": recommendation.reason, "explanation_snapshot": recommendation.explanation_snapshot,
                                    "score_breakdown": recommendation.score_breakdown, "score": str(recommendation.score),
                                    "context_fingerprint": hashlib.sha256(priority.token.encode()).hexdigest()}
+                        if priority.strategy is not None:
+                            lineage["strategy"] = priority.strategy_for(recommendation.pk)
                     line = SalesRequestLine(sales_request=request, product=product,
                         selection_source="RECOMMENDATION" if recommendation else "ORDINARY", recommendation=recommendation,
                         quantity=command["quantity"], lineage_snapshot=lineage,

@@ -42,6 +42,10 @@ def recommendation_presentation(request, customer_code):
 
     selected = recommendations[position] if recommendations else None
     params = {"customer_code": customer.customer_code}
+    if request.GET.get("catalog_context"):
+        # Carry the existing signed context back to Customer360. Validation is
+        # still performed by its consumer/catalog, never silently reissue it.
+        params["catalog_context"] = request.GET["catalog_context"]
     if visit:
         params["visit_id"] = visit.pk
     customer_url = "/customers/?" + urlencode(params)
